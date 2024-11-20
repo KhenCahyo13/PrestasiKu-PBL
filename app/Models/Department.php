@@ -31,7 +31,7 @@
             return $stmt->execute();
         }
 
-        public function delete(string $departmentId): bool {
+        public function destroy(string $departmentId): bool {
             $sql = "DELETE FROM $this->table WHERE department_id = :department_id";
             $stmt = $this->getDbConnection()->prepare($sql);
             $stmt->bindParam(':department_id', $departmentId);

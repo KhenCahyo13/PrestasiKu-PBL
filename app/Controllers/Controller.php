@@ -1,19 +1,29 @@
 <?php
     namespace App\Controllers;
-    abstract class Controller {
+    class Controller {
         // For get all data
-        abstract function index();
+        function index() {
+
+        }
 
         // For get data by id
-        abstract function show($id);
+        function show($id) {
+
+        }
 
         // For create data
-        abstract function store();
+        function store() {
+
+        }
 
         // For update data
-        abstract function update($id);
+        function update($id) {
+
+        }
 
         // For delete data
-        abstract function destroy($id);
+        function destroy($id) {
+            
+        }
     }
 ?>
