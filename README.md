@@ -4,6 +4,7 @@ A project for students achievments listing and for last project in third semeste
 
 ## Tech Stack
 **Client:** JQuery, AJAX, Bootstrap
+
 **Server:** PHP Native, Composer
 
 ## Installation
