@@ -2,39 +2,51 @@
     namespace App\Controllers;
 
     use App\Models\User;
+    use Slim\Psr7\Request;
+    use Slim\Psr7\Response;
 
-    class UserController extends Controller {
+    class AuthController extends Controller
+    {
         private $userModel;
 
         public function __construct() {
             $this->userModel = new User();
         }
 
-        public function register() {
-            $hashedPassword = password_hash($_POST['user_password'], PASSWORD_DEFAULT);
-            $data = array(
-                'user_username' => $_POST['user_username'],
+        public function register(Request $request, Response $response) {
+            $data = $request->getParsedBody();
+
+            $username = $data['user_username'] ?? '';
+            $password = $data['user_password'] ?? '';
+
+            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+            $insertData = array(
+                'user_username' => $username,
                 'user_password' => $hashedPassword
             );
 
-            $action = $this->userModel->create($data);
+            $action = $this->userModel->create($insertData);
 
             if ($action) {
-                $response = array(
+                $responseData = array(
                     'success' => true,
                     'message' => 'Successfully registered!',
-                    'data' => $action
+                    'data' => $insertData
                 );
-
-                echo json_encode($response);
             } else {
-                $response = array(
+                $responseData = array(
                     'success' => false,
                     'message' => 'Failed to register!',
                     'data' => null
                 );
-                echo json_encode($response);
             }
+
+            $response->getBody()->write(json_encode($responseData));
+
+            return $response
+            ->withHeader('Content-Type', 'application/json')
+            ->withStatus(201);
         }
     }
 ?>
