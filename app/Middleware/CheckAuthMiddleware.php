@@ -12,7 +12,11 @@ use Psr\Http\Server\MiddlewareInterface;
 use Slim\Psr7\Response as Psr7Response;
 
     class CheckAuthMiddleware implements MiddlewareInterface {
-        private string $jwtSecretKey = 'secret-key';
+        private string $jwtSecretKey;
+
+        public function __construct() {
+            $this->jwtSecretKey = getenv('JWT_SECRET_KEY');
+        }
 
         public function process(Request $request, RequestHandlerInterface $handler): Response
         {

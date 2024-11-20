@@ -5,13 +5,18 @@
     use PDOException;
 
     class Database {
-        private string $dbHost = "localhost"; 
-        private string $dbName = "PrestasiKu";
-        private string $dbUsername = "SA"; 
-        private string $dbPassword = "Khencahyo@130402";
+        private string $dbHost; 
+        private string $dbName;
+        private string $dbUsername; 
+        private string $dbPassword;
         private PDO $dbConnection;
 
         public function __construct() {
+            $this->dbHost = getenv('DB_HOST');
+            $this->dbName = getenv('DB_NAME');
+            $this->dbUsername = getenv('DB_USERNAME');
+            $this->dbPassword = getenv('DB_PASSWORD');
+
             try {
                 $dsn = "sqlsrv:server=$this->dbHost;Database=$this->dbName";
                 $this->dbConnection = new PDO($dsn, $this->dbUsername, $this->dbPassword);
