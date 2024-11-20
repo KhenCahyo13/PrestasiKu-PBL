@@ -2,6 +2,7 @@
     namespace App\Controllers;
 
     use App\Models\User;
+    use Psr\Http\Message\ResponseInterface;
     use Slim\Psr7\Request;
     use Slim\Psr7\Response;
 
@@ -13,7 +14,7 @@
             $this->userModel = new User();
         }
 
-        public function register(Request $request, Response $response) {
+        public function register(Request $request, Response $response): ResponseInterface {
             $data = $request->getParsedBody();
 
             $username = $data['user_username'] ?? '';
