@@ -1,4 +1,5 @@
 <?php
+    namespace App\Controllers;
     abstract class Controller {
         // For get all data
         abstract function index();
