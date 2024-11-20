@@ -5,17 +5,17 @@
     use App\Models\Model;
 
     class Department extends Model {
-        protected $table = "departments";
+        protected $table = "Master.Departments";
         protected $primaryKey = "department_id";
         public function getAll(): array {
-            $sql = "SELECT * FROM Master.Departments";
+            $sql = "SELECT * FROM $this->table";
             $stmt = $this->getDbConnection()->query($sql);
     
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
         public function create(array $data): bool {
-            $sql = "INSERT INTO departments (department_name) VALUES (:department_name)";
+            $sql = "INSERT INTO $this->table (department_name) VALUES (:department_name)";
             $stmt = $this->getDbConnection()->prepare($sql);
             $stmt->bindParam(':department_name', $data['departement_name']);
     
@@ -23,7 +23,7 @@
         }
 
         public function update(array $data): bool {
-            $sql = "UPDATE departments SET department_name = :department_name WHERE department_id = :department_id";
+            $sql = "UPDATE $this->table SET department_name = :department_name WHERE department_id = :department_id";
             $stmt = $this->getDbConnection()->prepare($sql);
             $stmt->bindParam(':department_name', $data['department_name']);
             $stmt->bindParam(':department_id', $data['department_id']);
@@ -32,7 +32,7 @@
         }
 
         public function delete(string $departmentId): bool {
-            $sql = "DELETE FROM departments WHERE department_id = :department_id";
+            $sql = "DELETE FROM $this->table WHERE department_id = :department_id";
             $stmt = $this->getDbConnection()->prepare($sql);
             $stmt->bindParam(':department_id', $departmentId);
     
