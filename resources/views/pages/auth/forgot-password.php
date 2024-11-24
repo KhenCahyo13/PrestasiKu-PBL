@@ -17,8 +17,8 @@
         <form action="#" method="POST">
             <div class="d-flex flex-column gap-2">
                 <div class="d-flex flex-column gap-1">
-                    <label for="user_username" class="text-sm">Email Address <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control form-control-sm" placeholder="Enter your email address" id="user_username">
+                    <label for="emailAddress" class="text-sm">Email Address <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control form-control-sm" placeholder="Enter your email address" id="emailAddress">
                 </div>
                 <button class="btn btn-primary mt-2">Send Email</button>
             </div>

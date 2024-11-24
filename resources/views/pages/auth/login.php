@@ -17,12 +17,12 @@
         <form action="#" method="POST">
             <div class="d-flex flex-column gap-2">
                 <div class="d-flex flex-column gap-1">
-                    <label for="user_username" class="text-sm">Username <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control form-control-sm" placeholder="Enter your username" id="user_username">
+                    <label for="username" class="text-sm">Username <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control form-control-sm" placeholder="Enter your username" id="username">
                 </div>
                 <div class="d-flex flex-column gap-1">
-                    <label for="user_password" class="text-sm">Password <span class="text-danger">*</span></label>
-                    <input type="password" class="form-control form-control-sm" placeholder="Enter your password" id="user_password">
+                    <label for="password" class="text-sm">Password <span class="text-danger">*</span></label>
+                    <input type="password" class="form-control form-control-sm" placeholder="Enter your password" id="password">
                     <div class="d-flex justify-content-end">
                         <a href="#" class="my-0 text-sm text-primary">Forgot Password</a>
                     </div>

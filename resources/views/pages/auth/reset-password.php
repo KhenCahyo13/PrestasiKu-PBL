@@ -17,8 +17,8 @@
         <form action="#" method="POST">
             <div class="d-flex flex-column gap-2">
                 <div class="d-flex flex-column gap-1">
-                    <label for="user_username" class="text-sm">New Password <span class="text-danger">*</span></label>
-                    <input type="password" class="form-control form-control-sm" placeholder="Enter your new password" id="user_username">
+                    <label for="password" class="text-sm">New Password <span class="text-danger">*</span></label>
+                    <input type="password" class="form-control form-control-sm" placeholder="Enter your new password" id="password">
                 </div>
                 <button class="btn btn-primary mt-2">Reset Password</button>
             </div>
