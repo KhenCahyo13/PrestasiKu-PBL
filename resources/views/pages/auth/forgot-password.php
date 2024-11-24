@@ -23,7 +23,7 @@
                 <button class="btn btn-primary mt-2">Send Email</button>
             </div>
         </form>
-        <p class="my-0 text-sm text-center">Don't have account? <a href="#" class="text-primary">Register</a></p>
+        <p class="my-0 text-sm text-center">Don't have account?  <a href="<?= url('auth/register') ?>" class="text-primary">Register</a></p>
     </div>
 </section>
 <?php

@@ -12,7 +12,7 @@
     <div class="mt-5 d-flex flex-column gap-4">
         <div class="d-flex flex-column align-items-center">
             <p class="my-0 heading-4"><span class="text-primary">Ready</span> to Join Us?</p>
-            <p class="my-0 text-base text-secondary">Sign up for an account and record your achievements with us!</p>
+            <p class="my-0 text-base text-secondary text-center">Sign up for an account and record your achievements with us!</p>
         </div>
         <!-- Stepper -->
         <div class="stepper-container mt-3">
@@ -96,7 +96,7 @@
                 <p class="my-0 text-center text-sm text-primary mt-5">You will be redirected to the login page in 3 seconds</p>
              </div>
         </form>
-        <p class="my-0 text-sm text-center" id="loginElement">Already have account? <a href="#" class="text-primary">Login</a></p>
+        <p class="my-0 text-sm text-center" id="loginElement">Already have account?  <a href="<?= url('auth/login') ?>" class="text-primary">Login</a></p>
     </div>
 </section>
 

@@ -19,5 +19,9 @@
 
     function js($path = '') {
         return '/PrestasiKu-PBL/resources/js/' . ltrim($path, '/');
-    }  
+    }
+
+    function url($path = '') {
+        return '/PrestasiKu-PBL/public/web/' . ltrim($path, '/');
+    }
 ?>

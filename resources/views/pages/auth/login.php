@@ -24,13 +24,15 @@
                     <label for="password" class="text-sm">Password <span class="text-danger">*</span></label>
                     <input type="password" class="form-control form-control-sm" placeholder="Enter your password" id="password">
                     <div class="d-flex justify-content-end">
-                        <a href="#" class="my-0 text-sm text-primary">Forgot Password</a>
+                        <a href="<?= url('auth/forgot-password') ?>" class="my-0 text-sm text-primary">Forgot Password</a>
                     </div>
                 </div>
                 <button class="btn btn-primary mt-2">Login</button>
             </div>
         </form>
-        <p class="my-0 text-sm text-center">Don't have account? <a href="#" class="text-primary">Register</a></p>
+        <p class="my-0 text-sm text-center">
+            Don't have account?  <a href="<?= url('auth/register') ?>" class="text-primary">Register</a>
+        </p>
     </div>
 </section>
 <?php
