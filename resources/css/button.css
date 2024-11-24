@@ -6,3 +6,7 @@
 .btn-primary {
     background-color: #3B82F6;
 }
+
+.btn-outline-primary {
+    border-radius: 1px solid #3B82F6;
+}

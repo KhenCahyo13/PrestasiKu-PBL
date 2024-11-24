@@ -11,10 +11,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/2.6.0/uicons-bold-rounded/css/uicons-bold-rounded.css'>
     <!-- Internal -->
     <link rel="stylesheet" href="<?= css('/typography.css') ?>">
     <link rel="stylesheet" href="<?= css('/form.css') ?>">
     <link rel="stylesheet" href="<?= css('/button.css') ?>">
+    <link rel="stylesheet" href="<?= css('/stepper.css') ?>">
+    <link rel="stylesheet" href="<?= css('/style.css') ?>">
     <link rel="stylesheet" href="<?= css('/auth.css') ?>">
 </head>
 <body>
