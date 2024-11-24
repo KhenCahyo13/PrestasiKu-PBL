@@ -1,0 +1,23 @@
+.left-content {
+    display: none;
+}
+
+.right-content {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+@media screen and (min-width: 992px) {
+     .left-content {
+        display: block;
+        width: 50%;
+        min-height: 100vh;
+        background-color: #3B82F6;
+     }
+
+     .right-content {
+        width: 50%;
+     }
+}
