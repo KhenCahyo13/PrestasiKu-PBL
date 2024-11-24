@@ -9,6 +9,11 @@
         return $path ? $viewsDir . '/' . ltrim($path, '/') : $viewsDir;
     }
 
+    function templates($path = '') {
+        $viewsDir = __DIR__ . '/../../resources/templates';
+        return $path ? $viewsDir . '/' . ltrim($path, '/') : $viewsDir;
+    }
+
     function css($path = '') {
         return '/PrestasiKu-PBL/resources/css/' . ltrim($path, '/');
     }    
