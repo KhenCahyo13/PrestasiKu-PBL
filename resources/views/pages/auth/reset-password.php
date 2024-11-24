@@ -15,8 +15,8 @@
             <p class="my-0 text-base text-secondary">Create a more secure password for your account!</p>
         </div>
         <form action="#" method="POST">
-            <div class="d-flex flex-column gap-2">
-                <div class="d-flex flex-column gap-1">
+            <div class="d-flex flex-column gap-3">
+                <div class="d-flex flex-column gap-2">
                     <label for="password" class="text-sm">New Password <span class="text-danger">*</span></label>
                     <input type="password" class="form-control form-control-sm" placeholder="Enter your new password" id="password">
                 </div>

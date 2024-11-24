@@ -15,8 +15,8 @@
             <p class="my-0 text-base text-secondary">Enter your email address to reset your password.</p>
         </div>
         <form action="#" method="POST">
-            <div class="d-flex flex-column gap-2">
-                <div class="d-flex flex-column gap-1">
+            <div class="d-flex flex-column gap-3">
+                <div class="d-flex flex-column gap-2">
                     <label for="emailAddress" class="text-sm">Email Address <span class="text-danger">*</span></label>
                     <input type="text" class="form-control form-control-sm" placeholder="Enter your email address" id="emailAddress">
                 </div>
