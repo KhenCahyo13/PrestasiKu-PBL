@@ -10,6 +10,10 @@
                 include views('pages/auth/forgot-password.php');
                 return $response;
             });
+            $auth->get('/reset-password', function($request, $response) {
+                include views('pages/auth/reset-password.php');
+                return $response;
+            });
         });
     });
 ?>
