@@ -41,5 +41,19 @@
 
             return $response->withStatus(404)->write('File not found.');
         });
+
+        // Serve images
+        $group->get('/images/{file}', function ($request, $response, $args) {
+            $filePath = __DIR__ . '/../public/assets/images/' . $args['file'];
+
+            if (file_exists($filePath)) {
+                $mimeType = mime_content_type($filePath);
+                $response = $response->withHeader('Content-Type', $mimeType);
+                $response->getBody()->write(file_get_contents($filePath));
+                return $response;
+            }
+
+            return $response->withStatus(404)->write('File not found.');
+        });
     });
 ?>

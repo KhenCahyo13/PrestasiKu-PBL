@@ -19,5 +19,10 @@
                 return $response;
             });
         });
+        // Pages Routes
+        $web->get('/dashboard', function($request, $response) {
+            include views('pages/dashboard.php');
+            return $response;
+        });
     });
 ?>

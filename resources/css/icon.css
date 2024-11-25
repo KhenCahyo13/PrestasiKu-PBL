@@ -1,0 +1,9 @@
+.rounded-icon {
+    background-color: #F3F4F6;
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

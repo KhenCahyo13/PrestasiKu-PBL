@@ -1,0 +1,12 @@
+.rounded-profile {
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    overflow: hidden;
+}
+
+.rounded-profile img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
