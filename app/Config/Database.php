@@ -12,10 +12,10 @@
         private PDO $dbConnection;
 
         public function __construct() {
-            $this->dbHost = getenv('DB_HOST');
-            $this->dbName = getenv('DB_NAME');
-            $this->dbUsername = getenv('DB_USERNAME');
-            $this->dbPassword = getenv('DB_PASSWORD');
+            $this->dbHost = "KHOIRUL";
+            $this->dbName = "PrestasiKu";
+            $this->dbUsername = "";
+            $this->dbPassword = "";
 
             try {
                 $dsn = "sqlsrv:server=$this->dbHost;Database=$this->dbName";

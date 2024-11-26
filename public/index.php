@@ -2,6 +2,10 @@
     use Dotenv\Dotenv;
     use Dotenv\Exception\InvalidPathException;
 
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
     // Load library
     require_once '../vendor/autoload.php';
     // Load helpers

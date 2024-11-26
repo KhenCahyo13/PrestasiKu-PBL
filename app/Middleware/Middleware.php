@@ -1,19 +1,16 @@
 <?php
-    namespace App\Middleware;
+namespace App\Middleware;
 
-    use Psr\Http\Server\RequestHandlerInterface;
-    use Psr\Http\Message\RequestInterface as Request;
-    use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
-    abstract class Middleware {
-        /**
-         * Method untuk menangani request di middleware.
-         *
-         * @param Request $request
-         * @param Response $response
-         * @param callable $next Fungsi untuk melanjutkan ke middleware berikutnya
-         * @return Response
-         */
-        abstract public function process(Request $request, RequestHandlerInterface $handler): Response;
-    }
-?>
+abstract class Middleware {
+    /**
+     *
+     * @param ServerRequestInterface $request
+     * @param RequestHandlerInterface $handler
+     * @return ResponseInterface
+     */
+    abstract public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface;
+}

@@ -1,21 +1,24 @@
 <?php
-    namespace App\Models;
 
-    use App\Config\Database;
-    use PDO;
+namespace App\Models;
 
-    abstract class Model {
-        protected string $table;
-        protected string $primaryKey;
-        private PDO $db;
-    
-        public function __construct() {
-            $database = new Database();
-            $this->db = $database->getConnection();
-        }
-    
-        public function getDbConnection(): PDO {
-            return $this->db;
-        }
-    }
-?>
+use App\Config\Database;
+use PDO;
+
+abstract class Model
+{
+  protected string $table;
+  protected string $primaryKey;
+  private PDO $db;
+
+  public function __construct()
+  {
+    $database = new Database();
+    $this->db = $database->getConnection();
+  }
+
+  public function getDbConnection(): PDO
+  {
+    return $this->db;
+  }
+}
