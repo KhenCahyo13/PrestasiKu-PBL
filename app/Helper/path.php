@@ -8,8 +8,8 @@
         return $path ? $viewsDir . '/' . ltrim($path, '/') : $viewsDir;
     }
 
-    function templates($path = '') {
-        $viewsDir = __DIR__ . '/../../resources/templates';
+    function layouts($path = '') {
+        $viewsDir = __DIR__ . '/../../resources/layouts';
         return $path ? $viewsDir . '/' . ltrim($path, '/') : $viewsDir;
     }
 

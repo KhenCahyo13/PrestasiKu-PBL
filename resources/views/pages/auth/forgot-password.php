@@ -28,5 +28,5 @@
 </section>
 <?php
     $content = ob_get_clean();
-    include dirname(__DIR__, 2) . '/templates/auth.php';
+    include dirname(__DIR__, 2) . '/layouts/auth.php';
 ?>

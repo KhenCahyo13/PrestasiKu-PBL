@@ -24,8 +24,8 @@
 <body>
     <section class="row page-container">
         <div class="d-none d-lg-block col-lg-2" id="sidebarElement">
+            <!-- Sidebar -->
             <aside class="sidebar shadow-sm rounded px-2 py-2">
-                <!-- Sidebar Brand -->
                 <p class="my-0 heading-5 text-primary text-center font-semibold">PrestasiKu</p>
                 <div class="mt-5 sidebar-items">
                     <a href="#" class="px-3 py-3 d-flex align-items-center gap-3 rounded sidebar-item sidebar-item-active">
@@ -44,6 +44,7 @@
             </aside>
         </div>
         <div class="col-12 col-lg-10" id="navbarElement">
+            <!-- Navbar -->
             <nav class="d-flex align-items-center justify-content-between px-3 py-2 shadow-sm rounded" style="background-color: white;">
                 <button class="btn btn-transparent p-0" id="navbarButton">
                     <i class="fa-solid fa-bars" style="font-size: 1rem;" id="navbarButtonIcon"></i>
@@ -62,6 +63,16 @@
                     </button>
                 </div>
             </nav>
+            <!-- Content -->
+             <main class="row main-container mt-4">
+                <div class="col-12">
+                    <div class="px-3 py-3 rounded shadow-sm bg-white">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class=""></div>
+                        </div>
+                    </div>
+                </div>
+             </main>
         </div>
     </section>
 
