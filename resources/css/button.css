@@ -4,9 +4,9 @@
 }
 
 .btn-primary {
-    background-color: #3B82F6;
+    background-color: var(--primary-color);
 }
 
 .btn-outline-primary {
-    border-radius: 1px solid #3B82F6;
+    border-radius: 1px solid var(--primary-color);
 }

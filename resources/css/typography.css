@@ -1,3 +1,5 @@
+@import url('./variables.css');
+
 /* Font Size */
 .heading-1 {
   font-size: 3rem;
@@ -63,17 +65,17 @@
 
 /* Text Color */
 .text-primary {
-  color: #3B82F6;
+  color: var(--primary-color);
 }
 
 .text-secondary {
-  color: #9CA3AF;
+  color: var(--secondary-color);
 }
 
 .text-danger {
-  color: #DC2626;
+  color: var(--danger-color);
 }
 
 .text-white {
-  color: #FFFFFF;
+  color: var(--white-color);
 }

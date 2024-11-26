@@ -13,25 +13,25 @@
 }
 
 .stepper-line.stepper-line-active {
-    background-color: #3B82F6;
+    background-color: var(--primary-color);
 }
 
 .stepper-circle {
     width: 52px;
     height: 52px;
     border-radius: 50%;
-    border: 1px solid #9CA3AF;
+    border: 1px solid var(--secondary-color);
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
 .stepper-circle.stepper-active {
-    border: 1px solid #3B82F6;
-    color: #3B82F6;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
 }
 
 .stepper-circle.stepper-completed {
     border: none;
-    background-color: #3B82F6;
+    background-color: var(--primary-color);
 }
