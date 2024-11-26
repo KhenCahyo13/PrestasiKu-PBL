@@ -1,4 +1,10 @@
 <?php
+
+    use App\Controllers\AdminController;
+    use App\Controllers\AuthController;
+    use App\Controllers\DepartmentController;
+    use App\Middlewares\CheckAdminMiddleware;
+
     $app->group('/api', function($api) {
         $api->group('/auth', function ($api) {
             $api->post('/register', AuthController::class . ':register');

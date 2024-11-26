@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Middleware;
+namespace App\Middlewares;
 
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -8,9 +8,8 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Psr7\Response;
 
-class CheckAdminMiddleware implements MiddlewareInterface
+class CheckAdminMiddleware extends Middleware implements MiddlewareInterface
 {
-
   public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
   {
     if (session_status() === PHP_SESSION_NONE) {
