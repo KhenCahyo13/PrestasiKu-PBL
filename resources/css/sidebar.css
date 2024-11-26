@@ -1,6 +1,7 @@
 .sidebar {
+    width: 16%;
     height: 100%;
-    background-color: white;
+    background-color: var(--white-color);
 }
 
 .sidebar-items {
@@ -16,23 +17,23 @@
 }
 
 .sidebar-items .sidebar-item:hover {
-    background-color: #DBEAFE;
+    background-color: var(--blue-100);
 }
 
 .sidebar-items .sidebar-item:hover p {
-    color: #3B82F6;
+    color: var(--primary-color);
 }
 
 .sidebar-items .sidebar-item:hover i {
-    color: #3B82F6;
+    color: var(--primary-color);
 }
 
 .sidebar-items .sidebar-item p  {
-    color: #9CA3AF;
+    color: var(--secondary-color);
 }
 
 .sidebar-items .sidebar-item i  {
-    color: #9CA3AF;
+    color: var(--secondary-color);
 }
 
 .sidebar-items .sidebar-item.sidebar-item-active {
@@ -40,9 +41,9 @@
 }
 
 .sidebar-items .sidebar-item.sidebar-item-active p  {
-    color: #3B82F6;
+    color: var(--primary-color);
 }
 
 .sidebar-items .sidebar-item.sidebar-item-active i  {
-    color: #3B82F6;
+    color: var(--primary-color);
 }

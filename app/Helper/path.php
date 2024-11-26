@@ -4,19 +4,19 @@
     }
 
     function views($path = '') {
-        $viewsDir = __DIR__ . '/../../resources/views';
+        $viewsDir = __DIR__ . '/../../resources/views/pages';
         return $path ? $viewsDir . '/' . ltrim($path, '/') : $viewsDir;
     }
 
-    function templates($path = '') {
-        $viewsDir = __DIR__ . '/../../resources/templates';
+    function layouts($path = '') {
+        $viewsDir = __DIR__ . '/../../resources/views/layouts';
         return $path ? $viewsDir . '/' . ltrim($path, '/') : $viewsDir;
     }
 
     function components($path = '') {
-        $viewsDir = __DIR__ . '/../../resources/components';
-        return $path ? $viewsDir . '/' . ltrim($path, '/') : $viewsDir;
-    }
+        $baseDir = __DIR__ . '/../../resources/views/components';
+        return $baseDir . '/' . ltrim($path, '/');
+    }    
 
     function css($path = '') {
         return '/PrestasiKu-PBL/resources/css/' . ltrim($path, '/');
