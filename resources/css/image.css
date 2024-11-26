@@ -1,0 +1,25 @@
+.rounded-profile {
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    overflow: hidden;
+}
+
+.rounded-profile img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.rounded-profile-rank {
+    border-radius: 50%;
+    width: 52px;
+    height: 52px;
+    overflow: hidden;
+}
+
+.rounded-profile-rank img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}

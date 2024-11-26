@@ -1,0 +1,33 @@
+.rounded-icon {
+    background-color: var(--gray-100);
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.card-icon-primary {
+    background-color: var(--blue-100);
+}
+
+.card-icon-primary i {
+    color: var(--blue-500);
+}
+
+.card-icon-success {
+    background-color: var(--green-100);
+}
+
+.card-icon-success i {
+    color: var(--green-500);
+}
+
+.card-icon-danger {
+    background-color: var(--red-100);
+}
+
+.card-icon-danger i {
+    color: var(--red-500);
+}
