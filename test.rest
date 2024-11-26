@@ -1,0 +1,6 @@
+POST http://localhost/PrestasiKu-PBL/public/api/test
+Content-Type: application/json
+
+{
+  "testing" : "testing" 
+}
