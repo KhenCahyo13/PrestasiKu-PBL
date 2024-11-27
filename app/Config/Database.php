@@ -12,17 +12,17 @@
         private PDO $dbConnection;
 
         public function __construct() {
-            $this->dbHost = "KHOIRUL";
-            $this->dbName = "PrestasiKu";
-            $this->dbUsername = "";
-            $this->dbPassword = "";
+            $this->dbHost = $_ENV['DB_HOST'];
+            $this->dbName = $_ENV['DB_NAME'];
+            $this->dbUsername = $_ENV['DB_USERNAME'];
+            $this->dbPassword = $_ENV['DB_PASSWORD'];
 
             try {
                 $dsn = "sqlsrv:server=$this->dbHost;Database=$this->dbName";
                 $this->dbConnection = new PDO($dsn, $this->dbUsername, $this->dbPassword);
                 $this->dbConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             } catch (PDOException $e) {
-                die("Connection failed: " . $e->getMessage());
+                 echo "Connection failed: " . $e->getMessage();
             }
         }
 

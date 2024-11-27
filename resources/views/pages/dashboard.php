@@ -87,7 +87,7 @@
                                     <p class="text-base text-secondary my-0">1.</p>
                                     <div class="d-flex align-items-center gap-3">
                                         <div class="rounded-profile-rank">
-                                            <img src="<?= assets('/images/sample-profile1.png') ?>" alt="Profile Image">
+                                            <img src="<?= images('sample-profile1.png') ?>" alt="Profile Image">
                                         </div>
                                         <div class="d-flex flex-column">
                                             <p class="my-0 text-sm font-medium">Khen Muhammad Cahyo</p>
@@ -105,7 +105,7 @@
     </div>
 </div>
 
-<script src="<?= js('/dashboard.js?v=' . time()) ?>"></script>
+<script src="<?= js('dashboard.js?v=' . time()) ?>"></script>
 <?php
     $content = ob_get_clean();
     include layouts('main.php')

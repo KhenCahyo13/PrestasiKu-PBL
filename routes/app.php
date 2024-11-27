@@ -3,7 +3,9 @@
 
     $app = AppFactory::create();
 
-    $app->setBasePath('/PrestasiKu-PBL/public');
+    $app->setBasePath('/PrestasiKu-PBL');
+    $app->addErrorMiddleware(true, true, true);
+
 
     require_once __DIR__ . '/../routes/resources.php';
     require_once __DIR__ . '/../routes/api.php';

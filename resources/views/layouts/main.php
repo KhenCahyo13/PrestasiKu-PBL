@@ -14,15 +14,15 @@
     <script src="https://kit.fontawesome.com/255fd51aa4.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
     <!--Internal -->
-    <link rel="stylesheet" href="<?= css('/typography.css?v=' . time()) ?>">
-    <link rel="stylesheet" href="<?= css('/form.css?v=' . time()) ?>">
-    <link rel="stylesheet" href="<?= css('/button.css?v=' . time()) ?>">
-    <link rel="stylesheet" href="<?= css('/page.css?v=' . time()) ?>">
-    <link rel="stylesheet" href="<?= css('/sidebar.css?v=' . time()) ?>">
-    <link rel="stylesheet" href="<?= css('/navbar.css?v=' . time()) ?>">
-    <link rel="stylesheet" href="<?= css('/icon.css?v=' . time()) ?>">
-    <link rel="stylesheet" href="<?= css('/image.css?v=' . time()) ?>">
-    <link rel="stylesheet" href="<?= css('/chart.css?v=' . time()) ?>">
+    <link rel="stylesheet" href="<?= css('typography.css?v=' . time()) ?>">
+    <link rel="stylesheet" href="<?= css('form.css?v=' . time()) ?>">
+    <link rel="stylesheet" href="<?= css('button.css?v=' . time()) ?>">
+    <link rel="stylesheet" href="<?= css('page.css?v=' . time()) ?>">
+    <link rel="stylesheet" href="<?= css('sidebar.css?v=' . time()) ?>">
+    <link rel="stylesheet" href="<?= css('navbar.css?v=' . time()) ?>">
+    <link rel="stylesheet" href="<?= css('icon.css?v=' . time()) ?>">
+    <link rel="stylesheet" href="<?= css('image.css?v=' . time()) ?>">
+    <link rel="stylesheet" href="<?= css('chart.css?v=' . time()) ?>">
 </head>
 <body>
     <section class="px-3 py-3 d-flex gap-4" style="height: 100vh;">
@@ -39,6 +39,6 @@
         </div>
     </section>
 
-    <script src="<?= js('/navbar.js?v=' . time()) ?>"></script>
+    <script src="<?= js('navbar.js?v=' . time()) ?>"></script>
 </body>
 </html>

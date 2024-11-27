@@ -9,7 +9,7 @@
         <button class="btn btn-transparent p-0" id="profileButton">
             <div class="d-flex align-items-center gap-2">
                 <div class="rounded-profile">
-                    <img src="<?= assets('/images/sample-profile1.png') ?>" alt="Profile Image">
+                    <img src="<?= images('sample-profile1.png') ?>" alt="Profile Image">
                 </div>
                 <i class="fi fi-br-angle-down icon text-secondary" style="font-size: 10px;"></i>
             </div>

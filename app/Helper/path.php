@@ -1,8 +1,4 @@
 <?php
-    function assets($path = '') {
-        return '/PrestasiKu-PBL/public/assets/' . ltrim($path, '/');
-    }
-
     function views($path = '') {
         $viewsDir = __DIR__ . '/../../resources/views/pages';
         return $path ? $viewsDir . '/' . ltrim($path, '/') : $viewsDir;
@@ -18,15 +14,23 @@
         return $baseDir . '/' . ltrim($path, '/');
     }    
 
-    function css($path = '') {
-        return '/PrestasiKu-PBL/resources/css/' . ltrim($path, '/');
+    function images($path = '') {
+        return '/assets/images/' . ltrim($path, '/');
     }
 
+    function icons($path = '') {
+        return '/assets/icons/' . ltrim($path, '/');
+    }
+
+    function css($path = '') {
+        return '/assets/css/' . ltrim($path, '/');
+    }    
+
     function js($path = '') {
-        return '/PrestasiKu-PBL/resources/js/' . ltrim($path, '/');
+        return '/assets/js/' . ltrim($path, '/');
     }
 
     function url($path = '') {
-        return '/PrestasiKu-PBL/public/web/' . ltrim($path, '/');
+        return '/PrestasiKu-PBL/web/' . ltrim($path, '/');
     }
 ?>
