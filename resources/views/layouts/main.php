@@ -23,6 +23,7 @@
     <link rel="stylesheet" href="<?= css('icon.css?v=' . time()) ?>">
     <link rel="stylesheet" href="<?= css('image.css?v=' . time()) ?>">
     <link rel="stylesheet" href="<?= css('chart.css?v=' . time()) ?>">
+    <link rel="stylesheet" href="<?= css('dropdown.css?v=' . time()) ?>">
 </head>
 <body>
     <section class="px-3 py-3 d-flex gap-4" style="height: 100vh;">
@@ -39,6 +40,10 @@
         </div>
     </section>
 
+    <script>
+        const BASE_API_URL = '<?php echo $_ENV['BASE_API_URL']; ?>';
+        const redirectSuccessLogoutUrl = '<?= url('auth/login') ?>';
+    </script>
     <script src="<?= js('navbar.js?v=' . time()) ?>"></script>
 </body>
 </html>

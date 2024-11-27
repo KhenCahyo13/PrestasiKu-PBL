@@ -25,5 +25,9 @@
     <main class="d-flex">
         <?= $content ?? '<p>Page not found!</p>' ?>
     </main>
+
+    <script>
+        const BASE_API_URL = '<?php echo $_ENV['BASE_API_URL']; ?>';
+    </script>
 </body>
 </html>

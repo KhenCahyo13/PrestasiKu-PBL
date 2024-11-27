@@ -38,7 +38,7 @@ $(document).ready(function() {
             data: JSON.stringify(data),
             success: function(response) {
                 if (response.success) {
-                    alert('Berhasil');
+                    window.location.href = redirectSuccessLoginUrl;
                 } else {
                     alertMessageElement.html(`
                         <div class="my-0 alert alert-danger alert-dismissible fade show" role="alert">

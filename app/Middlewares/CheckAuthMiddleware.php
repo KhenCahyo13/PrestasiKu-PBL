@@ -14,7 +14,7 @@
             }
 
             if (!isset($_SESSION['user'])) {
-                return new RedirectResponse('/PrestasiKu-PBL/public/web/auth/login');
+                return new RedirectResponse('/PrestasiKu-PBL/web/auth/login');
             }
 
             return $handler->handle($request);

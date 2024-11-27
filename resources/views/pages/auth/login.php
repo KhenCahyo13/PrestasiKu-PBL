@@ -40,7 +40,6 @@
 </section>
 
 <script>
-    const BASE_API_URL = '<?php echo $_ENV['BASE_API_URL']; ?>';
     const redirectSuccessLoginUrl = '<?= url('dashboard') ?>';
 </script>
 <script src="<?= js('login.js?v=' . time()) ?>"></script>
