@@ -10,19 +10,24 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/255fd51aa4.js" crossorigin="anonymous"></script>
     <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/2.6.0/uicons-bold-rounded/css/uicons-bold-rounded.css'>
     <!-- Internal -->
-    <link rel="stylesheet" href="<?= css('/typography.css') ?>">
-    <link rel="stylesheet" href="<?= css('/form.css') ?>">
-    <link rel="stylesheet" href="<?= css('/button.css') ?>">
-    <link rel="stylesheet" href="<?= css('/stepper.css') ?>">
-    <link rel="stylesheet" href="<?= css('/style.css') ?>">
-    <link rel="stylesheet" href="<?= css('/auth.css') ?>">
+    <link rel="stylesheet" href="<?= css('typography.css') ?>">
+    <link rel="stylesheet" href="<?= css('form.css') ?>">
+    <link rel="stylesheet" href="<?= css('button.css') ?>">
+    <link rel="stylesheet" href="<?= css('stepper.css') ?>">
+    <link rel="stylesheet" href="<?= css('style.css') ?>">
+    <link rel="stylesheet" href="<?= css('auth.css') ?>">
 </head>
 <body>
     <main class="d-flex">
         <?= $content ?? '<p>Page not found!</p>' ?>
     </main>
+
+    <script>
+        const BASE_API_URL = '<?php echo $_ENV['BASE_API_URL']; ?>';
+    </script>
 </body>
 </html>

@@ -88,7 +88,7 @@
             </div>
             <!-- Successful Step Form -->
              <div class="d-flex flex-column gap-3 d-none" id="successfulStep">
-                <img src="<?= assets('icons/checkSuccess.png') ?>" alt="Check Success" class="d-block mx-auto" style="width: 96px;">
+                <img src="<?= icons('checkSuccess.png') ?>" alt="Check Success" class="d-block mx-auto" style="width: 96px;">
                 <div class="d-flex flex-column gap-1">
                     <p class="my-0 text-center heading-6">Hooray, your account registration was successful!</p>
                     <p class="my-0 text-center text-sm text-secondary">Your account is being verified by the admin for correctness.</p>
@@ -100,7 +100,7 @@
     </div>
 </section>
 
-<script src="<?= js('/register.js') ?>"></script>
+<script src="<?= js('register.js') ?>"></script>
 <?php
     $content = ob_get_clean();
     include dirname(__DIR__, 2) . '/layouts/auth.php';

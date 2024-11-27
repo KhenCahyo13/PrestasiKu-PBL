@@ -6,13 +6,27 @@
         <button class="btn btn-transparent p-0 rounded-icon" id="notificationButton">
             <i class="fa-regular fa-bell" style="font-size: 1rem;"></i>
         </button>
-        <button class="btn btn-transparent p-0" id="profileButton">
-            <div class="d-flex align-items-center gap-2">
-                <div class="rounded-profile">
-                    <img src="<?= assets('/images/sample-profile1.png') ?>" alt="Profile Image">
+        <div class="dropdown">
+            <button class="btn btn-transparent p-0" id="profileButton" data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="rounded-profile">
+                        <img src="<?= images('sample-profile1.png') ?>" alt="Profile Image">
+                    </div>
+                    <i class="fa-solid fa-chevron-down" style="font-size: 10px;"></i>
                 </div>
-                <i class="fi fi-br-angle-down icon text-secondary" style="font-size: 10px;"></i>
-            </div>
-        </button>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileButton">
+                <li>
+                    <a class="dropdown-item d-flex align-items-center gap-2" href="#">
+                        <i class="fa-solid fa-gear text-secondary"></i> Settings
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item d-flex align-items-center gap-2" href="#" id="logoutButton">
+                        <i class="fa-solid fa-right-from-bracket text-secondary"></i> Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
     </div>
 </nav>
