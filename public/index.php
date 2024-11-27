@@ -9,7 +9,7 @@
     // Load library
     require_once '../vendor/autoload.php';
     // Load helpers
-    require_once '../app/Helper/path.php';
+    require_once '../app/Helpers/path.php';
     // Load routes
     require_once '../routes/app.php';
 
