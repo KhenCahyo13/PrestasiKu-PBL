@@ -1,4 +1,7 @@
 <?php
+
+    use App\Middlewares\CheckAuthMiddleware;
+
     $app->group('/web', function($web) {
         // Auth Group Routes
         $web->group('/auth', function($auth) {
@@ -23,6 +26,6 @@
         $web->get('/dashboard', function($request, $response) {
             include views('dashboard.php');
             return $response;
-        });
+        })->add(new CheckAuthMiddleware());
     });
 ?>
