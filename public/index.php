@@ -15,7 +15,7 @@
     // Load library
     require_once '../vendor/autoload.php';
     // Load helpers
-    require_once '../app/Helpers/path.php';
+    require_once '../app/Helpers/PathHelper.php';
     // Load routes
     require_once '../routes/app.php';
 
@@ -26,8 +26,4 @@
         echo "Error: " . $e->getMessage();
         exit();
     }
-    // Load helpers
-    require_once '../app/Helper/path.php';
-    // Load routes
-    require_once '../routes/app.php'; 
 ?>
