@@ -22,10 +22,17 @@
                 return $response;
             });
         });
-        // Pages Routes
+        // Dashboard Page Routes
         $web->get('/dashboard', function($request, $response) {
             include views('dashboard.php');
             return $response;
         })->add(new CheckAuthMiddleware());
+        // Master Pages Routes
+        $web->group('/master', function($master) {
+            $master->get('/departments', function($request, $response) {
+                include views('master/departments.php');
+                return $response;
+            });
+        });
     });
 ?>
