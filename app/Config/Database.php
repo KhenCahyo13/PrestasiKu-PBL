@@ -1,15 +1,18 @@
 <?php
-    namespace App\Config;
 
-    use PDO;
-    use PDOException;
+namespace App\Config;
 
-    class Database {
-        private string $dbHost; 
-        private string $dbName;
-        private string $dbUsername; 
-        private string $dbPassword;
-        private PDO $dbConnection;
+use PDO;
+use PDOException;
+use Dotenv\Dotenv;
+
+class Database
+{
+    private string $dbHost;
+    private string $dbName;
+    private string $dbUsername;
+    private string $dbPassword;
+    private PDO $dbConnection;
 
         public function __construct() {
             $this->dbHost = $_ENV['DB_HOST'];
@@ -26,12 +29,13 @@
             }
         }
 
-        public function getConnection(): PDO {
-            return $this->dbConnection;
-        }
-
-        public function close(): void {
-            $this->dbConnection = null;
-        }
+    public function getConnection(): PDO
+    {
+        return $this->dbConnection;
     }
-?>
+
+    public function close(): void
+    {
+        $this->dbConnection = null;
+    }
+}
