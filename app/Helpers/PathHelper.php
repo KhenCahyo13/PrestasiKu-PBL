@@ -12,7 +12,7 @@
     function components($path = '') {
         $baseDir = __DIR__ . '/../../resources/views/components';
         return $baseDir . '/' . ltrim($path, '/');
-    }    
+    }
 
     function images($path = '') {
         return '/assets/images/' . ltrim($path, '/');
