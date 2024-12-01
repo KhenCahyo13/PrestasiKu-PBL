@@ -1,18 +1,18 @@
 <?php
-$title = 'PrestasiKu - Master Departments';
-$pageTitle = 'Departments';
-$breadcrumbItems = [
-    ['label' => 'Master', 'url' => '/'],
-    ['label' => 'Departments', 'url' => '#'],
-];
-ob_start();
+    $title = 'PrestasiKu - Master Departments';
+    $pageTitle = 'Departments';
+    $breadcrumbItems = [
+        ['label' => 'Master', 'url' => '/'],
+        ['label' => 'Departments', 'url' => '#'],
+    ];
+    ob_start();
 ?>
 <!-- Render Breadcrumb -->
 <?php
-renderComponent('breadcrumb', [
-    'pageTitle' => $pageTitle,
-    'breadcrumbItems' => $breadcrumbItems,
-]);
+    renderComponent('breadcrumb', [
+        'pageTitle' => $pageTitle,
+        'breadcrumbItems' => $breadcrumbItems,
+    ]);
 ?>
 
 <!-- Datatable -->
@@ -120,6 +120,6 @@ renderComponent('breadcrumb', [
 
 
 <?php
-$content = ob_get_clean();
-include layouts('main.php');
+    $content = ob_get_clean();
+    include layouts('main.php');
 ?>
