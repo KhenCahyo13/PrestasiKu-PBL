@@ -18,6 +18,6 @@
     </div>
     <div class="sidebar-quotes">
         <img src="<?= images('student1.png') ?>" alt="Profile Image" class="sidebar-quotes-image">
-        <p class="my-0 text-xs text-center text-primary">“Outstanding students are those who are not afraid to fail and never stop learning.”</p>
+        <p class="my-0 text-xs text-center text-primary fst-italic">“Outstanding students are those who are not afraid to fail and never stop learning.”</p>
     </div>
 </aside>

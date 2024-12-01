@@ -12,7 +12,7 @@
     <div class="mt-5 d-flex flex-column gap-4">
         <div class="d-flex flex-column align-items-center">
             <p class="my-0 heading-4">Reset Your <span class="text-primary">Password</span></p>
-            <p class="my-0 text-base text-secondary">Create a more secure password for your account!</p>
+            <p class="my-0 text-base text-secondary text-center">Create a more secure password for your account!</p>
         </div>
         <form action="#" method="POST">
             <div class="d-flex flex-column gap-3">

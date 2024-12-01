@@ -68,5 +68,11 @@
 }
 
 @media screen and (min-width: 992px) {
+    .sidebar {
+        width: 16%;
+    }
 
+    .sidebar-quotes .sidebar-quotes-image {
+        top: -100%;
+    }
 }
