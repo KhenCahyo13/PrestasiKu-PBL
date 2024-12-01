@@ -1,5 +1,5 @@
 .btn {
-    padding: 8px 0px;
+    padding: 8px 16px;
     font-size: 14px;
 }
 
@@ -7,6 +7,20 @@
     background-color: var(--primary-color);
 }
 
+.btn-secondary {
+    background-color: var(--gray-400);
+    border-color: var(--gray-400) !important;
+}
+
 .btn-outline-primary {
     border-radius: 1px solid var(--primary-color);
+}
+
+.btn-dark {
+    background-color: var(--text-primary-color);
+}
+
+.btn-sm {
+    font-size: 12px;
+    border-radius: 6px;
 }
