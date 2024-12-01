@@ -1,5 +1,5 @@
 <div class="d-flex flex-column gap-1">
-    <h1 class="my-0 heading-5 font-semibold"><?= $pageTitle ?? '' ?></h1>
+    <h1 class="my-0 heading-5"><?= $pageTitle ?? '' ?></h1>
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <?php foreach ($breadcrumbItems as $index => $item): ?>

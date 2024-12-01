@@ -1,30 +1,30 @@
 <?php
-    $title = 'PrestasiKu - Master Departments';
-    $pageTitle = 'Departments';
-    $breadcrumbItems = [
-        ['label' => 'Master', 'url' => '/'],
-        ['label' => 'Departments', 'url' => '#'],
-    ];
-    ob_start();
+$title = 'PrestasiKu - Master Departments';
+$pageTitle = 'Departments';
+$breadcrumbItems = [
+    ['label' => 'Master', 'url' => '/'],
+    ['label' => 'Departments', 'url' => '#'],
+];
+ob_start();
 ?>
 <!-- Render Breadcrumb -->
 <?php
-    renderComponent('breadcrumb', [
-        'pageTitle' => $pageTitle,
-        'breadcrumbItems' => $breadcrumbItems,
-    ]);
+renderComponent('breadcrumb', [
+    'pageTitle' => $pageTitle,
+    'breadcrumbItems' => $breadcrumbItems,
+]);
 ?>
 
 <!-- Datatable -->
 <section class="my-1 bg-white rounded shadow-sm overflow-hidden">
     <div class="px-4 py-2 border-bottom border-secondary">
         <div class="d-flex align-items-center justify-content-between">
-            <h2 class="my-0 font-semibold heading-6">Departments List</h2>
+            <h2 class="my-0 heading-6">Departments List</h2>
             <div class="d-flex align-items-center gap-2">
                 <input type="text" placeholder="Search data ..." class="form-control form-control-sm" id="searchInput">
-                <button type="submit" class="btn btn-dark btn-sm">
+                <button type="button" class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#createDepartmentModal">
                     <div class="d-flex align-items-center gap-2">
-                        <i class="fa-solid fa-plus"></i> 
+                        <i class="fa-solid fa-plus"></i>
                         <span style="white-space: nowrap;">Add New</span>
                     </div>
                 </button>
@@ -89,8 +89,37 @@
         </div>
     </div>
 </section>
+<!-- Create Department Modal -->
+<div class="modal fade" id="createDepartmentModal" tabindex="-1" aria-labelledby="createDepartmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header justify-content-between px-3 py-3">
+                <p class="heading-6 my-0" id="createDepartmentModalLabel">Create Department</p>
+                <button type="button" class="btn btn-transparent p-0" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="#" method="POST">
+                    <div class="d-flex flex-column gap-3">
+                        <div class="d-flex flex-column gap-2">
+                            <label for="username" class="text-sm">Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control form-control-sm" placeholder="Enter department name" id="department_name">
+                            <span class="text-xs text-danger" id="departmentNameError"></span>
+                        </div>
+                        <div class="d-flex flex-column gap-2">
+                            <button type="submit" class="btn btn-primary">Create</button>
+                            <button type="submit" class="btn btn-outline-primary">Reset</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <?php
-    $content = ob_get_clean();
-    include layouts('main.php');
+$content = ob_get_clean();
+include layouts('main.php');
 ?>
