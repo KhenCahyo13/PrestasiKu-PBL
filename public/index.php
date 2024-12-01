@@ -16,6 +16,8 @@
     require_once '../vendor/autoload.php';
     // Load helpers
     require_once '../app/Helpers/PathHelper.php';
+    require_once '../app/Helpers/ResponseHelper.php';
+    require_once '../app/Helpers/RenderHelper.php';
     // Load routes
     require_once '../routes/app.php';
 

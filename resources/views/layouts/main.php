@@ -24,6 +24,7 @@
     <link rel="stylesheet" href="<?= css('image.css?v=' . time()) ?>">
     <link rel="stylesheet" href="<?= css('chart.css?v=' . time()) ?>">
     <link rel="stylesheet" href="<?= css('dropdown.css?v=' . time()) ?>">
+    <link rel="stylesheet" href="<?= css('border.css?v=' . time()) ?>">
 </head>
 <body>
     <section class="px-3 py-3 d-flex gap-4" style="height: 100vh;">
