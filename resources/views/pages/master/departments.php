@@ -31,7 +31,7 @@
             </div>
         </div>
     </div>
-    <table class="table table-hover">
+    <table class="table table-responsive table-hover">
         <thead>
             <tr>
                 <th class="px-4 py-3 text-sm font-medium">No</th>
