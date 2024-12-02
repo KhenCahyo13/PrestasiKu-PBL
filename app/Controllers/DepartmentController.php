@@ -24,7 +24,7 @@ class DepartmentController
         $offset = ($page - 1) * $limit;
 
         $departments = $this->departmentModel->getAll($limit, $offset);
-        $totalDepartments = count($this->departmentModel->getAll());
+        $totalDepartments = $this->departmentModel->getTotalCount();;
         $totalPages = ceil($totalDepartments / $limit);
 
         if (empty($departments)) {

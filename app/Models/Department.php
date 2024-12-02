@@ -10,6 +10,14 @@ class Department extends Model
     protected string $table = "Master.Departments";
     protected string $primaryKey = "department_id";
 
+
+    public function getTotalCount(): int
+    {
+        $sql = "SELECT COUNT(*) AS total FROM $this->table";
+        $stmt = $this->getDbConnection()->prepare($sql);
+        $stmt->execute();
+        return (int) $stmt->fetch(\PDO::FETCH_ASSOC)['total'];
+    }
     public function getAll(int $limit = 10, int $offset = 0): array
     {
         $sql = "SELECT * FROM $this->table ORDER BY $this->primaryKey OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
