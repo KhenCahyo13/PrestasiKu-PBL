@@ -31,6 +31,7 @@
             </div>
         </div>
     </div>
+    <div class="px-4" id="alertMessage"></div>
     <div class="table-responsive">
         <table class="table table-hover">
             <thead class="table-secondary">
@@ -45,7 +46,7 @@
             <tbody id="departmentsTableBody"></tbody>
         </table>
     </div>
-    <div class="px-4 pt-2 pb-2">
+    <div class="px-4 py-2">
         <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between gap-3">
             <p class="my-0 text-secondary text-xs">Showing <span class="font-medium">5</span> data out of <span class="font-medium">25</span></p>
             <div class="d-flex align-items-center gap-2">
@@ -65,6 +66,7 @@
         </div>
     </div>
 </section>
+
 <!-- Create Department Modal -->
 <div class="modal fade" id="createDepartmentModal" tabindex="-1" aria-labelledby="createDepartmentModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -76,7 +78,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form action="#" method="POST">
+                <form action="#" method="POST" id="createDepartmentForm">
                     <div class="d-flex flex-column gap-3">
                         <div class="d-flex flex-column gap-2">
                             <label for="username" class="text-sm">Name <span class="text-danger">*</span></label>
@@ -85,7 +87,7 @@
                         </div>
                         <div class="d-flex flex-column gap-2">
                             <button type="submit" class="btn btn-primary">Create</button>
-                            <button type="submit" class="btn btn-outline-primary">Reset</button>
+                            <button type="reset" class="btn btn-outline-primary">Reset</button>
                         </div>
                     </div>
                 </form>
@@ -94,6 +96,21 @@
     </div>
 </div>
 
+<!-- Delete Department Modal -->
+<div class="modal fade" id="deleteDepartmentModal" tabindex="-1" aria-labelledby="deleteDepartmentModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <input type="text" id="departmentId" hidden>
+                <p class="my-0 text-sm text-center">Are you sure to delete this department data?</p>
+            </div>
+            <div class="modal-footer py-1">
+                <button type="button" class="btn btn-warning btn-sm" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger btn-sm" id="deleteDepartmentButton">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script src="<?= js('department.js?v=' . time()) ?>"></script>
 
 <?php

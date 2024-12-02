@@ -1,7 +1,7 @@
 $(document).ready(function() {
     const alertMessageElement = $('#alertMessage');
 
-    // Get Departments data and setup into departments table
+    // Get and setup departments table
     const fetchAndSetupDepartmentsTable = () => {
         const departmentsTableBody = $('#departmentsTableBody');
         let page = 1;
@@ -13,7 +13,6 @@ $(document).ready(function() {
             url: `${BASE_API_URL}/departments?page=${page}&limit=${limit}`,
             method: 'GET',
             success: function(response) {
-                console.log(response.data);
                 for (let i = 0; i < response.data.length; i++) {
                     const department = response.data[i];
                     const departmentRow = `
@@ -34,9 +33,9 @@ $(document).ready(function() {
                                             </a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item d-flex align-items-center gap-2" href="#">
+                                            <button type="button" class="dropdown-item d-flex align-items-center gap-2" data-id="${department.department_id}" data-bs-toggle="modal" data-bs-target="#deleteDepartmentModal" id="deleteDepartmentAction">
                                                 <i class="fa-solid fa-trash text-secondary"></i> Delete
-                                            </a>
+                                            </button>
                                         </li>
                                     </ul>
                                 </div>
@@ -45,6 +44,14 @@ $(document).ready(function() {
                     `;
                     departmentsTableBody.append(departmentRow);
                 }
+
+                document.querySelectorAll('#deleteDepartmentAction').forEach((button) => {
+                    button.addEventListener('click', function () {
+                        const departmentId = this.getAttribute('data-id');
+            
+                        $('#departmentId').val(departmentId);
+                    });
+                });
             },
             error: function() {
                 console.log('Error while fetching departments data!');
@@ -52,7 +59,7 @@ $(document).ready(function() {
         });
     };
 
-
+    // Create a new department
     const createDepartment = () => {
         const createDepartmentForm = $('#createDepartmentForm');
         const createDepartmentModal = $('#createDepartmentModal');
@@ -111,6 +118,41 @@ $(document).ready(function() {
             });
         });
     }
+
+    // Delete a department
+    const deleteDepartmentButton = $('#deleteDepartmentButton');
+    deleteDepartmentButton.click(function() {
+        const departmentId = $('#departmentId').val();
+        const deleteDepartmentModal = $('#deleteDepartmentModal');
+
+        $.ajax({
+            url: `${BASE_API_URL}/departments/${departmentId}`,
+            method: 'DELETE',
+            success: function(response)  {
+                deleteDepartmentModal.modal('hide');
+                fetchAndSetupDepartmentsTable();
+                alertMessageElement.html(`
+                    <div class="my-2 alert alert-success alert-dismissible fade show" role="alert">
+                        <p class="my-0 text-sm">
+                            <strong>Success!</strong> ${response.message}
+                        </p>
+                        <button type="button" class="btn btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `);
+            },
+            error: function() {
+                deleteDepartmentModal.modal('hide');
+                alertMessageElement.html(`
+                    <div class="my-2 alert alert-danger alert-dismissible fade show" role="alert">
+                        <p class="my-0 text-sm">
+                            <strong>Failed!</strong> Department deletion failed
+                        </p>
+                        <button type="button" class="btn btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `);
+            }
+        });
+    });
 
     // Run the functions
     fetchAndSetupDepartmentsTable();
