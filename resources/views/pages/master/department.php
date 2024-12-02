@@ -82,8 +82,8 @@ renderComponent('breadcrumb', [
                     <div class="d-flex flex-column gap-3">
                         <div class="d-flex flex-column gap-2">
                             <label for="username" class="text-sm">Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control form-control-sm" placeholder="Enter department name" id="department_name">
-                            <span class="text-xs text-danger" id="departmentNameError"></span>
+                            <input type="text" class="form-control form-control-sm" placeholder="Enter department name" id="createDepartmentName">
+                            <span class="text-xs text-danger" id="createDepartmentNameError"></span>
                         </div>
                         <div class="d-flex flex-column gap-2">
                             <button type="submit" class="btn btn-primary">Create</button>

@@ -75,17 +75,17 @@ $(document).ready(function() {
     const createDepartment = () => {
         const createDepartmentForm = $('#createDepartmentForm');
         const createDepartmentModal = $('#createDepartmentModal');
-        const departmentName = $('#department_name');
+        const departmentName = $('#createDepartmentName');
         
         createDepartmentForm.submit(function(event) {
             event.preventDefault();
 
-            $('#departmentNameError').text('');
+            $('#createDepartmentNameError').text('');
 
             let isValid = true;
 
             if (departmentName.val() === '') {
-                $('#departmentNameError').text('Department name is required');
+                $('#createDepartmentNameError').text('Department name is required');
                 isValid = false;
             }
 
@@ -176,7 +176,7 @@ $(document).ready(function() {
     // Delete a department
     const deleteDepartmentButton = $('#deleteDepartmentButton');
     deleteDepartmentButton.click(function() {
-        const departmentId = $('#departmentId').val();
+        const departmentId = $('#deleteDepartmentId').val();
         const deleteDepartmentModal = $('#deleteDepartmentModal');
 
         $.ajax({
