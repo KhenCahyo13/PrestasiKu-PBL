@@ -14,11 +14,11 @@
         });
 
         $api->group('/departments', function ($api) {
-            $api->get('', DepartmentController::class . ':getDepartments');
-            $api->get('/{id}', DepartmentController::class . ':getDepartmentById');
-            $api->post('', DepartmentController::class . ':createDepartment');
-            $api->patch('/{id}', DepartmentController::class . ':updateDepartment');
-            $api->delete('/{id}', DepartmentController::class . ':deleteDepartment');
+            $api->get('', DepartmentController::class . ':index');
+            $api->get('/{id}', DepartmentController::class . ':show');
+            $api->post('', DepartmentController::class . ':store');
+            $api->patch('/{id}', DepartmentController::class . ':update');
+            $api->delete('/{id}', DepartmentController::class . ':delete');
         })->add(new CheckAuthMiddleware());
 
         $api->group('/users', function ($api) {

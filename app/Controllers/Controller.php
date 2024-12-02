@@ -1,28 +1,31 @@
 <?php
     namespace App\Controllers;
+
+    use Slim\Psr7\Request;
+    use Slim\Psr7\Response;
     class Controller {
         // For get all data
-        function index() {
+        function index(Request $request, Response $response) {
 
         }
 
         // For get data by id
-        function show($id) {
+        function show(Request $request, Response $response, array $args) {
 
         }
 
         // For create data
-        function store() {
+        function store(Request $request, Response $response) {
 
         }
 
         // For update data
-        function update($id) {
+        function update(Request $request, Response $response, array $args) {
 
         }
 
         // For delete data
-        function destroy($id) {
+        function delete(Request $request, Response $response, array $args) {
             
         }
     }

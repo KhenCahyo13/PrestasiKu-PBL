@@ -3,12 +3,11 @@
 namespace App\Controllers;
 
 use App\Models\Department;
-use Psr\Http\Message\ResponseInterface;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
 use App\Helpers\ResponseHelper;
 
-class DepartmentController
+class DepartmentController extends Controller
 {
     private $departmentModel;
 
@@ -17,7 +16,7 @@ class DepartmentController
         $this->departmentModel = new Department();
     }
 
-    public function getDepartments(Request $request, Response $response): Response
+    public function index(Request $request, Response $response): Response
     {
         $page = (int) ($request->getQueryParams()['page'] ?? 1);
         $limit = (int) ($request->getQueryParams()['limit'] ?? 10);
@@ -41,7 +40,7 @@ class DepartmentController
         );
     }
 
-    public function getDepartmentById(Request $request, Response $response, array $args): Response
+    public function show(Request $request, Response $response, array $args): Response
     {
         $id = $args['id'];
         $department = $this->departmentModel->getById($id);
@@ -53,7 +52,7 @@ class DepartmentController
         return ResponseHelper::success($response, $department, 'Department fetched successfully');
     }
 
-    public function createDepartment(Request $request, Response $response): Response
+    public function store(Request $request, Response $response): Response
     {
         $data = json_decode($request->getBody(), true);
 
@@ -76,7 +75,7 @@ class DepartmentController
         return ResponseHelper::success($response, $insertData, 'Department created successfully', 201);
     }
 
-    public function updateDepartment(Request $request, Response $response, array $args): Response
+    public function update(Request $request, Response $response, array $args): Response
     {
         $id = $args['id'] ?? null;
 
@@ -105,7 +104,7 @@ class DepartmentController
         return ResponseHelper::success($response, [], 'Department updated successfully');
     }
 
-    public function deleteDepartment(Request $request, Response $response, array $args): Response
+    public function delete(Request $request, Response $response, array $args): Response
     {
         $id = $args['id'];
 
