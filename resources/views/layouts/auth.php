@@ -28,7 +28,7 @@
     </main>
 
     <script>
-        const BASE_API_URL = '<?php echo $_ENV['BASE_API_URL']; ?>';
+        const BASE_API_URL = 'http://localhost:8000/PrestasiKu-PBL/api';
     </script>
 </body>
 </html>

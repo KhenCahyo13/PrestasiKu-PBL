@@ -4,6 +4,7 @@
     use App\Controllers\AuthController;
     use App\Controllers\DepartmentController;
     use App\Middlewares\CheckAdminMiddleware;
+    use App\Middlewares\CheckAuthMiddleware;
 
     $app->group('/api', function($api) {
         $api->group('/auth', function ($api) {
@@ -18,7 +19,7 @@
             $api->post('', DepartmentController::class . ':createDepartment');
             $api->patch('/{id}', DepartmentController::class . ':updateDepartment');
             $api->delete('/{id}', DepartmentController::class . ':deleteDepartment');
-        })->add(new CheckAdminMiddleware());
+        })->add(new CheckAuthMiddleware());
 
         $api->group('/users', function ($api) {
             $api->get('', AdminController::class . ':getUsers');

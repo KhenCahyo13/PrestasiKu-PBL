@@ -44,9 +44,10 @@
     </section>
 
     <script>
-        const BASE_API_URL = '<?php echo $_ENV['BASE_API_URL']; ?>';
+        const BASE_API_URL = 'http://localhost:8000/PrestasiKu-PBL/api';
         const redirectSuccessLogoutUrl = '<?= url('auth/login') ?>';
     </script>
     <script src="<?= js('navbar.js?v=' . time()) ?>"></script>
+    <script src="<?= js('dateFormatter.js?v=' . time()) ?>"></script>
 </body>
 </html>

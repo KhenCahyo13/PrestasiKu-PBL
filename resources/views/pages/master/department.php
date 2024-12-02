@@ -1,9 +1,9 @@
 <?php
-    $title = 'PrestasiKu - Master Departments';
-    $pageTitle = 'Departments';
+    $title = 'PrestasiKu - Master Department';
+    $pageTitle = 'Department';
     $breadcrumbItems = [
         ['label' => 'Master', 'url' => '/'],
-        ['label' => 'Departments', 'url' => '#'],
+        ['label' => 'Department', 'url' => '#'],
     ];
     ob_start();
 ?>
@@ -42,33 +42,7 @@
                     <th class="px-md-4 py-md-3 text-sm font-medium text-center">Actions</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td class="px-md-4 py-md-3 text-sm">1</td>
-                    <td class="px-md-4 py-md-3 text-sm">Information Technology</td>
-                    <td class="px-md-4 py-md-3 text-sm">December, 24 2024, 14:00</td>
-                    <td class="px-md-4 py-md-3 text-sm">December, 24 2024, 14:00</td>
-                    <td class="px-md-4 py-md-3 text-sm">
-                        <div class="dropdown">
-                            <button class="btn btn-transparent d-block mx-auto p-0" id="actionsButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fa-solid fa-ellipsis text-sm"></i>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileButton">
-                                <li>
-                                    <a class="dropdown-item d-flex align-items-center gap-2" href="#">
-                                        <i class="fa-solid fa-edit text-secondary"></i> Update
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item d-flex align-items-center gap-2" href="#">
-                                        <i class="fa-solid fa-trash text-secondary"></i> Delete
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
+            <tbody id="departmentsTableBody"></tbody>
         </table>
     </div>
     <div class="px-4 pt-2 pb-2">
@@ -120,6 +94,7 @@
     </div>
 </div>
 
+<script src="<?= js('department.js?v=' . time()) ?>"></script>
 
 <?php
     $content = ob_get_clean();
