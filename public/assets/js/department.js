@@ -1,8 +1,13 @@
 $(document).ready(function() {
+    const alertMessageElement = $('#alertMessage');
+
+    // Get Departments data and setup into departments table
     const fetchAndSetupDepartmentsTable = () => {
         const departmentsTableBody = $('#departmentsTableBody');
         let page = 1;
         let limit = 10;
+
+        departmentsTableBody.empty();
 
         $.ajax({
             url: `${BASE_API_URL}/departments?page=${page}&limit=${limit}`,
@@ -47,5 +52,67 @@ $(document).ready(function() {
         });
     };
 
+
+    const createDepartment = () => {
+        const createDepartmentForm = $('#createDepartmentForm');
+        const createDepartmentModal = $('#createDepartmentModal');
+        const departmentName = $('#department_name');
+        
+        createDepartmentForm.submit(function(event) {
+            event.preventDefault();
+
+            $('#departmentNameError').text('');
+
+            let isValid = true;
+
+            if (departmentName.val() === '') {
+                $('#departmentNameError').text('Department name is required');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                return false;
+            }
+
+            const data = {
+                department_name: departmentName.val()
+            };
+
+            $.ajax({
+                url: `${BASE_API_URL}/departments`,
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function(response) {
+                    fetchAndSetupDepartmentsTable();
+                    createDepartmentModal.modal('hide');
+                    createDepartmentForm[0].reset();
+                    alertMessageElement.html(`
+                        <div class="my-2 alert alert-success alert-dismissible fade show" role="alert">
+                            <p class="my-0 text-sm">
+                                <strong>Success!</strong> ${response.message}
+                            </p>
+                            <button type="button" class="btn btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    `);
+                },
+                error: function() {
+                    createDepartmentModal.modal('hide');
+                    createDepartmentForm[0].reset();
+                    alertMessageElement.html(`
+                        <div class="my-2 alert alert-danger alert-dismissible fade show" role="alert">
+                            <p class="my-0 text-sm">
+                                <strong>Failed!</strong> Department creation failed
+                            </p>
+                            <button type="button" class="btn btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    `);
+                }
+            });
+        });
+    }
+
+    // Run the functions
     fetchAndSetupDepartmentsTable();
+    createDepartment();
 });
