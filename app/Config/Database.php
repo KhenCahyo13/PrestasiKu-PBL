@@ -4,7 +4,6 @@ namespace App\Config;
 
 use PDO;
 use PDOException;
-use Dotenv\Dotenv;
 
 class Database
 {
@@ -15,10 +14,10 @@ class Database
     private PDO $dbConnection;
 
         public function __construct() {
-            $this->dbHost = $_ENV['DB_HOST'];
-            $this->dbName = $_ENV['DB_NAME'];
-            $this->dbUsername = $_ENV['DB_USERNAME'];
-            $this->dbPassword = $_ENV['DB_PASSWORD'];
+            $this->dbHost = 'localhost';
+            $this->dbName = 'PrestasiKu';
+            $this->dbUsername = 'SA';
+            $this->dbPassword = 'Khencahyo@130402';
 
             try {
                 $dsn = "sqlsrv:server=$this->dbHost;Database=$this->dbName";
