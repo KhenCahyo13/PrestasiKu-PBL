@@ -1,18 +1,18 @@
 <?php
-    $title = 'PrestasiKu - Master Department';
-    $pageTitle = 'Department';
-    $breadcrumbItems = [
-        ['label' => 'Master', 'url' => '/'],
-        ['label' => 'Department', 'url' => '#'],
-    ];
-    ob_start();
+$title = 'PrestasiKu - Master Department';
+$pageTitle = 'Department';
+$breadcrumbItems = [
+    ['label' => 'Master', 'url' => '/'],
+    ['label' => 'Department', 'url' => '#'],
+];
+ob_start();
 ?>
 <!-- Render Breadcrumb -->
 <?php
-    renderComponent('breadcrumb', [
-        'pageTitle' => $pageTitle,
-        'breadcrumbItems' => $breadcrumbItems,
-    ]);
+renderComponent('breadcrumb', [
+    'pageTitle' => $pageTitle,
+    'breadcrumbItems' => $breadcrumbItems,
+]);
 ?>
 
 <!-- Datatable -->
@@ -96,12 +96,37 @@
     </div>
 </div>
 
+<!-- Update Department Modal -->
+<div class="modal fade" id="updateDepartmentModal" tabindex="-1" aria-labelledby="updateDepartmentModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header justify-content-center">
+                <p class="my-0 text-sm text-center">Are you sure to update this department data?</p>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex flex-column gap-3">
+                    <input type="text" id="updateDepartmentId" hidden>
+                    <div class="d-flex flex-column gap-2">
+                        <label for="username" class="text-sm">Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control form-control-sm" placeholder="Enter department name" id="updateDepartmentName">
+                        <span class="text-xs text-danger" id="updateDepartmentNameError"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer py-1">
+                <button type="button" class="btn btn-warning btn-sm" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger btn-sm" id="updateDepartmentButton">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Delete Department Modal -->
 <div class="modal fade" id="deleteDepartmentModal" tabindex="-1" aria-labelledby="deleteDepartmentModal" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-body">
-                <input type="text" id="departmentId" hidden>
+                <input type="text" id="deleteDepartmentId" hidden>
                 <p class="my-0 text-sm text-center">Are you sure to delete this department data?</p>
             </div>
             <div class="modal-footer py-1">
@@ -114,6 +139,6 @@
 <script src="<?= js('department.js?v=' . time()) ?>"></script>
 
 <?php
-    $content = ob_get_clean();
-    include layouts('main.php');
+$content = ob_get_clean();
+include layouts('main.php');
 ?>

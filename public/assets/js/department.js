@@ -28,9 +28,9 @@ $(document).ready(function() {
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="actionsButton">
                                         <li>
-                                            <a class="dropdown-item d-flex align-items-center gap-2" href="#">
+                                            <button type="button" class="dropdown-item d-flex align-items-center gap-2" data-id="${department.department_id}" data-name="${department.department_name}" data-bs-toggle="modal" data-bs-target="#updateDepartmentModal" id="updateDepartmentAction">
                                                 <i class="fa-solid fa-edit text-secondary"></i> Update
-                                            </a>
+                                            </button>
                                         </li>
                                         <li>
                                             <button type="button" class="dropdown-item d-flex align-items-center gap-2" data-id="${department.department_id}" data-bs-toggle="modal" data-bs-target="#deleteDepartmentModal" id="deleteDepartmentAction">
@@ -45,11 +45,23 @@ $(document).ready(function() {
                     departmentsTableBody.append(departmentRow);
                 }
 
+                // Delete department button action
                 document.querySelectorAll('#deleteDepartmentAction').forEach((button) => {
                     button.addEventListener('click', function () {
                         const departmentId = this.getAttribute('data-id');
             
-                        $('#departmentId').val(departmentId);
+                        $('#deleteDepartmentId').val(departmentId);
+                    });
+                });
+
+                // Update department button action
+                document.querySelectorAll('#updateDepartmentAction').forEach((button) => {
+                    button.addEventListener('click', function () {
+                        const departmentId = this.getAttribute('data-id');
+                        const departmentName = this.getAttribute('data-name');
+            
+                        $('#updateDepartmentId').val(departmentId);
+                        $('#updateDepartmentName').val(departmentName);
                     });
                 });
             },
@@ -118,6 +130,48 @@ $(document).ready(function() {
             });
         });
     }
+
+    // Update a department
+    const updateDepartmentButton = $('#updateDepartmentButton');
+    updateDepartmentButton.click(function() {
+        const departmentId = $('#updateDepartmentId').val();
+        const departmentName = $('#updateDepartmentName').val();
+        const updateDepartmentModal = $('#updateDepartmentModal');
+
+        const data = {
+            department_name: departmentName
+        };
+
+        $.ajax({
+            url: `${BASE_API_URL}/departments/${departmentId}`,
+            method: 'PATCH',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function(response)  {
+                updateDepartmentModal.modal('hide');
+                fetchAndSetupDepartmentsTable();
+                alertMessageElement.html(`
+                    <div class="my-2 alert alert-success alert-dismissible fade show" role="alert">
+                        <p class="my-0 text-sm">
+                            <strong>Success!</strong> ${response.message}
+                        </p>
+                        <button type="button" class="btn btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `);
+            },
+            error: function() {
+                updateDepartmentModal.modal('hide');
+                alertMessageElement.html(`
+                    <div class="my-2 alert alert-danger alert-dismissible fade show" role="alert">
+                        <p class="my-0 text-sm">
+                            <strong>Failed!</strong> Department update failed
+                        </p>
+                        <button type="button" class="btn btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `);
+            }
+        });
+    });
 
     // Delete a department
     const deleteDepartmentButton = $('#deleteDepartmentButton');
