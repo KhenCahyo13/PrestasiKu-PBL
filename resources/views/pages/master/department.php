@@ -48,18 +48,18 @@ renderComponent('breadcrumb', [
     </div>
     <div class="px-4 py-2">
         <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between gap-3">
-            <p class="my-0 text-secondary text-xs">Showing <span class="font-medium">5</span> data out of <span class="font-medium">25</span></p>
+            <p class="my-0 text-secondary text-xs">Showing <span class="font-medium" id="showPerPageTotal"></span> data out of <span class="font-medium" id="totalData"></span> - Page <span class="font-medium" id="currentPage"></span> from <span class="font-medium" id="totalPages"></span> pages</p>
             <div class="d-flex align-items-center gap-2">
                 <p class="my-0 text-secondary text-xs">Show</p>
-                <select class="form-select form-select-sm">
+                <select class="form-select form-select-sm" id="showPerPagePagination">
                     <option value="5">5</option>
                     <option value="10">10</option>
                 </select>
                 <p class="my-0 text-secondary text-xs" style="white-space: nowrap">per page</p>
-                <button class="btn btn-secondary btn-sm" type="button">
+                <button class="btn btn-secondary btn-sm" type="button" id="prevButtonPagination">
                     <i class="fa-solid fa-chevron-left"></i>
                 </button>
-                <button class="btn btn-secondary btn-sm" type="button">
+                <button class="btn btn-secondary btn-sm" type="button" id="nextButtonPagination">
                     <i class="fa-solid fa-chevron-right"></i>
                 </button>
             </div>

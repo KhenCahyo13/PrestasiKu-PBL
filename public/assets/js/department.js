@@ -1,11 +1,12 @@
 $(document).ready(function() {
     const alertMessageElement = $('#alertMessage');
+    const showPerPagePagination = $('#showPerPagePagination');
+    const prevButtonPagination = $('#prevButtonPagination');
+    const nextButtonPagination = $('#nextButtonPagination');
 
     // Get and setup departments table
-    const fetchAndSetupDepartmentsTable = () => {
+    const fetchAndSetupDepartmentsTable = (page = 1, limit = showPerPagePagination) => {
         const departmentsTableBody = $('#departmentsTableBody');
-        let page = 1;
-        let limit = 10;
 
         departmentsTableBody.empty();
 
@@ -13,6 +14,10 @@ $(document).ready(function() {
             url: `${BASE_API_URL}/departments?page=${page}&limit=${limit}`,
             method: 'GET',
             success: function(response) {
+                $('#showPerPageTotal').text(response.pagination.items_per_page);
+                $('#totalData').text(response.pagination.total_items);
+                $('#currentPage').text(response.pagination.current_page);
+                $('#totalPages').text(response.pagination.total_pages);
                 for (let i = 0; i < response.data.length; i++) {
                     const department = response.data[i];
                     const departmentRow = `
@@ -208,7 +213,31 @@ $(document).ready(function() {
         });
     });
 
+    // Table Pagination
+    showPerPagePagination.change(function() {
+        const limit = $(this).val();
+
+        fetchAndSetupDepartmentsTable(1, limit);
+    });
+
+    prevButtonPagination.click(function() {
+        const currentPage = parseInt($('#currentPage').text());
+
+        if (currentPage > 1) {
+            fetchAndSetupDepartmentsTable(currentPage - 1, showPerPagePagination.val());
+        }
+    });
+
+    nextButtonPagination.click(function() {
+        const currentPage = parseInt($('#currentPage').text());
+        const totalPages = parseInt($('#totalPages').text());
+
+        if (currentPage < totalPages) {
+            fetchAndSetupDepartmentsTable(currentPage + 1, showPerPagePagination.val());
+        }
+    });
+
     // Run the functions
-    fetchAndSetupDepartmentsTable();
+    fetchAndSetupDepartmentsTable(1, 5);
     createDepartment();
 });
