@@ -1,12 +1,9 @@
 <?php
-
-    use App\Controllers\AchievementController;
     use App\Controllers\AdminController;
     use App\Controllers\AuthController;
     use App\Controllers\DepartmentController;
     use App\Middlewares\CheckAdminMiddleware;
 
-    use App\Middlewares\CheckStudentMiddleware;
     use App\Middlewares\CheckAuthMiddleware;
 
     $app->group('/api', function($api) {
@@ -31,9 +28,5 @@
             $api->delete('/{id}', AdminController::class . ':deleteUser');
             $api->patch('/{id}/verify', AdminController::class . ':verifiedRegistration');
         })->add(new CheckAdminMiddleware());
-
-        $api->group('/achievements', function ($api) {
-            $api->post('/upload', AchievementController::class . ':createAchievement');
-        })->add(new CheckStudentMiddleware());
     });
 ?>
