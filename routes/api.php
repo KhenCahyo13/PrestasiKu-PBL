@@ -1,9 +1,11 @@
 <?php
 
-    use App\Controllers\AdminController;
+use App\Controllers\AchievementController;
+use App\Controllers\AdminController;
     use App\Controllers\AuthController;
     use App\Controllers\DepartmentController;
     use App\Middlewares\CheckAdminMiddleware;
+    use App\Middlewares\CheckStudentMiddleware;
 
     $app->group('/api', function($api) {
         $api->group('/auth', function ($api) {
@@ -25,6 +27,11 @@
             $api->get('/{id}', AdminController::class . ':getUserById');
             $api->patch('/{id}', AdminController::class . ':updateUser');
             $api->delete('/{id}', AdminController::class . ':deleteUser');
+            $api->patch('/{id}/verify', AdminController::class . ':verifiedRegistration');
         })->add(new CheckAdminMiddleware());
+
+        $api->group('/achievements', function ($api) {
+            $api->post('/upload', AchievementController::class . ':createAchievement');
+        })->add(new CheckStudentMiddleware());
     });
 ?>
