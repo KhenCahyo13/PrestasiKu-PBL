@@ -75,4 +75,23 @@ class AdminController{
     }
   }
 
+    public function verifiedRegistration(Request $request, Response $response, $args): ResponseInterface
+    {
+        try {
+            $data = $request->getParsedBody();
+            $data['user_id'] = $args['id'];
+            $data['user_isverified'] = 1;
+
+            $verified = $this->userModel->verifiedRegistration($data);
+
+            if ($verified) {
+                return ResponseHelper::success($response, [], 'User registration verified successfully');
+            } else {
+                return ResponseHelper::error($response, 'Failed to verify registration', 400);
+            }
+        } catch (\Exception $e) {
+            return ResponseHelper::error($response, 'Failed to verify registration', 500);
+        }
+    }
+
 }

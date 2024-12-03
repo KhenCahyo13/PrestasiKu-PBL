@@ -151,4 +151,20 @@ class User extends Model
         }
     }
 
+
+    public function verifiedRegistration(array $data): bool
+    {
+        try {
+            $sql = "UPDATE $this->tableUser SET user_isverified = :user_isverified WHERE user_id = :user_id";
+            $stmt = $this->getDbConnection()->prepare($sql);
+            $stmt->execute([
+                ':user_isverified' => $data['user_isverified'],
+                ':user_id' => $data['user_id']
+            ]);
+            return true;
+        } catch (\Exception $e) {
+            error_log("Error user: " . $e->getMessage());
+            return false;
+        }
+    }
 }
