@@ -10,49 +10,66 @@ class Department extends Model
     protected string $primaryKey = "department_id";
 
 
-    public function getTotalCount(): int
-    {
-        $sql = "SELECT COUNT(*) AS total FROM $this->table";
-        $stmt = $this->getDbConnection()->prepare($sql);
+    public function getTotalCount(): int {
+        $query = 'EXEC Metadata.CountTableData @TableName = :tableName';
+        $stmt = $this->getDbConnection()->prepare($query);
+
+        $stmt->bindValue(':tableName', $this->table, PDO::PARAM_STR);
+
         $stmt->execute();
-        return (int) $stmt->fetch(\PDO::FETCH_ASSOC)['total'];
-    }
-    public function getAll(int $limit = 10, int $offset = 0): array
-    {
-        $sql = "SELECT * FROM $this->table ORDER BY $this->primaryKey OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-        $stmt = $this->getDbConnection()->prepare($sql);
-        $stmt->bindValue(1, $offset, PDO::PARAM_INT);
-        $stmt->bindValue(2, $limit, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        return (int) $stmt->fetch(PDO::FETCH_ASSOC)['Total'];
     }
 
-    public function getById(string $id): array
-    {
-        $sql = "SELECT * FROM $this->table WHERE department_id = :id";
-        $stmt = $this->getDbConnection()->prepare($sql);
-        $stmt->bindParam(':id', $id);
+    public function getAll(int $limit = 10, int $offset = 0): array {
+        $query = 'EXEC CRUD.SelectSingleTableWithPagination @TableName = :tableName, @Columns = :columns, @Offset = :offset, @Limit = :limit';
+        $stmt = $this->getDbConnection()->prepare($query);
+
+        $stmt->bindValue(':tableName', $this->table, PDO::PARAM_STR);
+        $stmt->bindValue(':columns', '*', PDO::PARAM_STR);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+
         $stmt->execute();
 
-        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getById(string $id): array {
+        $query = 'EXEC CRUD.SelectTableDataByColumn @TableName = :tableName, @ColumnName = :columnName, @Value = :value';
+        $stmt = $this->getDbConnection()->prepare($query);
+
+        $stmt->bindParam(':tableName', $this->table, PDO::PARAM_STR);
+        $stmt->bindParam(':columnName', $this->primaryKey, PDO::PARAM_STR);
+        $stmt->bindParam(':value', $id, PDO::PARAM_STR);
+        $stmt->execute();
+
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($result === false) {
-            return [];
+            return array();
         }
 
         return $result;
     }
 
-    public function create(array $data): bool
-    {
-        $sql = "INSERT INTO $this->table (department_name) VALUES (:department_name)";
-        $stmt = $this->getDbConnection()->prepare($sql);
-        $stmt->bindParam(':department_name', $data['department_name']);
-
+    public function create(array $data): bool {
+        $query = 'EXEC CRUD.InsertTableData @TableName = :tableName, @Columns = :columns, @Values = :values';
+        $stmt = $this->getDbConnection()->prepare($query);
+        
+        $stmt->bindParam(':tableName', $this->table, PDO::PARAM_STR);
+        
+        $columns = implode(',', array_keys($data));
+        $stmt->bindParam(':columns', $columns, PDO::PARAM_STR);
+    
+        $values = array_map(function($value) {
+            return is_string($value) ? "'" . addslashes($value) . "'" : $value;
+        }, array_values($data));
+        $values = implode(',', $values);
+        $stmt->bindParam(':values', $values, PDO::PARAM_STR);
+    
         return $stmt->execute();
     }
 
-    public function update(array $data): bool
-    {
+    public function update(array $data): bool {
         try {
             $sql = "UPDATE $this->table SET department_name = :department_name WHERE department_id = :department_id";
             $stmt = $this->getDbConnection()->prepare($sql);
@@ -66,11 +83,13 @@ class Department extends Model
         }
     }
 
-    public function delete(string $id): bool
-    {
-        $sql = "DELETE FROM $this->table WHERE department_id = :department_id";
-        $stmt = $this->getDbConnection()->prepare($sql);
-        $stmt->bindParam(':department_id', $id);
+    public function delete(string $id): bool {
+        $query = 'EXEC CRUD.DeleteTableDataByColumn @TableName = :tableName, @ColumnName = :columnName, @Value = :value';
+        $stmt = $this->getDbConnection()->prepare($query);
+
+        $stmt->bindParam(':tableName', $this->table, PDO::PARAM_STR);
+        $stmt->bindParam(':columnName', $this->primaryKey, PDO::PARAM_STR);
+        $stmt->bindParam(':value', $id, PDO::PARAM_STR);
 
         return $stmt->execute();
     }

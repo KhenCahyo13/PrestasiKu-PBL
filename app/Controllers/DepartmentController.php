@@ -11,13 +11,11 @@ class DepartmentController extends Controller
 {
     private $departmentModel;
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->departmentModel = new Department();
     }
 
-    public function index(Request $request, Response $response): Response
-    {
+    public function index(Request $request, Response $response): Response {
         $page = (int) ($request->getQueryParams()['page'] ?? 1);
         $limit = (int) ($request->getQueryParams()['limit'] ?? 10);
         $offset = ($page - 1) * $limit;
@@ -40,8 +38,7 @@ class DepartmentController extends Controller
         );
     }
 
-    public function show(Request $request, Response $response, array $args): Response
-    {
+    public function show(Request $request, Response $response, array $args): Response {
         $id = $args['id'];
         $department = $this->departmentModel->getById($id);
 
@@ -52,8 +49,7 @@ class DepartmentController extends Controller
         return ResponseHelper::success($response, $department, 'Department fetched successfully');
     }
 
-    public function store(Request $request, Response $response): Response
-    {
+    public function store(Request $request, Response $response): Response {
         $data = json_decode($request->getBody(), true);
 
         $departmentName = $data['department_name'] ?? '';
@@ -75,8 +71,7 @@ class DepartmentController extends Controller
         return ResponseHelper::success($response, $insertData, 'Department created successfully', 201);
     }
 
-    public function update(Request $request, Response $response, array $args): Response
-    {
+    public function update(Request $request, Response $response, array $args): Response {
         $id = $args['id'] ?? null;
 
         if (!$id) {
@@ -104,8 +99,7 @@ class DepartmentController extends Controller
         return ResponseHelper::success($response, [], 'Department updated successfully');
     }
 
-    public function delete(Request $request, Response $response, array $args): Response
-    {
+    public function delete(Request $request, Response $response, array $args): Response {
         $id = $args['id'];
 
         $result = $this->departmentModel->delete($id);
