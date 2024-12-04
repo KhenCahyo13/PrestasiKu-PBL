@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Helpers\ResponseHelper;
 use App\Models\User;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Psr7\Request;
@@ -28,7 +29,7 @@ class AuthController
 			return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
 		}
 
-		$existingUser = $this->userModel->getUserByUsername($data['user_username']);
+		$existingUser = $this->userModel->getByUsername($data['user_username']);
 		if ($existingUser) {
 			$response->getBody()->write(json_encode(['success' => false, 'message' => 'Username already exists!']));
 			return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
@@ -80,78 +81,76 @@ class AuthController
 		return $response->withHeader('Content-Type', 'application/json')->withStatus($result ? 201 : 500);
 	}
 
-	public function login(Request $request, Response $response): ResponseInterface
-	{
+	public function login(Request $request, Response $response): ResponseInterface {
 		$body = $request->getBody();
 		$data = json_decode($body, true);
 
-		if (!empty($data['user_username']) && !empty($data['user_password'])) {
-			$user = $this->userModel->getUserByUsername($data['user_username']);
+		if (!empty($data['user_username']) || !empty($data['user_password'])) {
+			$user = $this->userModel->getByUsername($data['user_username']);
 
 			if ($user) {
 				if (password_verify($data['user_password'], $user['user_password'])) {
-					if ($user['user_isverified'] == 1) {
+					if ($user['user_isverified'] === 1) {
 						$_SESSION['user'] = [
 							'id' => $user['user_id'],
 							'username' => $user['user_username'],
-							'role' => $user['role_id']
+							'role' => $user['role_name']
 						];
 
-						$responseData = [
-							'success' => true,
-							'message' => 'Login successful!',
-							'data' => $_SESSION['user']
-						];
+						return ResponseHelper::success(
+							$response,
+							$user,
+							'Successfully login.',
+							200
+						);
 					} else {
-						$responseData = [
-							'success' => false,
-							'message' => 'You are not verified by the admin!',
-						];
+						return ResponseHelper::error(
+							$response,
+							'Your account is not verified yet.',
+							400
+						);
 					}
 				} else {
-					$responseData = [
-						'success' => false,
-						'message' => 'Invalid password!',
-					];
+					return ResponseHelper::error(
+						$response,
+						'Username or password is incorrect.',
+						400
+					);
 				}
 			} else {
-				$responseData = [
-					'success' => false,
-					'message' => 'User not found!',
-				];
+				return ResponseHelper::error(
+					$response,
+					'Username or password is incorrect.',
+					400
+				);
 			}
 		} else {
-			$responseData = [
-				'success' => false,
-				'message' => 'Username and password are required!',
-			];
+			return ResponseHelper::error(
+				$response,
+				'Username or password is required',
+				400
+			);
 		}
-
-		$response->getBody()->write(json_encode($responseData));
-		return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
 	}
 
 
-	public function logout(Request $request, Response $response): ResponseInterface
-	{
+	public function logout(Request $request, Response $response): ResponseInterface {
 		if (!isset($_SESSION['user'])) {
-			$responseData = [
-				'success' => false,
-				'message' => 'You are not logged in!',
-			];
-			$response->getBody()->write(json_encode($responseData));
-			return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+			return ResponseHelper::error(
+				$response,
+				'You are not logged in.',
+				400
+			);
 		}
 
 		unset($_SESSION['user']);
 		session_destroy();
 
-		$responseData = [
-			'success' => true,
-			'message' => 'Logout successful!',
-		];
-
-		$response->getBody()->write(json_encode($responseData));
-		return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+		return ResponseHelper::success(
+			$response,
+			array(),
+			'Successfully logged out.',
+			200
+		);
 	}
 }

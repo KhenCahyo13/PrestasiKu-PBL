@@ -2,20 +2,38 @@
 
 namespace App\Models;
 
-class User extends Model
-{
-    protected string $tableUser = 'Master.Users';
+use PDO;
+
+class User extends Model {
+    protected string $table = 'Master.Users';
+    protected string $primaryKey = 'user_id';
     protected string $tableStudentDetail = 'Master.StudentDetailUsers';
     protected string $tableLectureDetail = 'Master.LectureDetailUsers';
     protected string $tableRole = 'Master.Roles';
 
-    public function getUserByUsername(string $username): ?array
-    {
-        $sql = "SELECT * FROM $this->tableUser WHERE user_username = :username";
-        $stmt = $this->getDbConnection()->prepare($sql);
-        $stmt->execute([':username' => $username]);
+    public function getByUsername(string $username): array | null {
+        $query = 'EXEC CRUD.SelectTableDataByColumnWithJoins
+            @TableName = :tableName,
+            @TableColumns = :tableColumn,
+            @ColumnName = :columnName,
+            @ColumnValue = :columnValue,
+            @JoinConditions = :joinConditions
+        ';
+        $stmt = $this->getDbConnection()->prepare($query);
+
+        $tableColumns = 'Master.Users.user_id, Master.Users.user_username, Master.Roles.role_name';
+        $joinConditions = 'INNER JOIN Master.Roles ON Master.Users.role_id = Master.Roles.role_id';
+
+        $stmt->bindParam(':tableName', $this->table, PDO::PARAM_STR);
+        $stmt->bindParam(':tableColumn', $tableColumns, PDO::PARAM_STR);
+        $stmt->bindParam(':columnName', 'user_username', PDO::PARAM_STR);
+        $stmt->bindParam(':columnValue', $username, PDO::PARAM_STR);
+        $stmt->bindParam(':joinConditions', $joinConditions, PDO::PARAM_STR);
+
+        $stmt->execute();
         $result = $stmt->fetch(\PDO::FETCH_ASSOC);
-        return $result ?: null;
+
+        return $result ?? null;
     }
 
 
@@ -40,7 +58,7 @@ class User extends Model
                 ':detail_profile' => $data['detail_profile']
             ]);
 
-            $sqlUser = "INSERT INTO $this->tableUser 
+            $sqlUser = "INSERT INTO $this->table 
                 (user_id, detail_student_id, role_id, user_username, user_password) 
                 VALUES 
                 (:user_id, :detail_student_id, :role_id, :user_username, :user_password)";
@@ -82,7 +100,7 @@ class User extends Model
                 ':detail_profile' => $data['detail_profile']
             ]);
 
-            $sqlUser = "INSERT INTO $this->tableUser
+            $sqlUser = "INSERT INTO $this->table
                 (user_id, detail_lecture_id, role_id, user_username, user_password) 
                 VALUES 
                 (:user_id, :detail_lecture_id, :role_id, :user_username, :user_password)";
@@ -106,7 +124,7 @@ class User extends Model
 
     public function getUsers(): array
     {
-        $sql = "SELECT * FROM $this->tableUser";
+        $sql = "SELECT * FROM $this->table";
         $stmt = $this->getDbConnection()->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -114,7 +132,7 @@ class User extends Model
 
     public function getUserById(string $userId): ?array
     {
-        $sql = "SELECT * FROM $this->tableUser WHERE user_id = :user_id";
+        $sql = "SELECT * FROM $this->table WHERE user_id = :user_id";
         $stmt = $this->getDbConnection()->prepare($sql);
         $stmt->execute([':user_id' => $userId]);
         $result = $stmt->fetch(\PDO::FETCH_ASSOC);
@@ -124,7 +142,7 @@ class User extends Model
     public function updateUser(array $data): bool
     {
         try {
-            $sql = "UPDATE $this->tableUser SET user_username = :user_username, user_password = :user_password WHERE user_id = :user_id";
+            $sql = "UPDATE $this->table SET user_username = :user_username, user_password = :user_password WHERE user_id = :user_id";
             $stmt = $this->getDbConnection()->prepare($sql);
             $stmt->execute([
                 ':user_username' => $data['user_username'],
@@ -141,7 +159,7 @@ class User extends Model
     public function deleteUser(string $userId): bool
     {
         try {
-            $sql = "DELETE FROM $this->tableUser WHERE user_id = :user_id";
+            $sql = "DELETE FROM $this->table WHERE user_id = :user_id";
             $stmt = $this->getDbConnection()->prepare($sql);
             $stmt->execute([':user_id' => $userId]);
             return true;
@@ -155,7 +173,7 @@ class User extends Model
     public function verifiedRegistration(array $data): bool
     {
         try {
-            $sql = "UPDATE $this->tableUser SET user_isverified = :user_isverified WHERE user_id = :user_id";
+            $sql = "UPDATE $this->table SET user_isverified = :user_isverified WHERE user_id = :user_id";
             $stmt = $this->getDbConnection()->prepare($sql);
             $stmt->execute([
                 ':user_isverified' => $data['user_isverified'],
