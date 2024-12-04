@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use PDO;
-use App\Models\Model;
 
 class Department extends Model
 {
