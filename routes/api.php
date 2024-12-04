@@ -20,26 +20,26 @@ $app->group('/api', function ($api) {
     $api->group('/departments', function ($api) {
         $api->get('', DepartmentController::class . ':index');
         $api->get('/{id}', DepartmentController::class . ':show');
-        $api->post('', DepartmentController::class . ':store');
-        $api->patch('/{id}', DepartmentController::class . ':update');
-        $api->delete('/{id}', DepartmentController::class . ':delete');
+        $api->post('', DepartmentController::class . ':store')->add(new CheckAdminMiddleware());
+        $api->patch('/{id}', DepartmentController::class . ':update')->add(new CheckAdminMiddleware());
+        $api->delete('/{id}', DepartmentController::class . ':delete')->add(new CheckAdminMiddleware());
     })->add(new CheckAuthMiddleware());
     // Study Program Routes
     $api->group('/study-programs', function ($api) {
         $api->get('', StudyProgramController::class . ':index');
         $api->get('/{id}', StudyProgramController::class . ':show');
-        $api->post('', StudyProgramController::class . ':store');
-        $api->patch('/{id}', StudyProgramController::class . ':update');
-        $api->delete('/{id}', StudyProgramController::class . ':delete');
+        $api->post('', StudyProgramController::class . ':store')->add(new CheckAdminMiddleware());
+        $api->patch('/{id}', StudyProgramController::class . ':update')->add(new CheckAdminMiddleware());
+        $api->delete('/{id}', StudyProgramController::class . ':delete')->add(new CheckAdminMiddleware());
     })->add(new CheckAuthMiddleware());
     // SP Class Routes
     $api->group('/sp-classes', function ($api) {
         $api->get('', SPClassController::class . ':index');
         $api->get('/{id}', SPClassController::class . ':show');
-        $api->post('', SPClassController::class . ':store');
-        $api->patch('/{id}', SPClassController::class . ':update');
-        $api->delete('/{id}', SPClassController::class . ':delete');
-    });
+        $api->post('', SPClassController::class . ':store')->add(new CheckAdminMiddleware());
+        $api->patch('/{id}', SPClassController::class . ':update')->add(new CheckAdminMiddleware());
+        $api->delete('/{id}', SPClassController::class . ':delete')->add(new CheckAdminMiddleware());
+    })->add(new CheckAuthMiddleware());
     // User Routes
     $api->group('/users', function ($api) {
         $api->get('', AdminController::class . ':getUsers');
