@@ -43,7 +43,7 @@ class StudyProgram extends Model
 
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($result === false) {
-            return [];
+            return array();
         }
 
         return $result;

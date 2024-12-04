@@ -23,7 +23,11 @@ class StudyProgramController extends Controller {
         $totalPages = ceil($totalStudyPrograms / $limit);
 
         if (empty($studyPrograms)) {
-            return ResponseHelper::error($response, 'Study programs data is empty.', 200);
+            return ResponseHelper::error(
+                $response,
+                'Study programs data is empty.',
+                200
+            );
         }
 
         return ResponseHelper::withPagination(
@@ -42,10 +46,18 @@ class StudyProgramController extends Controller {
         $studyProgram = $this->studyProgramModel->getById($id);
 
         if (!$studyProgram) {
-            return ResponseHelper::error($response, 'Study program not found', 404);
+            return ResponseHelper::error(
+                $response,
+                'Study program not found',
+                404
+            );
         }
 
-        return ResponseHelper::success($response, $studyProgram, 'Successfully get study program.');
+        return ResponseHelper::success(
+            $response,
+            $studyProgram,
+            'Successfully get study program.'
+        );
     }
 
     public function store(Request $request, Response $response): Response {
@@ -55,11 +67,19 @@ class StudyProgramController extends Controller {
         $studyProgramName = $data['studyprogram_name'] ?? '';
 
         if (empty($departmentId)) {
-            return ResponseHelper::error($response, 'Department name is required!', 400);
+            return ResponseHelper::error(
+                $response,
+                'Department name is required!',
+                400
+            );
         }
 
         if (empty($studyProgramName)) {
-            return ResponseHelper::error($response, 'Study program name is required!', 400);
+            return ResponseHelper::error(
+                $response,
+                'Study program name is required!',
+                400
+            );
         }
 
         $insertData = [
@@ -70,42 +90,75 @@ class StudyProgramController extends Controller {
         $action = $this->studyProgramModel->create($insertData);
 
         if (!$action) {
-            return ResponseHelper::error($response, 'Failed when create study program', 500);
+            return ResponseHelper::error(
+                $response,
+                'Failed when create study program',
+                500
+            );
         }
 
-        return ResponseHelper::success($response, $insertData, 'Successfully created study program', 201);
+        return ResponseHelper::success(
+            $response,
+            $insertData,
+            'Successfully created study program',
+            201
+        );
     }
 
     public function update(Request $request, Response $response, array $args): Response {
         $studyProgramId = $args['id'] ?? null;
 
         if (!$studyProgramId) {
-            return ResponseHelper::error($response, 'Study program id is required!', 400);
+            return ResponseHelper::error(
+                $response,
+                'Study program id is required!',
+                400
+            );
         }
 
         $body = $request->getBody()->getContents();
         $data = json_decode($body, true);
 
         if (!is_array($data)) {
-            return ResponseHelper::error($response, 'Invalid JSON format!', 400);
+            return ResponseHelper::error(
+                $response,
+                'Invalid JSON format!',
+                400
+            );
         }
 
         if (empty($data['department_id'])) {
-            return ResponseHelper::error($response, 'Department id is required!', 400);
+            return ResponseHelper::error(
+                $response,
+                'Department id is required!',
+                400
+            );
         }
 
         if (empty($data['studyprogram_name'])) {
-            return ResponseHelper::error($response, 'Study program name is required!', 400);
+            return ResponseHelper::error(
+                $response,
+                'Study program name is required!',
+                400
+            );
         }
 
         $data['studyprogram_id'] = $studyProgramId;
         $action = $this->studyProgramModel->update($data);
 
         if (!$action) {
-            return ResponseHelper::error($response, 'Failed when update study program', 500);
+            return ResponseHelper::error(
+                $response,
+                'Failed when update study program',
+                500
+            );
         }
 
-        return ResponseHelper::success($response, [], 'Successfully updated study program');
+        return ResponseHelper::success(
+            $response,
+            array(),
+            'Successfully updated study program'
+        );
     }
 
     public function delete(Request $request, Response $response, array $args): Response {
@@ -114,9 +167,17 @@ class StudyProgramController extends Controller {
         $action = $this->studyProgramModel->delete($studyProgramId);
 
         if (!$action) {
-            return ResponseHelper::error($response, 'Failed when delete study program', 500);
+            return ResponseHelper::error(
+                $response,
+                'Failed when delete study program',
+                500
+            );
         }
 
-        return ResponseHelper::success($response, [], 'Successfully deleted study program');
+        return ResponseHelper::success(
+            $response,
+            array(),
+            'Successfully deleted study program'
+        );
     }
 }
