@@ -37,6 +37,6 @@
                 include views('master/study-program.php');
                 return $response;
             });
-        });
+        })->add(new CheckAuthMiddleware());
     });
 ?>
