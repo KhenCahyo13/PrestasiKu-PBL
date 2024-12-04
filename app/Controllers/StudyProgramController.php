@@ -9,6 +9,7 @@ use App\Helpers\ResponseHelper;
 
 class StudyProgramController extends Controller {
     private StudyProgram $studyProgramModel;
+    
     public function __construct() {
         $this->studyProgramModel = new StudyProgram();
     }

@@ -18,6 +18,7 @@ class StudyProgram extends Model
         $stmt->execute();
         return (int) $stmt->fetch(PDO::FETCH_ASSOC)['Total'];
     }
+    
     public function getAll(int $limit = 10, int $offset = 0): array {
         $query = 'EXEC CRUD.SelectSingleTableWithPagination @TableName = :tableName, @Columns = :columns, @Offset = :offset, @Limit = :limit';
         $stmt = $this->getDbConnection()->prepare($query);
