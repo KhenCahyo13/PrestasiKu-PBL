@@ -1,14 +1,12 @@
 <?php
-
 namespace App\Models;
 
 use PDO;
 
-class Department extends Model
+class StudyProgram extends Model
 {
-    protected string $table = "Master.Departments";
-    protected string $primaryKey = "department_id";
-
+    protected string $table = "Master.StudyPrograms";
+    protected string $primaryKey = "studyprogram_id";
 
     public function getTotalCount(): int {
         $query = 'EXEC Metadata.CountTableData @TableName = :tableName';
@@ -67,20 +65,17 @@ class Department extends Model
         $stmt->bindParam(':values', $values, PDO::PARAM_STR);
     
         return $stmt->execute();
-    }
+    }     
 
     public function update(array $data): bool {
-        try {
-            $sql = "UPDATE $this->table SET department_name = :department_name WHERE department_id = :department_id";
-            $stmt = $this->getDbConnection()->prepare($sql);
-            $stmt->bindParam(':department_name', $data['department_name']);
-            $stmt->bindParam(':department_id', $data['department_id']);
+        $sql = "UPDATE $this->table SET department_id = :department_id, studyprogram_name = :studyprogram_name WHERE $this->primaryKey = :studyprogram_id";
+        $stmt = $this->getDbConnection()->prepare($sql);
 
-            return $stmt->execute();
-        } catch (\PDOException $e) {
-            error_log("Failed to update department: " . $e->getMessage());
-            return false;
-        }
+        $stmt->bindParam(':department_id', $data['department_id'], PDO::PARAM_INT);
+        $stmt->bindParam(':studyprogram_name', $data['studyprogram_name'], PDO::PARAM_STR);
+        $stmt->bindParam(':studyprogram_id', $data['studyprogram_id'], PDO::PARAM_STR);
+
+        return $stmt->execute();
     }
 
     public function delete(string $id): bool {

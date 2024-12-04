@@ -1,14 +1,11 @@
 <?php
-
 namespace App\Models;
 
 use PDO;
 
-class Department extends Model
-{
-    protected string $table = "Master.Departments";
-    protected string $primaryKey = "department_id";
-
+class SPClass extends Model {
+    protected string $table = 'Master.SPClass';
+    protected string $primaryKey = 'spclass_id';
 
     public function getTotalCount(): int {
         $query = 'EXEC Metadata.CountTableData @TableName = :tableName';
@@ -19,7 +16,7 @@ class Department extends Model
         $stmt->execute();
         return (int) $stmt->fetch(PDO::FETCH_ASSOC)['Total'];
     }
-
+    
     public function getAll(int $limit = 10, int $offset = 0): array {
         $query = 'EXEC CRUD.SelectSingleTableWithPagination @TableName = :tableName, @Columns = :columns, @Offset = :offset, @Limit = :limit';
         $stmt = $this->getDbConnection()->prepare($query);
@@ -70,17 +67,14 @@ class Department extends Model
     }
 
     public function update(array $data): bool {
-        try {
-            $sql = "UPDATE $this->table SET department_name = :department_name WHERE department_id = :department_id";
-            $stmt = $this->getDbConnection()->prepare($sql);
-            $stmt->bindParam(':department_name', $data['department_name']);
-            $stmt->bindParam(':department_id', $data['department_id']);
+        $sql = "UPDATE $this->table SET studyprogram_id = :studyprogram_id, spclass_name = :spclass_name WHERE $this->primaryKey = :spclass_id";
+        $stmt = $this->getDbConnection()->prepare($sql);
 
-            return $stmt->execute();
-        } catch (\PDOException $e) {
-            error_log("Failed to update department: " . $e->getMessage());
-            return false;
-        }
+        $stmt->bindParam(':studyprogram_id', $data['studyprogram_id'], PDO::PARAM_INT);
+        $stmt->bindParam(':spclass_name', $data['spclass_name'], PDO::PARAM_STR);
+        $stmt->bindParam(':spclass_id', $data['spclass_id'], PDO::PARAM_STR);
+
+        return $stmt->execute();
     }
 
     public function delete(string $id): bool {
