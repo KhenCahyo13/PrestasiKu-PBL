@@ -3,15 +3,16 @@ $(document).ready(function() {
     const showPerPagePagination = $('#showPerPagePagination');
     const prevButtonPagination = $('#prevButtonPagination');
     const nextButtonPagination = $('#nextButtonPagination');
+    const searchDepartmentInput = $('#searchDepartment');
 
     // Get and setup departments table
-    const fetchAndSetupDepartmentsTable = (page = 1, limit = showPerPagePagination) => {
+    const fetchAndSetupDepartmentsTable = (page = 1, limit = showPerPagePagination, search = '') => {
         const departmentsTableBody = $('#departmentsTableBody');
 
         departmentsTableBody.empty();
 
         $.ajax({
-            url: `${BASE_API_URL}/departments?page=${page}&limit=${limit}`,
+            url: `${BASE_API_URL}/departments?page=${page}&limit=${limit}&search=${search}`,
             method: 'GET',
             success: function(response) {
                 $('#showPerPageTotal').text(response.pagination.items_per_page);
@@ -213,7 +214,7 @@ $(document).ready(function() {
         });
     });
 
-    // Table Pagination
+    // Table DataTables
     showPerPagePagination.change(function() {
         const limit = $(this).val();
 
@@ -236,6 +237,17 @@ $(document).ready(function() {
             fetchAndSetupDepartmentsTable(currentPage + 1, showPerPagePagination.val());
         }
     });
+
+    let debounceTimeout;
+    searchDepartmentInput.keyup(function () {
+        const search = $(this).val();
+    
+        clearTimeout(debounceTimeout);
+    
+        debounceTimeout = setTimeout(function () {
+            fetchAndSetupDepartmentsTable(1, showPerPagePagination.val(), search);
+        }, 300);
+    });    
 
     // Run the functions
     fetchAndSetupDepartmentsTable(1, 5);

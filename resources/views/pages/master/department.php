@@ -15,13 +15,13 @@ renderComponent('breadcrumb', [
 ]);
 ?>
 
-<!-- Datatable -->
+<!-- DataTables -->
 <section class="my-1 bg-white rounded shadow-sm">
     <div class="px-4 py-3 border-bottom border-secondary">
         <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between gap-3">
             <h2 class="my-0 heading-6">Departments List</h2>
             <div class="d-flex align-items-center gap-2">
-                <input type="text" placeholder="Search data ..." class="form-control form-control-sm" id="searchInput">
+                <input type="text" placeholder="Search data ..." class="form-control form-control-sm" id="searchDepartment">
                 <button type="button" class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#createDepartmentModal">
                     <div class="d-flex align-items-center gap-2">
                         <i class="fa-solid fa-plus"></i>

@@ -18,10 +18,18 @@ class DepartmentController extends Controller
     public function index(Request $request, Response $response): Response {
         $page = (int) ($request->getQueryParams()['page'] ?? 1);
         $limit = (int) ($request->getQueryParams()['limit'] ?? 10);
+        $search = (string) ($request->getQueryParams()['search'] ?? '');
         $offset = ($page - 1) * $limit;
 
-        $departments = $this->departmentModel->getAll($limit, $offset);
-        $totalDepartments = $this->departmentModel->getTotalCount();;
+        $departments = $this->departmentModel->getAll($limit, $offset, $search);
+        $totalDepartments = 0;
+
+        if (empty($search) || $search === '') {
+            $totalDepartments = $this->departmentModel->getTotalCount();
+        } else {
+            $totalDepartments = count($departments);
+        }
+        
         $totalPages = ceil($totalDepartments / $limit);
 
         if (empty($departments)) {
