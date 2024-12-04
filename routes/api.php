@@ -3,6 +3,7 @@
 use App\Controllers\AdminController;
 use App\Controllers\AuthController;
 use App\Controllers\DepartmentController;
+use App\Controllers\SPClassController;
 use App\Controllers\StudyProgramController;
 use App\Middlewares\CheckAdminMiddleware;
 
@@ -31,6 +32,14 @@ $app->group('/api', function ($api) {
         $api->patch('/{id}', StudyProgramController::class . ':update');
         $api->delete('/{id}', StudyProgramController::class . ':delete');
     })->add(new CheckAuthMiddleware());
+    // SP Class Routes
+    $api->group('/sp-classes', function ($api) {
+        $api->get('', SPClassController::class . ':index');
+        $api->get('/{id}', SPClassController::class . ':show');
+        $api->post('', SPClassController::class . ':store');
+        $api->patch('/{id}', SPClassController::class . ':update');
+        $api->delete('/{id}', SPClassController::class . ':delete');
+    });
     // User Routes
     $api->group('/users', function ($api) {
         $api->get('', AdminController::class . ':getUsers');

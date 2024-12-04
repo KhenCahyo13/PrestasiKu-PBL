@@ -3,10 +3,9 @@ namespace App\Models;
 
 use PDO;
 
-class StudyProgram extends Model
-{
-    protected string $table = "Master.StudyPrograms";
-    protected string $primaryKey = "studyprogram_id";
+class SPClass extends Model {
+    protected string $table = 'Master.SPClass';
+    protected string $primaryKey = 'spclass_id';
 
     public function getTotalCount(): int {
         $query = 'EXEC Metadata.CountTableData @TableName = :tableName';
@@ -17,7 +16,7 @@ class StudyProgram extends Model
         $stmt->execute();
         return (int) $stmt->fetch(PDO::FETCH_ASSOC)['Total'];
     }
-
+    
     public function getAll(int $limit = 10, int $offset = 0): array {
         $query = 'EXEC CRUD.SelectSingleTableWithPagination @TableName = :tableName, @Columns = :columns, @Offset = :offset, @Limit = :limit';
         $stmt = $this->getDbConnection()->prepare($query);
@@ -65,15 +64,15 @@ class StudyProgram extends Model
         $stmt->bindParam(':values', $values, PDO::PARAM_STR);
     
         return $stmt->execute();
-    }     
+    }
 
     public function update(array $data): bool {
-        $sql = "UPDATE $this->table SET department_id = :department_id, studyprogram_name = :studyprogram_name WHERE $this->primaryKey = :studyprogram_id";
+        $sql = "UPDATE $this->table SET studyprogram_id = :studyprogram_id, spclass_name = :spclass_name WHERE $this->primaryKey = :spclass_id";
         $stmt = $this->getDbConnection()->prepare($sql);
 
-        $stmt->bindParam(':department_id', $data['department_id'], PDO::PARAM_INT);
-        $stmt->bindParam(':studyprogram_name', $data['studyprogram_name'], PDO::PARAM_STR);
-        $stmt->bindParam(':studyprogram_id', $data['studyprogram_id'], PDO::PARAM_STR);
+        $stmt->bindParam(':studyprogram_id', $data['studyprogram_id'], PDO::PARAM_INT);
+        $stmt->bindParam(':spclass_name', $data['spclass_name'], PDO::PARAM_STR);
+        $stmt->bindParam(':spclass_id', $data['spclass_id'], PDO::PARAM_STR);
 
         return $stmt->execute();
     }
