@@ -33,6 +33,10 @@
                 include views('master/department.php');
                 return $response;
             });
-        })->add(new CheckAuthMiddleware());
+            $master->get('/study-program', function($request, $response) {
+                include views('master/study-program.php');
+                return $response;
+            });
+        });
     });
 ?>
