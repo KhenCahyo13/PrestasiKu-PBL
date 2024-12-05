@@ -194,6 +194,41 @@ $(document).ready(function() {
             }
         });
     });
+	
+	// Delete a sp class
+	const deleteSpClassButton = $('#deleteSpClassButton');
+	deleteSpClassButton.click(function() {
+		const spClassId = $('#deleteSpClassId').val();
+		const deleteSpClassModal = $('#deleteSpClassModal');
+
+		$.ajax({
+			url: `${BASE_API_URL}/sp-classes/${spClassId}`,
+			method: 'DELETE',
+			success: function(response)  {
+				deleteSpClassModal.modal('hide');
+				fetchAndSetupClassTable(1, 5);
+				alertMessageElement.html(`
+					<div class="my-2 alert alert-success alert-dismissible fade show" role="alert">
+						<p class="my-0 text-sm">
+							<strong>Success!</strong> ${response.message}
+						</p>
+						<button type="button" class="btn btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
+					</div>
+				`);
+			},
+			error: function() {
+				deleteSpClassModal.modal('hide');
+				alertMessageElement.html(`
+					<div class="my-2 alert alert-danger alert-dismissible fade show" role="alert">
+						<p class="my-0 text-sm">
+							<strong>Failed!</strong> Failed when delete class.
+						</p>
+						<button type="button" class="btn btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
+					</div>
+				`);
+			}
+		});
+	});
 
 	// Table DataTables
 	showPerPagePagination.change(function() {
