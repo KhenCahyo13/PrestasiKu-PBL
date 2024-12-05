@@ -17,18 +17,22 @@ class StudyProgramController extends Controller {
     public function index(Request $request, Response $response): Response {
         $page = (int) ($request->getQueryParams()['page'] ?? 1);
         $limit = (int) ($request->getQueryParams()['limit'] ?? 10);
+        $search = (string) ($request->getQueryParams()['search'] ?? '');
         $offset = ($page - 1) * $limit;
 
-        $studyPrograms = $this->studyProgramModel->getAll($limit, $offset);
-        $totalStudyPrograms = $this->studyProgramModel->getTotalCount();;
+        $studyPrograms = $this->studyProgramModel->getAll($limit, $offset, $search);
+        $totalStudyPrograms = 0;
+
+        if (empty($search) || $search === '') {
+            $totalStudyPrograms = $this->studyProgramModel->getTotalCount();
+        } else {
+            $totalStudyPrograms = count($studyPrograms);
+        }
+        
         $totalPages = ceil($totalStudyPrograms / $limit);
 
         if (empty($studyPrograms)) {
-            return ResponseHelper::error(
-                $response,
-                'Study programs data is empty.',
-                200
-            );
+            return ResponseHelper::error($response, 'Study programs not found', 404);
         }
 
         return ResponseHelper::withPagination(

@@ -22,7 +22,7 @@ renderComponent('breadcrumb', [
         <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between gap-3">
             <h2 class="my-0 heading-6">Study Program List</h2>
             <div class="d-flex align-items-center gap-2">
-                <input type="text" placeholder="Search data ..." class="form-control form-control-sm" id="searchInput">
+                <input type="text" placeholder="Search data ..." class="form-control form-control-sm" id="searchStudyProgram">
                 <button type="button" class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#createStudyProgramModal">
                     <div class="d-flex align-items-center gap-2">
                         <i class="fa-solid fa-plus"></i>
@@ -38,55 +38,14 @@ renderComponent('breadcrumb', [
             <thead class="table-secondary">
                 <tr>
                     <th class="px-md-4 py-md-3 text-sm font-medium">No</th>
-                    <th class="px-md-4 py-md-3 text-sm font-medium">Department Name</th>
-                    <th class="px-md-4 py-md-3 text-sm font-medium">Study Program Name</th>
+                    <th class="px-md-4 py-md-3 text-sm font-medium">Name</th>
+                    <th class="px-md-4 py-md-3 text-sm font-medium">Department</th>
                     <th class="px-md-4 py-md-3 text-sm font-medium">Created at</th>
                     <th class="px-md-4 py-md-3 text-sm font-medium">Last Updated</th>
                     <th class="px-md-4 py-md-3 text-sm font-medium text-center">Actions</th>
                 </tr>
             </thead>
-            <tbody id="studyProgramsTableBody">
-                <tr>
-                    <td class="px-md-4 py-md-3 text-sm">1</td> 
-                    <td class="px-md-4 py-md-3 text-sm">Teknologi Informasi</td> 
-                    <td class="px-md-4 py-md-3 text-sm">D-IV Teknik Informatika</td>
-                    <td class="px-md-4 py-md-3 text-sm">25 January 2025</td>
-                    <td class="px-md-4 py-md-3 text-sm">25 January 2025</td>
-                    <td class="px-md-4 py-md-3 text-sm text-center">...</td>
-                </tr>
-                <tr>
-                    <td class="px-md-4 py-md-3 text-sm">2</td>
-                    <td class="px-md-4 py-md-3 text-sm">Teknik Sipil</td>
-                    <td class="px-md-4 py-md-3 text-sm">D-III Teknik Sipil</td>
-                    <td class="px-md-4 py-md-3 text-sm">04 November 2024</td>
-                    <td class="px-md-4 py-md-3 text-sm">05 November 2024</td>
-                    <td class="px-md-4 py-md-3 text-sm text-center">...</td>
-                </tr>
-                <tr>
-                    <td class="px-md-4 py-md-3 text-sm">3</td>
-                    <td class="px-md-4 py-md-3 text-sm">Teknik Elektro</td>
-                    <td class="px-md-4 py-md-3 text-sm">D-IV Sistem Kelistrikan</td>
-                    <td class="px-md-4 py-md-3 text-sm">16 December 2024</td>
-                    <td class="px-md-4 py-md-3 text-sm">18 December 2024</td>
-                    <td class="px-md-4 py-md-3 text-sm text-center">...</td>
-                </tr>
-                <tr>
-                    <td class="px-md-4 py-md-3 text-sm">4</td>
-                    <td class="px-md-4 py-md-3 text-sm">Teknik Kimia</td>
-                    <td class="px-md-4 py-md-3 text-sm">D-IV Teknologi Kimia Industri</td>
-                    <td class="px-md-4 py-md-3 text-sm">1 March 2025</td>
-                    <td class="px-md-4 py-md-3 text-sm">4 March 2025</td>
-                    <td class="px-md-4 py-md-3 text-sm text-center">...</td>
-                </tr>
-                <tr>
-                    <td class="px-md-4 py-md-3 text-sm">5</td>
-                    <td class="px-md-4 py-md-3 text-sm">Teknik Mesin</td>
-                    <td class="px-md-4 py-md-3 text-sm">D-III Teknologi Pemeliharaan Pesawat Udara</td>
-                    <td class="px-md-4 py-md-3 text-sm">26 June 2025</td>
-                    <td class="px-md-4 py-md-3 text-sm">30 June 2025</td>
-                    <td class="px-md-4 py-md-3 text-sm text-center">...</td>
-                </tr>
-            </tbody>
+            <tbody id="studyProgramsTableBody"></tbody>
         </table>
     </div>
     <div class="px-4 py-2">
@@ -188,6 +147,7 @@ renderComponent('breadcrumb', [
         </div>
     </div>
 </div>
+<script src="<?= js('studyProgram.js?v=' . time()) ?>"></script>
 
 <?php
 $content = ob_get_clean();

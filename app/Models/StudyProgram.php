@@ -18,14 +18,27 @@ class StudyProgram extends Model
         return (int) $stmt->fetch(PDO::FETCH_ASSOC)['Total'];
     }
 
-    public function getAll(int $limit = 10, int $offset = 0): array {
-        $query = 'EXEC CRUD.SelectSingleTableWithPagination @TableName = :tableName, @Columns = :columns, @Offset = :offset, @Limit = :limit';
+    public function getAll(int $limit = 10, int $offset = 0, string $search = ''): array {
+        $query = 'EXEC CRUD.SelectSingleTableForDataTablesWithJoins 
+                @TableName = :tableName,
+                @TableColumns = :tableColumns,
+                @SearchColumnName = :searchColumnName,
+                @SearchValue = :searchValue,
+                @Offset = :offset,
+                @Limit = :limit,
+                @JoinConditions = :joinConditions';
         $stmt = $this->getDbConnection()->prepare($query);
 
+        $tableColumns = 'Master.StudyPrograms.*, Master.Departments.department_name';
+        $joinConditions = 'INNER JOIN Master.Departments ON Master.StudyPrograms.department_id = Master.Departments.department_id';
+
         $stmt->bindValue(':tableName', $this->table, PDO::PARAM_STR);
-        $stmt->bindValue(':columns', '*', PDO::PARAM_STR);
+        $stmt->bindValue(':tableColumns', $tableColumns, PDO::PARAM_STR);
+        $stmt->bindValue(':searchColumnName', 'studyprogram_name', PDO::PARAM_STR);
+        $stmt->bindValue(':searchValue', $search, PDO::PARAM_STR);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':joinConditions', $joinConditions, PDO::PARAM_STR);
 
         $stmt->execute();
 

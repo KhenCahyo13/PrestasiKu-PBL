@@ -42,7 +42,8 @@ class DepartmentController extends Controller
             $page,
             $totalPages,
             $totalDepartments,
-            $limit
+            $limit,
+            'Successfully get departments data.'
         );
     }
 
