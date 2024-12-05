@@ -6,6 +6,7 @@ $(document).ready(function() {
 	const nextButtonPagination = $('#nextButtonPagination');
 	const searchSpClassInput = $('#searchSpClass');
 	const createStudyProgramIdSelectInput = $('#createStudyProgramId');
+	const updateStudyProgramIdSelectInput = $('#updateStudyProgramId');
 
 	const fetchAndSetupClassTable = (page = 1, limit = showPerPagePagination, search = '') => {
 		const classTableBody = $('#classTableBody');
@@ -36,7 +37,7 @@ $(document).ready(function() {
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="actionsButton">
                                         <li>
-                                            <button type="button" class="dropdown-item d-flex align-items-center gap-2" data-id="${spClass.spclass_id}" data-name="${spClass.spclass_name}" data-studyprogram="${spClass.studyprogram_name}" data-bs-toggle="modal" data-bs-target="#updateSpClassModal" id="updateSpClassAction">
+                                            <button type="button" class="dropdown-item d-flex align-items-center gap-2" data-id="${spClass.spclass_id}" data-name="${spClass.spclass_name}" data-studyprogram="${spClass.studyprogram_id}" data-bs-toggle="modal" data-bs-target="#updateSpClassModal" id="updateSpClassAction">
                                                 <i class="fa-solid fa-edit text-secondary"></i> Update
                                             </button>
                                         </li>
@@ -139,7 +140,7 @@ $(document).ready(function() {
                     alertMessageElement.html(`
                         <div class="my-2 alert alert-danger alert-dismissible fade show" role="alert">
                             <p class="my-0 text-sm">
-                                <strong>Failed!</strong> Failed when create class data.
+                                <strong>Failed!</strong> Failed when create class.
                             </p>
                             <button type="button" class="btn btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
@@ -148,6 +149,51 @@ $(document).ready(function() {
             });
         });
     }
+
+	// Update a sp class
+	// Update a study program
+    const updateSpClassButton = $('#updateSpClassButton');
+    updateSpClassButton.click(function() {
+        const spClassId = $('#updateSpClassId').val();
+        const studyProgramId = $('#updateStudyProgramId').val();
+        const spClassName = $('#updateSpClassName').val();
+        const updateSpClassModal = $('#updateSpClassModal');
+
+        const data = {
+            spclass_name: spClassName,
+            studyprogram_id: studyProgramId
+        };
+
+        $.ajax({
+            url: `${BASE_API_URL}/sp-classes/${spClassId}`,
+            method: 'PATCH',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function(response)  {
+                updateSpClassModal.modal('hide');
+                fetchAndSetupClassTable(1, 5);
+                alertMessageElement.html(`
+                    <div class="my-2 alert alert-success alert-dismissible fade show" role="alert">
+                        <p class="my-0 text-sm">
+                            <strong>Success!</strong> ${response.message}
+                        </p>
+                        <button type="button" class="btn btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `);
+            },
+            error: function() {
+                updateSpClassModal.modal('hide');
+                alertMessageElement.html(`
+                    <div class="my-2 alert alert-danger alert-dismissible fade show" role="alert">
+                        <p class="my-0 text-sm">
+                            <strong>Failed!</strong> Failed when update class.
+                        </p>
+                        <button type="button" class="btn btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `);
+            }
+        });
+    });
 
 	// Table DataTables
 	showPerPagePagination.change(function() {
@@ -195,6 +241,7 @@ $(document).ready(function() {
 					<option value="${studyProgram.studyprogram_id}">${studyProgram.studyprogram_name}</option>
 				`;
 				createStudyProgramIdSelectInput.append(studyProgramIdOptionInput);
+				updateStudyProgramIdSelectInput.append(studyProgramIdOptionInput);
 			}
 		},
 		error: function(response) {

@@ -120,6 +120,13 @@ renderComponent('breadcrumb', [
                         <input type="text" class="form-control form-control-sm" placeholder="Enter Class Name" id="updateSpClassName">
                         <span class="text-xs text-danger" id="updateSpClassNameError"></span>
                     </div>
+                    <div class="d-flex flex-column gap-2">
+                        <label for="updateStudyProgramId" class="text-sm">Study Program <span class="text-danger">*</span></label>
+                        <select id="updateStudyProgramId" class="form-select form-select-sm">
+                            <option value="">- Select study program</option>
+                        </select>
+                        <span class="text-xs text-danger" id="updateStudyProgramIdError"></span>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer py-1">
