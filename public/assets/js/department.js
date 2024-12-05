@@ -109,7 +109,7 @@ $(document).ready(function() {
                 contentType: 'application/json',
                 data: JSON.stringify(data),
                 success: function(response) {
-                    fetchAndSetupDepartmentsTable();
+                    fetchAndSetupDepartmentsTable(1, 5);
                     createDepartmentModal.modal('hide');
                     createDepartmentForm[0].reset();
                     alertMessageElement.html(`
@@ -155,7 +155,7 @@ $(document).ready(function() {
             data: JSON.stringify(data),
             success: function(response)  {
                 updateDepartmentModal.modal('hide');
-                fetchAndSetupDepartmentsTable();
+                fetchAndSetupDepartmentsTable(1, 5);
                 alertMessageElement.html(`
                     <div class="my-2 alert alert-success alert-dismissible fade show" role="alert">
                         <p class="my-0 text-sm">
@@ -190,7 +190,7 @@ $(document).ready(function() {
             method: 'DELETE',
             success: function(response)  {
                 deleteDepartmentModal.modal('hide');
-                fetchAndSetupDepartmentsTable();
+                fetchAndSetupDepartmentsTable(1, 5);
                 alertMessageElement.html(`
                     <div class="my-2 alert alert-success alert-dismissible fade show" role="alert">
                         <p class="my-0 text-sm">
