@@ -17,21 +17,41 @@ class AdminController
 		$this->userModel = new User();
 	}
 
-	public function getUsers(Request $request, Response $response): ResponseInterface
-	{
-		try {
-			$users = $this->userModel->getUsers();
-			return ResponseHelper::success($response, $users, 'Users retrieved successfully');
-		} catch (\Exception $e) {
-			return ResponseHelper::error($response, 'Failed to retrieve users', 500);
-		}
-	}
+    public function getUsers(Request $request, Response $response): Response {
+        $page = (int) ($request->getQueryParams()['page'] ?? 1);
+        $limit = (int) ($request->getQueryParams()['limit'] ?? 10);
+        $search = (string) ($request->getQueryParams()['search'] ?? '');
+        $offset = ($page - 1) * $limit;
 
-	public function getUserById(Request $request, Response $response, $args): ResponseInterface
-	{
+        $departments = $this->userModel->getAll($limit, $offset, $search);
+        $totalDepartments = 0;
+
+        if (empty($search) || $search === '') {
+            $totalDepartments = $this->userModel->getTotalCount();
+        } else {
+            $totalDepartments = count($departments);
+        }
+        
+        $totalPages = ceil($totalDepartments / $limit);
+
+        if (empty($departments)) {
+            return ResponseHelper::error($response, 'No departments found', 404);
+        }
+
+        return ResponseHelper::withPagination(
+            $response,
+            $departments,
+            $page,
+            $totalPages,
+            $totalDepartments,
+            $limit
+        );
+    }
+
+	public function getUserById(Request $request, Response $response, $args): ResponseInterface {
 		try {
 			$userId = $args['id'];
-			$user = $this->userModel->getUserById($userId);
+			$user = $this->userModel->getById($userId);
 			if ($user) {
 				return ResponseHelper::success($response, $user, 'User retrieved successfully');
 			} else {
@@ -42,15 +62,14 @@ class AdminController
 		}
 	}
 
-	public function updateUser(Request $request, Response $response, $args): ResponseInterface
-	{
+	public function updateUser(Request $request, Response $response, $args): ResponseInterface {
 		try {
 			$data = $request->getParsedBody();
 			$data['user_id'] = $args['id'];
 
-			$updated = $this->userModel->updateUser($data);
+			$action = $this->userModel->update($data);
 
-			if ($updated) {
+			if ($action) {
 				return ResponseHelper::success($response, [], 'User updated successfully');
 			} else {
 				return ResponseHelper::error($response, 'Failed to update user', 400);
@@ -60,13 +79,12 @@ class AdminController
 		}
 	}
 
-	public function deleteUser(Request $request, Response $response, $args): ResponseInterface
-	{
+	public function deleteUser(Request $request, Response $response, $args): ResponseInterface {
 		try {
 			$userId = $args['id'];
-			$deleted = $this->userModel->deleteUser($userId);
+			$action = $this->userModel->delete($userId);
 
-			if ($deleted) {
+			if ($action) {
 				return ResponseHelper::success($response, [], 'User deleted successfully');
 			} else {
 				return ResponseHelper::error($response, 'Failed to delete user', 400);
@@ -76,16 +94,15 @@ class AdminController
 		}
 	}
 
-	public function verifiedRegistration(Request $request, Response $response, $args): ResponseInterface
-	{
+	public function verifiedRegistration(Request $request, Response $response, $args): ResponseInterface {
 		try {
 			$data = $request->getParsedBody();
 			$data['user_id'] = $args['id'];
 			$data['user_isverified'] = 1;
 
-			$verified = $this->userModel->verifiedRegistration($data);
+			$action = $this->userModel->verifiedRegistration($data);
 
-			if ($verified) {
+			if ($action) {
 				return ResponseHelper::success($response, [], 'User registration verified successfully');
 			} else {
 				return ResponseHelper::error($response, 'Failed to verify registration', 400);

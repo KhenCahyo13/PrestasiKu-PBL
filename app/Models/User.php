@@ -13,6 +13,16 @@ class User extends Model {
     protected string $lecturerDetailsTable = 'Master.UserLecturerDetails';
     protected string $rolesTable = 'Master.Roles';
 
+    public function getTotalCount(): int {
+        $query = 'EXEC Metadata.CountTableData @TableName = :tableName';
+        $stmt = $this->getDbConnection()->prepare($query);
+
+        $stmt->bindValue(':tableName', $this->table, PDO::PARAM_STR);
+
+        $stmt->execute();
+        return (int) $stmt->fetch(PDO::FETCH_ASSOC)['Total'];
+    }
+
     public function getByUsername(string $username): array | null {
         $query = 'EXEC CRUD.SelectTableDataByColumnWithJoins
             @TableName = :tableName,
@@ -38,6 +48,40 @@ class User extends Model {
         return $results ?: null;
     }
 
+    public function getAll(int $limit = 10, int $offset = 0, string $search = ''): array {
+        $query = 'EXEC CRUD.SelectSingleTableForDataTables 
+                @TableName = :tableName,
+                @Columns = :columns,
+                @SearchColumnName = :searchColumnName,
+                @SearchValue = :searchValue,
+                @Offset = :offset,
+                @Limit = :limit';
+        $stmt = $this->getDbConnection()->prepare($query);
+
+        $stmt->bindValue(':tableName', $this->table, PDO::PARAM_STR);
+        $stmt->bindValue(':columns', '*', PDO::PARAM_STR);
+        $stmt->bindValue(':searchColumnName', 'user_username', PDO::PARAM_STR);
+        $stmt->bindValue(':searchValue', $search, PDO::PARAM_STR);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getById(string $userId): array | null {
+        $sql = 'EXEC CRUD.SelectTableDataByColumn @TableName = :tableName, @ColumnName = :columnName, @Value = :user_id';
+        $stmt = $this->getDbConnection()->prepare($sql);
+        
+        $stmt->bindParam(':tableName', $this->table, PDO::PARAM_STR);
+        $stmt->bindParam(':columnName', $this->primaryKey, PDO::PARAM_STR);
+        $stmt->bindParam(':user_id', $userId, PDO::PARAM_STR);
+
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result ?? null;
+    }
 
     public function createStudent(array $userData, array $studentDetailsData): bool {
         try {
@@ -126,30 +170,16 @@ class User extends Model {
         }
     }
 
-    public function getUsers(): array {
-        $sql = 'SELECT * FROM $this->table';
-        $stmt = $this->getDbConnection()->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    public function getUserById(string $userId): array | null {
-        $sql = 'SELECT * FROM $this->table WHERE user_id = :user_id';
-        $stmt = $this->getDbConnection()->prepare($sql);
-        $stmt->execute([':user_id' => $userId]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result ?? null;
-    }
-
-    public function updateUser(array $data): bool {
+    public function update(array $data): bool {
         try {
-            $sql = 'UPDATE $this->table SET user_username = :user_username, user_password = :user_password WHERE user_id = :user_id';
-            $stmt = $this->getDbConnection()->prepare($sql);
-            $stmt->execute([
-                ':user_username' => $data['user_username'],
-                ':user_password' => password_hash($data['user_password'], PASSWORD_DEFAULT),
-                ':user_id' => $data['user_id']
-            ]);
+            $query = 'UPDATE $this->table SET user_username = :user_username, user_password = :user_password WHERE user_id = :user_id';
+            $stmt = $this->getDbConnection()->prepare($query);
+
+            $stmt->bindParam(':user_username', $data['user_username'], PDO::PARAM_STR);
+            $stmt->bindParam(':user_password', $data['user_password'], PDO::PARAM_STR);
+            $stmt->bindParam(':user_id', $data['user_id'], PDO::PARAM_STR);
+
+            $stmt->execute();
             return true;
         } catch (Exception $e) {
             error_log("Error updating user: " . $e->getMessage());
@@ -157,11 +187,16 @@ class User extends Model {
         }
     }
 
-    public function deleteUser(string $userId): bool {
+    public function delete(string $userId): bool {
         try {
-            $sql = 'DELETE FROM $this->table WHERE user_id = :user_id';
-            $stmt = $this->getDbConnection()->prepare($sql);
-            $stmt->execute([':user_id' => $userId]);
+            $query = 'EXEC CRUD.DeleteTableDataByColumn @TableName = :tableName, @ColumnName = :columnName, @Value = :value';
+            $stmt = $this->getDbConnection()->prepare($query);
+
+            $stmt->bindParam(':tableName', $this->table, PDO::PARAM_STR);
+            $stmt->bindParam(':columnName', $this->primaryKey, PDO::PARAM_STR);
+            $stmt->bindParam(':value', $userId, PDO::PARAM_STR);
+
+            $stmt->execute();
             return true;
         } catch (Exception $e) {
             error_log("Error deleting user: " . $e->getMessage());
@@ -172,12 +207,14 @@ class User extends Model {
 
     public function verifiedRegistration(array $data): bool {
         try {
-            $sql = 'UPDATE $this->table SET user_isverified = :user_isverified WHERE user_id = :user_id';
-            $stmt = $this->getDbConnection()->prepare($sql);
-            $stmt->execute([
-                ':user_isverified' => $data['user_isverified'],
-                ':user_id' => $data['user_id']
-            ]);
+            $query = 'UPDATE $this->table SET user_isverified = :user_isverified WHERE user_id = :user_id';
+            $stmt = $this->getDbConnection()->prepare($query);
+
+            $stmt->bindParam(':user_isverified', $data['user_isverified'], PDO::PARAM_INT);
+            $stmt->bindParam(':user_id', $data['user_id'], PDO::PARAM_STR);
+
+            $stmt->execute();
+
             return true;
         } catch (Exception $e) {
             error_log("Error user: " . $e->getMessage());
