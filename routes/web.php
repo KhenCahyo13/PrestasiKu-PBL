@@ -37,6 +37,10 @@
                 include views('master/study-program.php');
                 return $response;
             });
+            $master->get('/sp-class', function($request, $response) {
+                include views('master/sp-class.php');
+                return $response;
+            });
         });
     });
 ?>
