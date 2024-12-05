@@ -29,7 +29,7 @@ class StudyProgram extends Model
                 @JoinConditions = :joinConditions';
         $stmt = $this->getDbConnection()->prepare($query);
 
-        $tableColumns = 'Master.StudyPrograms.*, Master.Departments.department_name';
+        $tableColumns = 'Master.StudyPrograms.*, Master.Departments.department_id, Master.Departments.department_name';
         $joinConditions = 'INNER JOIN Master.Departments ON Master.StudyPrograms.department_id = Master.Departments.department_id';
 
         $stmt->bindValue(':tableName', $this->table, PDO::PARAM_STR);

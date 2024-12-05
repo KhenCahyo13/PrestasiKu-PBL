@@ -6,6 +6,7 @@ $(document).ready(function() {
     const nextButtonPagination = $('#nextButtonPagination');
     const searchStudyProgramInput = $('#searchStudyProgram');
     const createDepartmentIdSelectInput = $('#createDepartmentId');
+    const updateDepartmentIdSelectInput = $('#updateDepartmentId');
 
     // Get and setup study programs table
     const fetchAndSetupStudyProgramsTable = (page = 1, limit = showPerPagePagination, search = '') => {
@@ -37,7 +38,7 @@ $(document).ready(function() {
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="actionsButton">
                                         <li>
-                                            <button type="button" class="dropdown-item d-flex align-items-center gap-2" data-id="${studyProgram.studyprogram_id}" data-name="${studyProgram.studyprogram_name}" data-bs-toggle="modal" data-bs-target="#updateStudyProgramModal" id="updateStudyProgramAction">
+                                            <button type="button" class="dropdown-item d-flex align-items-center gap-2" data-id="${studyProgram.studyprogram_id}" data-name="${studyProgram.studyprogram_name}" data-department="${studyProgram.department_id}" data-bs-toggle="modal" data-bs-target="#updateStudyProgramModal" id="updateStudyProgramAction">
                                                 <i class="fa-solid fa-edit text-secondary"></i> Update
                                             </button>
                                         </li>
@@ -68,9 +69,11 @@ $(document).ready(function() {
                     button.addEventListener('click', function () {
                         const studyProgramId = this.getAttribute('data-id');
                         const studyProgramName = this.getAttribute('data-name');
+                        const departmentId = this.getAttribute('data-department');
             
                         $('#updateStudyProgramId').val(studyProgramId);
                         $('#updateStudyProgramName').val(studyProgramName);
+                        $('#updateDepartmentId').val(departmentId);
                     });
                 });
             },
@@ -147,6 +150,50 @@ $(document).ready(function() {
             });
         });
     }
+
+    // Update a study program
+    const updateStudyProgramButton = $('#updateStudyProgramButton');
+    updateStudyProgramButton.click(function() {
+        const studyProgramId = $('#updateStudyProgramId').val();
+        const departmentId = $('#updateDepartmentId').val();
+        const studyProgramName = $('#updateStudyProgramName').val();
+        const updateStudyProgramModal = $('#updateStudyProgramModal');
+
+        const data = {
+            studyprogram_name: studyProgramName,
+            department_id: departmentId
+        };
+
+        $.ajax({
+            url: `${BASE_API_URL}/study-programs/${studyProgramId}`,
+            method: 'PATCH',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function(response)  {
+                updateStudyProgramModal.modal('hide');
+                fetchAndSetupStudyProgramsTable(1, 5);
+                alertMessageElement.html(`
+                    <div class="my-2 alert alert-success alert-dismissible fade show" role="alert">
+                        <p class="my-0 text-sm">
+                            <strong>Success!</strong> ${response.message}
+                        </p>
+                        <button type="button" class="btn btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `);
+            },
+            error: function() {
+                updateStudyProgramModal.modal('hide');
+                alertMessageElement.html(`
+                    <div class="my-2 alert alert-danger alert-dismissible fade show" role="alert">
+                        <p class="my-0 text-sm">
+                            <strong>Failed!</strong> Failed when update study program.
+                        </p>
+                        <button type="button" class="btn btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `);
+            }
+        });
+    });
 
     // Delete a study program
     const deleteStudyProgramButton = $('#deleteStudyProgramButton');
@@ -229,6 +276,7 @@ $(document).ready(function() {
                     <option value="${department.department_id}">${department.department_name}</option>
                 `;
                 createDepartmentIdSelectInput.append(departmentIdOptionInput);
+                updateDepartmentIdSelectInput.append(departmentIdOptionInput);
             }
         },
         error: function(response) {

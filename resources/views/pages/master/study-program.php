@@ -120,11 +120,18 @@ renderComponent('breadcrumb', [
                         <input type="text" class="form-control form-control-sm" placeholder="Enter Study Program name" id="updateStudyProgramName">
                         <span class="text-xs text-danger" id="updateStudyProgramNameError"></span>
                     </div>
+                    <div class="d-flex flex-column gap-2">
+                            <label for="username" class="text-sm">Department <span class="text-danger">*</span></label>
+                            <select id="updateDepartmentId" class="form-select form-select-sm">
+                                <option value="">- Select department</option>
+                            </select>
+                            <span class="text-xs text-danger" id="updateDepartmentIdError"></span>
+                        </div>
                 </div>
             </div>
             <div class="modal-footer py-1">
                 <button type="button" class="btn btn-warning btn-sm" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger btn-sm" id="updateStudyprogramButton">Update</button>
+                <button type="button" class="btn btn-danger btn-sm" id="updateStudyProgramButton">Update</button>
             </div>
         </div>
     </div>
