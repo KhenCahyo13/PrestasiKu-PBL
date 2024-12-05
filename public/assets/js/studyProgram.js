@@ -141,7 +141,7 @@ $(document).ready(function() {
                     alertMessageElement.html(`
                         <div class="my-2 alert alert-danger alert-dismissible fade show" role="alert">
                             <p class="my-0 text-sm">
-                                <strong>Failed!</strong> Department creation failed
+                                <strong>Failed!</strong> Failed when create study program data.
                             </p>
                             <button type="button" class="btn btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
