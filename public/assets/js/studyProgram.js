@@ -55,7 +55,7 @@ $(document).ready(function() {
                     studyProgramsTableBody.append(studyProgramRow);
                 }
 
-                // Delete department button action
+                // Delete study program button action
                 document.querySelectorAll('#deleteStudyProgramAction').forEach((button) => {
                     button.addEventListener('click', function () {
                         const studyProgramId = this.getAttribute('data-id');
@@ -64,7 +64,7 @@ $(document).ready(function() {
                     });
                 });
 
-                // Update department button action
+                // Update study program button action
                 document.querySelectorAll('#updateStudyProgramAction').forEach((button) => {
                     button.addEventListener('click', function () {
                         const studyProgramId = this.getAttribute('data-id');

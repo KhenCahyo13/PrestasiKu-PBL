@@ -22,7 +22,7 @@ renderComponent('breadcrumb', [
         <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between gap-3">
             <h2 class="my-0 heading-6">Class List</h2>
             <div class="d-flex align-items-center gap-2">
-                <input type="text" placeholder="Search data ..." class="form-control form-control-sm" id="searchClass">
+                <input type="text" placeholder="Search data ..." class="form-control form-control-sm" id="searchSpClass">
                 <button type="button" class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#createClassModal">
                     <div class="d-flex align-items-center gap-2">
                         <i class="fa-solid fa-plus"></i>
@@ -108,7 +108,7 @@ renderComponent('breadcrumb', [
 </div>
 
 <!-- Update Class Modal -->
-<div class="modal fade" id="updateClassModal" tabindex="-1" aria-labelledby="updateClassModal" aria-hidden="true">
+<div class="modal fade" id="updateSpClassModal" tabindex="-1" aria-labelledby="updateSpClassModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header justify-content-center">
@@ -116,37 +116,38 @@ renderComponent('breadcrumb', [
             </div>
             <div class="modal-body">
                 <div class="d-flex flex-column gap-3">
-                    <input type="text" id="updateClassId" hidden>
+                    <input type="text" id="updateSpClassId" hidden>
                     <div class="d-flex flex-column gap-2">
                         <label for="username" class="text-sm"> Name <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control form-control-sm" placeholder="Enter Class Name" id="updateClassName">
-                        <span class="text-xs text-danger" id="updateClassNameError"></span>
+                        <input type="text" class="form-control form-control-sm" placeholder="Enter Class Name" id="updateSpClassName">
+                        <span class="text-xs text-danger" id="updateSpClassNameError"></span>
                     </div>
                 </div>
             </div>
             <div class="modal-footer py-1">
                 <button type="button" class="btn btn-warning btn-sm" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger btn-sm" id="updateClassButton">Update</button>
+                <button type="button" class="btn btn-danger btn-sm" id="updateSpClassButton">Update</button>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Delete Class Modal -->
-<div class="modal fade" id="deleteClassModal" tabindex="-1" aria-labelledby="deleteClassModal" aria-hidden="true">
+<div class="modal fade" id="deleteSpClassModal" tabindex="-1" aria-labelledby="deleteSpClassModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-body">
-                <input type="text" id="deleteCLassId" hidden>
-                <p class="my-0 text-sm text-center">Are you sure to delete this Class data?</p>
+                <input type="text" id="deleteSpClassId" hidden>
+                <p class="my-0 text-sm text-center">Are you sure to delete this class data?</p>
             </div>
             <div class="modal-footer py-1">
                 <button type="button" class="btn btn-warning btn-sm" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger btn-sm" id="deleteClassProgramButton">Delete</button>
+                <button type="button" class="btn btn-danger btn-sm" id="deleteSpClassButton">Delete</button>
             </div>
         </div>
     </div>
 </div>
+<script src="<?= js('spClass.js?v=' . time()) ?>"></script>
 
 <?php
 $content = ob_get_clean();
