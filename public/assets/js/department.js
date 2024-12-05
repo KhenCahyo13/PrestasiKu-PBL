@@ -170,7 +170,7 @@ $(document).ready(function() {
                 alertMessageElement.html(`
                     <div class="my-2 alert alert-danger alert-dismissible fade show" role="alert">
                         <p class="my-0 text-sm">
-                            <strong>Failed!</strong> Department update failed
+                            <strong>Failed!</strong> Failed when update department.
                         </p>
                         <button type="button" class="btn btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
@@ -205,7 +205,7 @@ $(document).ready(function() {
                 alertMessageElement.html(`
                     <div class="my-2 alert alert-danger alert-dismissible fade show" role="alert">
                         <p class="my-0 text-sm">
-                            <strong>Failed!</strong> Department deletion failed
+                            <strong>Failed!</strong> Failed when delete department.
                         </p>
                         <button type="button" class="btn btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
