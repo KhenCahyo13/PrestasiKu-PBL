@@ -1,9 +1,11 @@
 $(document).ready(function() {
+    // Init variables
     const alertMessageElement = $('#alertMessage');
     const showPerPagePagination = $('#showPerPagePagination');
     const prevButtonPagination = $('#prevButtonPagination');
     const nextButtonPagination = $('#nextButtonPagination');
     const searchStudyProgramInput = $('#searchStudyProgram');
+    const createDepartmentIdSelectInput = $('#createDepartmentId');
 
     // Get and setup study programs table
     const fetchAndSetupStudyProgramsTable = (page = 1, limit = showPerPagePagination, search = '') => {
@@ -24,8 +26,8 @@ $(document).ready(function() {
                     const studyProgramRow = `
                         <tr>
                             <td class="px-md-4 py-md-3 text-sm">${i + 1}</td>
-                            <td class="px-md-4 py-md-3 text-sm">${studyProgram.department_name}</td>
                             <td class="px-md-4 py-md-3 text-sm">${studyProgram.studyprogram_name}</td>
+                            <td class="px-md-4 py-md-3 text-sm">${studyProgram.department_name}</td>
                             <td class="px-md-4 py-md-3 text-sm">${formatDateToIndonesian(studyProgram.studyprogram_createdat)}</td>
                             <td class="px-md-4 py-md-3 text-sm">${formatDateToIndonesian(studyProgram.studyprogram_updatedat)}</td>
                             <td class="px-md-4 py-md-3 text-sm">
@@ -73,10 +75,78 @@ $(document).ready(function() {
                 });
             },
             error: function() {
-
+                console.log('Error while fetching study programs data!');
             }
         });
     };
+
+    // Create a new study program
+    const createStudyProgram = () => {
+        const createStudyProgramForm = $('#createStudyProgramForm');
+        const createStudyProgramModal = $('#createStudyProgramModal');
+        const studyProgramName = $('#createStudyProgramName');
+        const departmentId = $('#createDepartmentId');
+        
+        createStudyProgramForm.submit(function(event) {
+            event.preventDefault();
+
+            $('#createStudyProgramNameError').text('');
+            $('#createDepartmentIdError').text('');
+
+            let isValid = true;
+
+            if (studyProgramName.val() === '') {
+                $('#createStudyProgramNameError').text('Study program name is required');
+                isValid = false;
+            }
+
+            if (departmentId.val() === '') {
+                $('#createDepartmentIdError').text('Department name is required');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                return false;
+            }
+
+            const data = {
+                studyprogram_name: studyProgramName.val(),
+                department_id: departmentId.val()
+            };
+
+            $.ajax({
+                url: `${BASE_API_URL}/study-programs`,
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function(response) {
+                    fetchAndSetupStudyProgramsTable(1, 5);
+                    createStudyProgramModal.modal('hide');
+                    createStudyProgramForm[0].reset();
+                    alertMessageElement.html(`
+                        <div class="my-2 alert alert-success alert-dismissible fade show" role="alert">
+                            <p class="my-0 text-sm">
+                                <strong>Success!</strong> ${response.message}
+                            </p>
+                            <button type="button" class="btn btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    `);
+                },
+                error: function() {
+                    createStudyProgramModal.modal('hide');
+                    createStudyProgramForm[0].reset();
+                    alertMessageElement.html(`
+                        <div class="my-2 alert alert-danger alert-dismissible fade show" role="alert">
+                            <p class="my-0 text-sm">
+                                <strong>Failed!</strong> Department creation failed
+                            </p>
+                            <button type="button" class="btn btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    `);
+                }
+            });
+        });
+    }
 
     // Table DataTables
     showPerPagePagination.change(function() {
@@ -111,8 +181,27 @@ $(document).ready(function() {
         debounceTimeout = setTimeout(function () {
             fetchAndSetupStudyProgramsTable(1, showPerPagePagination.val(), search);
         }, 300);
-    });  
+    });
+
+    // Setup study programs input
+    $.ajax({
+        url: `${BASE_API_URL}/departments?page=1&limit=100&search=`,
+        method: 'GET',
+        success: function(response) {
+            for (let i = 0; i < response.data.length; i++) {
+                const department = response.data[i];
+                const departmentIdOptionInput = `
+                    <option value="${department.department_id}">${department.department_name}</option>
+                `;
+                createDepartmentIdSelectInput.append(departmentIdOptionInput);
+            }
+        },
+        error: function(response) {
+            console.log('Error while fetching departments data!');
+        }
+    });
 
     // Run functions
     fetchAndSetupStudyProgramsTable(1, 5);
+    createStudyProgram();
 });

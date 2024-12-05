@@ -84,15 +84,13 @@ renderComponent('breadcrumb', [
                     <div class="d-flex flex-column gap-2">
                         <div class="d-flex flex-column gap-2">
                             <label for="username" class="text-sm">Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control form-control-sm" placeholder="Enter Study Program name" id="createStudyProgramName">
+                            <input type="text" class="form-control form-control-sm" placeholder="Enter study program name" id="createStudyProgramName">
                             <span class="text-xs text-danger" id="createStudyProgramNameError"></span>
                         </div>
                         <div class="d-flex flex-column gap-2">
                             <label for="username" class="text-sm">Department <span class="text-danger">*</span></label>
-                            <select id="" class="form-select form-select-sm">
-                                <option value="1">Teknologi Informasi</option>
-                                <option value="1">Teknik Kimia</option>
-                                <option value="1">Teknik Elektro</option>
+                            <select id="createDepartmentId" class="form-select form-select-sm">
+                                <option value="">- Select department</option>
                             </select>
                             <span class="text-xs text-danger" id="createDepartmentIdError"></span>
                         </div>
