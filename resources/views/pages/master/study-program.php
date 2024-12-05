@@ -136,7 +136,7 @@ renderComponent('breadcrumb', [
         <div class="modal-content">
             <div class="modal-body">
                 <input type="text" id="deleteStudyProgramId" hidden>
-                <p class="my-0 text-sm text-center">Are you sure to delete this Study Program data?</p>
+                <p class="my-0 text-sm text-center">Are you sure to delete this study program data?</p>
             </div>
             <div class="modal-footer py-1">
                 <button type="button" class="btn btn-warning btn-sm" data-bs-dismiss="modal">Cancel</button>

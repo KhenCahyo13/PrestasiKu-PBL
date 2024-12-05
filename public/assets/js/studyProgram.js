@@ -37,12 +37,12 @@ $(document).ready(function() {
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="actionsButton">
                                         <li>
-                                            <button type="button" class="dropdown-item d-flex align-items-center gap-2" data-id="${studyProgram.studyprogram_id}" data-name="${studyProgram.studyprogram_name}" data-bs-toggle="modal" data-bs-target="#updateDepartmentModal" id="updateStudyProgramAction">
+                                            <button type="button" class="dropdown-item d-flex align-items-center gap-2" data-id="${studyProgram.studyprogram_id}" data-name="${studyProgram.studyprogram_name}" data-bs-toggle="modal" data-bs-target="#updateStudyProgramModal" id="updateStudyProgramAction">
                                                 <i class="fa-solid fa-edit text-secondary"></i> Update
                                             </button>
                                         </li>
                                         <li>
-                                            <button type="button" class="dropdown-item d-flex align-items-center gap-2" data-id="${studyProgram.studyprogram_id}" data-bs-toggle="modal" data-bs-target="#deleteDepartmentModal" id="deleteStudyProgramAction">
+                                            <button type="button" class="dropdown-item d-flex align-items-center gap-2" data-id="${studyProgram.studyprogram_id}" data-bs-toggle="modal" data-bs-target="#deleteStudyProgramModal" id="deleteStudyProgramAction">
                                                 <i class="fa-solid fa-trash text-secondary"></i> Delete
                                             </button>
                                         </li>
@@ -147,6 +147,41 @@ $(document).ready(function() {
             });
         });
     }
+
+    // Delete a study program
+    const deleteStudyProgramButton = $('#deleteStudyProgramButton');
+    deleteStudyProgramButton.click(function() {
+        const studyProgramId = $('#deleteStudyProgramId').val();
+        const deleteStudyProgramModal = $('#deleteStudyProgramModal');
+
+        $.ajax({
+            url: `${BASE_API_URL}/study-programs/${studyProgramId}`,
+            method: 'DELETE',
+            success: function(response)  {
+                deleteStudyProgramModal.modal('hide');
+                fetchAndSetupStudyProgramsTable(1, 5);
+                alertMessageElement.html(`
+                    <div class="my-2 alert alert-success alert-dismissible fade show" role="alert">
+                        <p class="my-0 text-sm">
+                            <strong>Success!</strong> ${response.message}
+                        </p>
+                        <button type="button" class="btn btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `);
+            },
+            error: function() {
+                deleteStudyProgramModal.modal('hide');
+                alertMessageElement.html(`
+                    <div class="my-2 alert alert-danger alert-dismissible fade show" role="alert">
+                        <p class="my-0 text-sm">
+                            <strong>Failed!</strong> Failed when delete study program.
+                        </p>
+                        <button type="button" class="btn btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `);
+            }
+        });
+    });
 
     // Table DataTables
     showPerPagePagination.change(function() {
