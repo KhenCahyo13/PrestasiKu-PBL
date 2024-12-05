@@ -16,21 +16,26 @@ class SPClassController extends Controller {
         $this->spClassModel = new SPClass();
     }
 
+
     public function index(Request $request, Response $response): Response {
         $page = (int) ($request->getQueryParams()['page'] ?? 1);
         $limit = (int) ($request->getQueryParams()['limit'] ?? 10);
+        $search = (string) ($request->getQueryParams()['search'] ?? '');
         $offset = ($page - 1) * $limit;
 
-        $spClasses = $this->spClassModel->getAll($limit, $offset);
-        $totalSpClasses = $this->spClassModel->getTotalCount();;
+        $spClasses = $this->spClassModel->getAll($limit, $offset, $search);
+        $totalSpClasses = 0;
+
+        if (empty($search) || $search === '') {
+            $totalSpClasses = $this->spClassModel->getTotalCount();
+        } else {
+            $totalSpClasses = count($spClasses);
+        }
+        
         $totalPages = ceil($totalSpClasses / $limit);
 
         if (empty($spClasses)) {
-            return ResponseHelper::error(
-                $response,
-                'Sp classes data is empty.',
-                200
-            );
+            return ResponseHelper::error($response, 'Sp class not found', 404);
         }
 
         return ResponseHelper::withPagination(
@@ -40,7 +45,7 @@ class SPClassController extends Controller {
             $totalPages,
             $totalSpClasses,
             $limit,
-            'Successfully get sp classes data.'
+            'Successfully get sp class data.'
         );
     }
 
