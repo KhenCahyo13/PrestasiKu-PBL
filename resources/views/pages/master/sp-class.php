@@ -23,7 +23,7 @@ renderComponent('breadcrumb', [
             <h2 class="my-0 heading-6">Class List</h2>
             <div class="d-flex align-items-center gap-2">
                 <input type="text" placeholder="Search data ..." class="form-control form-control-sm" id="searchSpClass">
-                <button type="button" class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#createClassModal">
+                <button type="button" class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#createSpClassModal">
                     <div class="d-flex align-items-center gap-2">
                         <i class="fa-solid fa-plus"></i>
                         <span style="white-space: nowrap;">Add New</span>
@@ -70,7 +70,7 @@ renderComponent('breadcrumb', [
 </section>
 
 <!-- Create Class Modal -->
-<div class="modal fade" id="createClassModal" tabindex="-1" aria-labelledby="createClassLabel" aria-hidden="true">
+<div class="modal fade" id="createSpClassModal" tabindex="-1" aria-labelledby="createSpClassModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header justify-content-between px-3 py-3">
@@ -80,21 +80,19 @@ renderComponent('breadcrumb', [
                 </button>
             </div>
             <div class="modal-body">
-                <form action="#" method="POST" id="createClassForm">
+                <form action="#" method="POST" id="createSpClassForm">
                     <div class="d-flex flex-column gap-2">
                         <div class="d-flex flex-column gap-2">
-                            <label for="username" class="text-sm"> Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control form-control-sm" placeholder="Enter Class Name" id="createClassName">
-                            <span class="text-xs text-danger" id="createClassNameError"></span>
+                            <label for="createSpClassName" class="text-sm"> Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control form-control-sm" placeholder="Enter Class Name" id="createSpClassName">
+                            <span class="text-xs text-danger" id="createSpClassNameError"></span>
                         </div>
                         <div class="d-flex flex-column gap-2">
-                            <label for="username" class="text-sm"> Study Program <span class="text-danger">*</span></label>
-                            <select id="" class="form-select form-select-sm">
-                                <option value="1">Teknologi Informasi</option>
-                                <option value="1">Teknik Kimia</option>
-                                <option value="1">Teknik Elektro</option>
+                            <label for="createStudyProgramId" class="text-sm">Study Program <span class="text-danger">*</span></label>
+                            <select id="createStudyProgramId" class="form-select form-select-sm">
+                                <option value="">- Select study program</option>
                             </select>
-                            <span class="text-xs text-danger" id="creatStudyProgramIdError"></span>
+                            <span class="text-xs text-danger" id="createStudyProgramIdError"></span>
                         </div>
                         <div class="d-flex flex-column gap-2 mt-1">
                             <button type="submit" class="btn btn-primary">Create</button>

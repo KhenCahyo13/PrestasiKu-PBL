@@ -5,6 +5,7 @@ $(document).ready(function() {
 	const prevButtonPagination = $('#prevButtonPagination');
 	const nextButtonPagination = $('#nextButtonPagination');
 	const searchSpClassInput = $('#searchSpClass');
+	const createStudyProgramIdSelectInput = $('#createStudyProgramId');
 
 	const fetchAndSetupClassTable = (page = 1, limit = showPerPagePagination, search = '') => {
 		const classTableBody = $('#classTableBody');
@@ -80,6 +81,74 @@ $(document).ready(function() {
 		});
 	}
 
+	// Create a new sp class
+	const createSpClass = () => {
+        const createSpClassForm = $('#createSpClassForm');
+        const createSpClassModal = $('#createSpClassModal');
+        const spClassName = $('#createSpClassName');
+        const studyProgramId = $('#createStudyProgramId');
+        
+        createSpClassForm.submit(function(event) {
+            event.preventDefault();
+
+            $('#createSpClassNameError').text('');
+            $('#createStudyProgramIdError').text('');
+
+            let isValid = true;
+
+            if (spClassName.val() === '') {
+                $('#createSpClassNameError').text('Class name is required');
+                isValid = false;
+            }
+
+            if (studyProgramId.val() === '') {
+                $('#createStudyProgramIdError').text('Study program name is required');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                return false;
+            }
+
+            const data = {
+                spclass_name: spClassName.val(),
+                studyprogram_id: studyProgramId.val()
+            };
+
+            $.ajax({
+                url: `${BASE_API_URL}/sp-classes`,
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function(response) {
+                    fetchAndSetupClassTable(1, 5);
+                    createSpClassModal.modal('hide');
+                    createSpClassForm[0].reset();
+                    alertMessageElement.html(`
+                        <div class="my-2 alert alert-success alert-dismissible fade show" role="alert">
+                            <p class="my-0 text-sm">
+                                <strong>Success!</strong> ${response.message}
+                            </p>
+                            <button type="button" class="btn btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    `);
+                },
+                error: function() {
+                    createStudyProgramModal.modal('hide');
+                    createStudyProgramForm[0].reset();
+                    alertMessageElement.html(`
+                        <div class="my-2 alert alert-danger alert-dismissible fade show" role="alert">
+                            <p class="my-0 text-sm">
+                                <strong>Failed!</strong> Failed when create class data.
+                            </p>
+                            <button type="button" class="btn btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    `);
+                }
+            });
+        });
+    }
+
 	// Table DataTables
 	showPerPagePagination.change(function() {
 		const limit = $(this).val();
@@ -115,6 +184,25 @@ $(document).ready(function() {
 		}, 300);
 	});
 
+	// Setup sp class input
+	$.ajax({
+		url: `${BASE_API_URL}/study-programs?page=1&limit=100&search=`,
+		method: 'GET',
+		success: function(response) {
+			for (let i = 0; i < response.data.length; i++) {
+				const studyProgram = response.data[i];
+				const studyProgramIdOptionInput = `
+					<option value="${studyProgram.studyprogram_id}">${studyProgram.studyprogram_name}</option>
+				`;
+				createStudyProgramIdSelectInput.append(studyProgramIdOptionInput);
+			}
+		},
+		error: function(response) {
+			console.log('Error while fetching study programs data!');
+		}
+	});
+
 	// Run functions
 	fetchAndSetupClassTable(1, 5);
+	createSpClass();
 });
