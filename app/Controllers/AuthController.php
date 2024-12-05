@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Helpers\ResponseHelper;
+use App\Models\Role;
 use App\Models\User;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Psr7\Request;
@@ -12,73 +13,93 @@ use Ramsey\Uuid\Uuid;
 class AuthController
 {
 	private $userModel;
+	private $roleModel;
 
-	public function __construct()
-	{
+	public function __construct() {
 		$this->userModel = new User();
+		$this->roleModel = new Role();
 	}
 
-	public function register(Request $request, Response $response): ResponseInterface
-	{
+	public function register(Request $request, Response $response): ResponseInterface {
 		$data = json_decode($request->getBody(), true);
-		$uuid = Uuid::uuid4();
+		$detailsId = Uuid::uuid4();
 
+		// Check Password Pattern
 		$passwordPattern = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/';
 		if (!preg_match($passwordPattern, $data['user_password'])) {
-			$response->getBody()->write(json_encode(['success' => false, 'message' => 'Password must contain at least one uppercase letter, one lowercase letter, one number, one special character, and be at least 8 characters long.']));
-			return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+			return ResponseHelper::error(
+				$response,
+				'Password must contain at least one uppercase letter, one lowercase letter, one number, one special character, and be at least 8 characters long.',
+				400
+			);
 		}
 
+		// Check if username already exists
 		$existingUser = $this->userModel->getByUsername($data['user_username']);
 		if ($existingUser) {
-			$response->getBody()->write(json_encode(['success' => false, 'message' => 'Username already exists!']));
-			return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+			return ResponseHelper::error(
+				$response,
+				'Username already exists.',
+				400
+			);
 		}
 
-		if (!isset($data['role_id']) || !in_array($data['role_id'], ['39DC23CD-CB63-4073-A15A-2D8A878A3F58', 'FBA2D7AA-4F83-4C48-9C9A-4EB7F8A253F8'])) {
-			$response->getBody()->write(json_encode(['success' => false, 'message' => 'Invalid role!']));
-			return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+		// Check role
+		$role = $this->roleModel->getById($data['role_id']);
+		if (!$role) {
+			return ResponseHelper::error(
+				$response,
+				'Role not found.',
+				400
+			);
 		}
 
-		$insertData = [
-			'user_id' => $uuid->toString(),
+		$results = false;
+		$userData = array(
+			'role_id' => $data['role_id'],
 			'user_username' => $data['user_username'],
 			'user_password' => password_hash($data['user_password'], PASSWORD_DEFAULT),
-			'role_id' => $data['role_id'],
-			'detail_id' => $uuid->toString()
-		];
+		);
 
-		if ($data['role_id'] === '39DC23CD-CB63-4073-A15A-2D8A878A3F58') {
-			$insertData += [
+		if ($role['role_name'] == 'Student') {
+			$userData['details_student_id'] = $detailsId->toString();
+			$studentDetailsData = array(
+				'detail_id' => $detailsId->toString(),
 				'spclass_id' => $data['spclass_id'],
 				'detail_name' => $data['detail_name'],
 				'detail_nim' => $data['detail_nim'],
-				'detail_date_of_birth' => $data['detail_date_of_birth'],
-				'detail_phone_number' => $data['detail_phone_number'],
+				'detail_dateofbirth' => $data['detail_dateofbirth'],
+				'detail_phonenumber' => $data['detail_phonenumber'],
 				'detail_email' => $data['detail_email'],
-				'detail_profile' => $data['detail_profile']
-			];
-			$result = $this->userModel->createStudent($insertData);
-		} else {
-			$insertData += [
+			);
+			$results = $this->userModel->createStudent($userData, $studentDetailsData);
+		} else if ($role['role_name'] == 'Lecturer') {
+			$userData['details_lecturer_id'] = $detailsId->toString();
+			$lecturerDetailsData = array(
+				'detail_id' => $detailsId->toString(),
 				'department_id' => $data['department_id'],
 				'detail_name' => $data['detail_name'],
 				'detail_nip' => $data['detail_nip'],
-				'detail_phone_number' => $data['detail_phone_number'],
+				'detail_phonenumber' => $data['detail_phonenumber'],
 				'detail_email' => $data['detail_email'],
-				'detail_profile' => $data['detail_profile']
-			];
-			$result = $this->userModel->createLecture($insertData);
+			);
+			$results = $this->userModel->createLecture($userData, $lecturerDetailsData);
 		}
 
-		if ($result) {
-			$responseData = ['success' => true, 'message' => 'Registration successful!', 'data' => $insertData];
+		if ($results) {
+			return ResponseHelper::success(
+				$response,
+				array(),
+				'Successfully register.',
+				201
+			);
 		} else {
-			$responseData = ['success' => false, 'message' => 'Failed to register user.'];
+			return ResponseHelper::error(
+				$response,
+				'Failed to register.',
+				400
+			);
 		}
-
-		$response->getBody()->write(json_encode($responseData));
-		return $response->withHeader('Content-Type', 'application/json')->withStatus($result ? 201 : 500);
 	}
 
 	public function login(Request $request, Response $response): ResponseInterface {
@@ -90,7 +111,7 @@ class AuthController
 
 			if ($user) {
 				if (password_verify($data['user_password'], $user['user_password'])) {
-					if ($user['user_isverified'] === 1) {
+					if ($user['user_isverified'] == 1) {
 						$_SESSION['user'] = [
 							'id' => $user['user_id'],
 							'username' => $user['user_username'],
