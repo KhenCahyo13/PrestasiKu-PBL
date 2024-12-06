@@ -3,6 +3,7 @@
 use App\Controllers\AdminController;
 use App\Controllers\AuthController;
 use App\Controllers\DepartmentController;
+use App\Controllers\RoleController;
 use App\Controllers\SPClassController;
 use App\Controllers\StudyProgramController;
 use App\Middlewares\CheckAdminMiddleware;
@@ -16,9 +17,13 @@ $app->group('/api', function ($api) {
         $api->post('/login', AuthController::class . ':login');
         $api->post('/logout', AuthController::class . ':logout');
     });
+    // Roles Routes
+    $api->group('/roles', function ($api) {
+        $api->get('', RoleController::class . ':index');
+    });
     // Department Routes
+    $api->get('/departments', DepartmentController::class . ':index');
     $api->group('/departments', function ($api) {
-        $api->get('', DepartmentController::class . ':index');
         $api->get('/{id}', DepartmentController::class . ':show');
         $api->post('', DepartmentController::class . ':store')->add(new CheckAdminMiddleware());
         $api->patch('/{id}', DepartmentController::class . ':update')->add(new CheckAdminMiddleware());
@@ -33,8 +38,8 @@ $app->group('/api', function ($api) {
         $api->delete('/{id}', StudyProgramController::class . ':delete')->add(new CheckAdminMiddleware());
     })->add(new CheckAuthMiddleware());
     // SP Class Routes
+    $api->get('/sp-classes', SPClassController::class . ':index');
     $api->group('/sp-classes', function ($api) {
-        $api->get('', SPClassController::class . ':index');
         $api->get('/{id}', SPClassController::class . ':show');
         $api->post('', SPClassController::class . ':store')->add(new CheckAdminMiddleware());
         $api->patch('/{id}', SPClassController::class . ':update')->add(new CheckAdminMiddleware());

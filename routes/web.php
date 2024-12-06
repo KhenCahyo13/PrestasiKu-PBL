@@ -1,6 +1,7 @@
 <?php
 
-    use App\Middlewares\CheckAuthMiddleware;
+use App\Middlewares\CheckAdminMiddleware;
+use App\Middlewares\CheckAuthMiddleware;
 
     $app->group('/web', function($web) {
         // Auth Group Routes
@@ -41,6 +42,7 @@
                 include views('master/sp-class.php');
                 return $response;
             });
-        })->add(new CheckAuthMiddleware());
+        })->add(new CheckAuthMiddleware())
+        ->add(new CheckAdminMiddleware());
     });
 ?>
