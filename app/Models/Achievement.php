@@ -177,44 +177,67 @@ class Achievement extends Model
         }
     }
 
+
     public function processApproveAchievement(array $data): bool
     {
         try {
             $this->getDbConnection()->beginTransaction();
 
-            $isApproved = $data['action'] === 'approved' ? 1 : 0;
-
-            $sqlUser = "SELECT role_id, user_username FROM Master.Users WHERE user_id = :user_id";
+            $sqlUser = "SELECT role_id FROM Master.Users WHERE user_id = :user_id";
             $stmtUser = $this->getDbConnection()->prepare($sqlUser);
             $stmtUser->bindParam(':user_id', $data['user_id']);
             $stmtUser->execute();
-            $userResult = $stmtUser->fetch(PDO::FETCH_ASSOC);
+            $user = $stmtUser->fetch(PDO::FETCH_ASSOC);
 
-            if (!$userResult) {
-                throw new \Exception("User not found with ID: " . $data['user_id']);
+            if (!$user) {
+                throw new \Exception("User not found.");
             }
 
-            $roleId = $userResult['role_id'];
-            $approverName = $roleId === '6EC386D9-7313-4659-8C7D-B11148750B7A'
-            ? 'Admin'
-            : ($roleId === 'FBA2D7AA-4F83-4C48-9C9A-4EB7F8A253F8' ? $userResult['user_username'] : null);
+            $roleId = $user['role_id'];
 
-            if (!$approverName) {
-                throw new \Exception("User role is not valid for this operation.");
+            if ($roleId === '6EC386D9-7313-4659-8C7D-B11148750B7A') {
+                $sqlCheck = " SELECT COUNT(*) AS pending_lecturers 
+                    FROM Achievement.AchievementApprovers 
+                    WHERE achievement_id = :achievement_id 
+                    AND approver_is_done = 0 
+                    AND user_id IN (SELECT user_id FROM Master.Users WHERE role_id = 'FBA2D7AA-4F83-4C48-9C9A-4EB7F8A253F8')";
+                $stmtCheck = $this->getDbConnection()->prepare($sqlCheck);
+                $stmtCheck->bindParam(':achievement_id', $data['achievement_id']);
+                $stmtCheck->execute();
+                $checkResult = $stmtCheck->fetch(PDO::FETCH_ASSOC);
+
+                if ($checkResult['pending_lecturers'] > 0) {
+                    throw new \Exception("Admin cannot approve before all lecturers finish approval.");
+                }
             }
 
-            $sqlUpdateApprover = "UPDATE Achievement.AchievementApprovers
-                              SET approver_is_done = 1, approver_updatedat = GETDATE(), approver_status = :approver_status
-                              WHERE achievement_id = :achievement_id AND user_id = :user_id";
-            $stmtApprover = $this->getDbConnection()->prepare($sqlUpdateApprover);
-            $stmtApprover->bindParam(':approver_status', $data['action']);
-            $stmtApprover->bindParam(':achievement_id', $data['achievement_id']);
-            $stmtApprover->bindParam(':user_id', $data['user_id']);
-            $stmtApprover->execute();
+            $sqlRejection = " SELECT COUNT(*) AS rejected_count 
+                FROM Achievement.AchievementApprovers 
+                WHERE achievement_id = :achievement_id 
+                AND approver_status = 'rejected'";
+            $stmtRejection = $this->getDbConnection()->prepare($sqlRejection);
+            $stmtRejection->bindParam(':achievement_id', $data['achievement_id']);
+            $stmtRejection->execute();
+            $rejectionResult = $stmtRejection->fetch(PDO::FETCH_ASSOC);
 
-            $logMessage = "{$approverName} " . ($isApproved ? "menyetujui" : "menolak") . " pencapaian.";
+            if ($rejectionResult['rejected_count'] > 0) {
+                throw new \Exception("Approval cannot proceed as previous approver has rejected.");
+            }
+
+            $sqlUpdate = " UPDATE Achievement.AchievementApprovers 
+                SET approver_is_done = 1, approver_updatedat = GETDATE(), approver_status = :status 
+                WHERE achievement_id = :achievement_id AND user_id = :user_id";
+            $stmtUpdate = $this->getDbConnection()->prepare($sqlUpdate);
+            $stmtUpdate->bindParam(':status', $data['action']);
+            $stmtUpdate->bindParam(':achievement_id', $data['achievement_id']);
+            $stmtUpdate->bindParam(':user_id', $data['user_id']);
+            $stmtUpdate->execute();
+
+            $logMessage = $data['action'] === 'approved'
+                ? "User {$data['user_id']} approved achievement {$data['achievement_id']}."
+                : "User {$data['user_id']} rejected achievement {$data['achievement_id']}.";
             $sqlLog = "INSERT INTO Achievement.AchievementLogs (achievement_id, log_message) 
-                   VALUES (:achievement_id, :log_message)";
+               VALUES (:achievement_id, :log_message)";
             $stmtLog = $this->getDbConnection()->prepare($sqlLog);
             $stmtLog->bindParam(':achievement_id', $data['achievement_id']);
             $stmtLog->bindParam(':log_message', $logMessage);
@@ -223,16 +246,14 @@ class Achievement extends Model
             $verificationStatus = $this->determineVerificationStatus($data['achievement_id']);
 
             $sqlUpdateVerification = "UPDATE Achievement.AchievementVerifications
-                                   SET verification_code = :verification_code,
-                                       verification_status = :verification_status,
-                                       verification_notes = :verification_notes,
-                                       verification_is_done = :verification_is_done,
-                                       verification_updatedat = GETDATE()
-                                   WHERE achievement_id = :achievement_id";
+                               SET verification_code = :verification_code,
+                                   verification_status = :verification_status,
+                                   verification_is_done = :verification_is_done,
+                                   verification_updatedat = GETDATE()
+                               WHERE achievement_id = :achievement_id";
             $stmtVerification = $this->getDbConnection()->prepare($sqlUpdateVerification);
             $stmtVerification->bindParam(':verification_code', $verificationStatus['code']);
             $stmtVerification->bindParam(':verification_status', $verificationStatus['status']);
-            $stmtVerification->bindParam(':verification_notes', $data['notes']);
             $stmtVerification->bindParam(':verification_is_done', $verificationStatus['isDone']);
             $stmtVerification->bindParam(':achievement_id', $data['achievement_id']);
             $stmtVerification->execute();
@@ -241,24 +262,22 @@ class Achievement extends Model
             return true;
         } catch (\PDOException $e) {
             $this->getDbConnection()->rollBack();
-            error_log("Database error: " . $e->getMessage());
             throw new \Exception("Database error: " . $e->getMessage());
         } catch (\Exception $e) {
             $this->getDbConnection()->rollBack();
-            error_log("Error: " . $e->getMessage());
-            throw new \Exception("Error: " . $e->getMessage());
+            throw $e;
         }
     }
 
     private function determineVerificationStatus(string $achievementId): array
     {
-        $sql = "SELECT 
-        COUNT(*) AS total_approvers,
-        SUM(CASE WHEN approver_status = 'approved' THEN 1 ELSE 0 END) AS approved_count,
-        SUM(CASE WHEN approver_status = 'rejected' THEN 1 ELSE 0 END) AS rejected_count,
-        COUNT(*) - SUM(CASE WHEN approver_is_done = 1 THEN 1 ELSE 0 END) AS pending_count
-    FROM Achievement.AchievementApprovers
-    WHERE achievement_id = :achievement_id";
+        $sql = " SELECT 
+            COUNT(*) AS total_approvers,
+            SUM(CASE WHEN approver_status = 'approved' THEN 1 ELSE 0 END) AS approved_count,
+            SUM(CASE WHEN approver_status = 'rejected' THEN 1 ELSE 0 END) AS rejected_count,
+            COUNT(*) - SUM(CASE WHEN approver_is_done = 1 THEN 1 ELSE 0 END) AS pending_count
+            FROM Achievement.AchievementApprovers
+            WHERE achievement_id = :achievement_id";
         $stmt = $this->getDbConnection()->prepare($sql);
         $stmt->bindParam(':achievement_id', $achievementId);
         $stmt->execute();
@@ -291,6 +310,7 @@ class Achievement extends Model
             'isDone' => 1
         ];
     }
+
 
 
     public function getNotificationsByUserId(string $userId): array
@@ -368,5 +388,4 @@ class Achievement extends Model
             throw new \Exception("Error: " . $e->getMessage());
         }
     }
-
 }
