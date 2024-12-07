@@ -1,11 +1,11 @@
 <?php
 
-use App\Controllers\AdminController;
 use App\Controllers\AuthController;
 use App\Controllers\DepartmentController;
 use App\Controllers\RoleController;
 use App\Controllers\SPClassController;
 use App\Controllers\StudyProgramController;
+use App\Controllers\UserController;
 use App\Middlewares\CheckAdminMiddleware;
 
 use App\Middlewares\CheckAuthMiddleware;
@@ -46,11 +46,9 @@ $app->group('/api', function ($api) {
         $api->delete('/{id}', SPClassController::class . ':delete')->add(new CheckAdminMiddleware());
     })->add(new CheckAuthMiddleware());
     // User Routes
+    $api->get('/users/{id}', UserController::class . ':show')->add(new CheckAuthMiddleware());
     $api->group('/users', function ($api) {
-        $api->get('', AdminController::class . ':getUsers');
-        $api->get('/{id}', AdminController::class . ':getUserById');
-        $api->patch('/{id}', AdminController::class . ':updateUser');
-        $api->delete('/{id}', AdminController::class . ':deleteUser');
-        $api->patch('/{id}/verify', AdminController::class . ':verifiedRegistration');
+        $api->get('', UserController::class . ':index');
+        $api->patch('/{id}/verify', UserController::class . ':verifyUserRegistration');
     })->add(new CheckAdminMiddleware());
 });

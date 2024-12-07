@@ -81,12 +81,10 @@ class User extends Model {
     }
 
     public function getById(string $userId): array | null {
-        $sql = 'EXEC CRUD.SelectTableDataByColumn @TableName = :tableName, @ColumnName = :columnName, @Value = :user_id';
-        $stmt = $this->getDbConnection()->prepare($sql);
+        $query = 'EXEC CRUD.GetUserDetailsByIdBasedOnRole @UserId = :userId';
+        $stmt = $this->getDbConnection()->prepare($query);
         
-        $stmt->bindParam(':tableName', $this->table, PDO::PARAM_STR);
-        $stmt->bindParam(':columnName', $this->primaryKey, PDO::PARAM_STR);
-        $stmt->bindParam(':user_id', $userId, PDO::PARAM_STR);
+        $stmt->bindParam(':userId', $userId, PDO::PARAM_STR);
 
         $stmt->execute();
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -217,7 +215,7 @@ class User extends Model {
 
     public function verifiedRegistration(array $data): bool {
         try {
-            $query = 'UPDATE $this->table SET user_isverified = :user_isverified WHERE user_id = :user_id';
+            $query = "UPDATE $this->table SET user_isverified = :user_isverified WHERE user_id = :user_id";
             $stmt = $this->getDbConnection()->prepare($query);
 
             $stmt->bindParam(':user_isverified', $data['user_isverified'], PDO::PARAM_INT);

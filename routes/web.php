@@ -33,21 +33,25 @@ $app->group('/web', function ($web) {
         $master->get('/department', function ($request, $response) {
             include views('master/department.php');
             return $response;
-        })->add(new CheckAdminMiddleware());
+        });
         $master->get('/study-program', function ($request, $response) {
             include views('master/study-program.php');
             return $response;
-        })->add(new CheckAdminMiddleware());
+        });
         $master->get('/sp-class', function ($request, $response) {
             include views('master/sp-class.php');
             return $response;
-        })->add(new CheckAdminMiddleware());
+        });
         $master->group('/user', function ($user) {
             $user->get('', function ($request, $response) {
                 include views('master/user/list.php');
                 return $response;
             });
-        })->add(new CheckAdminMiddleware());
+            $user->get('/{id}', function ($request, $response) {
+                include views('master/user/verify.php');
+                return $response;
+            });
+        });
     })->add(new CheckAuthMiddleware())
-        ->add(new CheckAdminMiddleware());
+    ->add(new CheckAdminMiddleware());
 });
