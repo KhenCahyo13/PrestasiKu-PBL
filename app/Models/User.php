@@ -49,21 +49,31 @@ class User extends Model {
     }
 
     public function getAll(int $limit = 10, int $offset = 0, string $search = ''): array {
-        $query = 'EXEC CRUD.SelectSingleTableForDataTables 
+        $query = 'EXEC CRUD.SelectSingleTableForDataTablesWithJoins 
                 @TableName = :tableName,
-                @Columns = :columns,
+                @TableColumns = :tableColumns,
                 @SearchColumnName = :searchColumnName,
                 @SearchValue = :searchValue,
                 @Offset = :offset,
-                @Limit = :limit';
+                @Limit = :limit,
+                @JoinConditions = :joinConditions';
         $stmt = $this->getDbConnection()->prepare($query);
 
+        $tableColumns = 'Master.Users.*,
+                        Master.UserStudentDetails.detail_name AS student_name, Master.UserStudentDetails.detail_nim AS student_nim, 
+                        Master.UserLecturerDetails.detail_name AS lecturer_name, Master.UserLecturerDetails.detail_nip AS lecturer_nip, 
+                        Master.Roles.role_name';
+        $joinConditions = 'LEFT JOIN Master.UserStudentDetails ON Master.UserStudentDetails.detail_id = Master.Users.details_student_id
+                        LEFT JOIN Master.UserLecturerDetails ON Master.UserLecturerDetails.detail_id = Master.Users.details_lecturer_id
+                        INNER JOIN Master.Roles ON Master.Roles.role_id = Master.Users.role_id';
+
         $stmt->bindValue(':tableName', $this->table, PDO::PARAM_STR);
-        $stmt->bindValue(':columns', '*', PDO::PARAM_STR);
+        $stmt->bindValue(':tableColumns', $tableColumns, PDO::PARAM_STR);
         $stmt->bindValue(':searchColumnName', 'user_username', PDO::PARAM_STR);
         $stmt->bindValue(':searchValue', $search, PDO::PARAM_STR);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':joinConditions', $joinConditions, PDO::PARAM_STR);
 
         $stmt->execute();
 
