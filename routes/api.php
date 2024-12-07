@@ -44,5 +44,6 @@ $app->group('/api', function ($api) {
         $api->get('/approved/{id}', AchievementController::class . ':getApprovedAchievements');
         $api->get('/notification/{id}', AchievementController::class . ':getNotifications');
         $api->delete('/delete/{id}', AchievementController::class . ':deleteAchievement');
+        $api->get('/grafic-scope', AchievementController::class . ':getAchievementScopePercentage');
     });
 });

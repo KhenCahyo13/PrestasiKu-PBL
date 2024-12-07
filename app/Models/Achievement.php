@@ -388,4 +388,21 @@ class Achievement extends Model
             throw new \Exception("Error: " . $e->getMessage());
         }
     }
+
+    public function getAchievementScopeCounts(): array
+    {
+        try {
+            $sql = "SELECT achievement_scope, COUNT(*) AS count
+                FROM Achievement.Achievements
+                GROUP BY achievement_scope";
+
+            $stmt = $this->getDbConnection()->prepare($sql);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            error_log("Database error: " . $e->getMessage());
+            throw new \Exception("Database error: " . $e->getMessage());
+        }
+    }
 }

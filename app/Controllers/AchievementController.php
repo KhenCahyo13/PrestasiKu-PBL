@@ -180,4 +180,26 @@ class AchievementController
             return ResponseHelper::error($response, 'Error: ' . $e->getMessage(), 500);
         }
     }
+
+    public function getAchievementScopePercentage(Request $request, Response $response): ResponseInterface
+    {
+        try {
+            $scopeData = $this->achievementModel->getAchievementScopeCounts();
+
+            $totalAchievements = array_sum(array_column($scopeData, 'count'));
+
+            if ($totalAchievements == 0) {
+                return ResponseHelper::error($response, 'No achievements found.', 404);
+            }
+
+            $scopePercentage = array_map(function ($scope) use ($totalAchievements) {
+                $scope['percentage'] = ($scope['count'] / $totalAchievements) * 100;
+                return $scope;
+            }, $scopeData);
+
+            return ResponseHelper::success($response, $scopePercentage, 'Achievement scope percentages retrieved successfully.');
+        } catch (\Exception $e) {
+            return ResponseHelper::error($response, 'Error: ' . $e->getMessage(), 500);
+        }
+    }
 }
