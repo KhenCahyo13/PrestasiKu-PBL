@@ -25,14 +25,6 @@ $app->group('/api', function ($api) {
         $api->delete('/{id}', DepartmentController::class . ':delete');
     })->add(new CheckAuthMiddleware());
 
-    $api->group('/users', function ($api) {
-        $api->get('', AdminController::class . ':getUsers');
-        $api->get('/{id}', AdminController::class . ':getUserById');
-        $api->patch('/{id}', AdminController::class . ':updateUser');
-        $api->delete('/{id}', AdminController::class . ':deleteUser');
-        $api->patch('/{id}/verify', AdminController::class . ':verifiedRegistration');
-    })->add(new CheckAdminMiddleware());
-
     $api->group('/achievements', function ($api) {
         $api->post('/upload', AchievementController::class . ':createAchievement');
         $api->post('/approval/{id}', AchievementController::class . ':approveAchievement');
