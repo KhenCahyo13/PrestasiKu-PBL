@@ -28,6 +28,13 @@ $app->group('/web', function ($web) {
         include views('dashboard.php');
         return $response;
     })->add(new CheckAuthMiddleware());
+    // Achievement Page Routes
+    $web->group('/achievement', function ($achievement) {
+        $achievement->get('/add-new', function ($request, $response) {
+            include views('achievement/add-new.php');
+            return $response;
+        });
+    });
     // Master Pages Routes
     $web->group('/master', function ($master) {
         $master->get('/department', function ($request, $response) {
