@@ -74,14 +74,14 @@ renderComponent('breadcrumb', [
         </div>
         <div class="col-12 col-md-6 col-lg-4">
             <div class="d-flex flex-column gap-2">
-                <label for="categoryId" class="text-sm">Category <span class="text-danger">*</span></label>
-                <select id="categoryId" class="form-control form-control-sm">
+                <label for="achievementCategoryId" class="text-sm">Category <span class="text-danger">*</span></label>
+                <select id="achievementCategoryId" class="form-control form-control-sm">
                     <option value="">- Select achievement scope</option>
                     <option value="International">International</option>
                     <option value="National">National</option>
                     <option value="Regional">Regional</option>
                 </select>
-                <span class="text-xs text-danger" id="categoryIdError"></span>
+                <span class="text-xs text-danger" id="achievementCategoryIdError"></span>
             </div>
         </div>
         <div class="col-12 col-md-6">
@@ -111,19 +111,19 @@ renderComponent('breadcrumb', [
         </div>
     </div>
     <div class="row gx-3 gy-2 px-4 py-3" id="supervisorContainer">
-        <div class="col-12 col-md-6">
+        <div class="col-12 col-md-6" id="supervisorElement1">
             <div class="d-flex align-items-center gap-2">
-                <select id="approvers" class="form-control form-control-sm w-100">
+                <select id="supervisor1" class="form-control form-control-sm w-100">
                     <option value="">- Select lecturer</option>
                     <option value="International">International</option>
                     <option value="National">National</option>
                     <option value="Regional">Regional</option>
                 </select>
-                <button class="btn btn-sm btn-danger">
+                <button type="button" class="btn btn-sm btn-danger" data-id="1">
                     <i class="fa-solid fa-trash"></i>
                 </button>
             </div>
-            <span class="text-xs text-danger mt-2" id="approversError"></span>
+            <span class="text-xs text-danger mt-2" id="supervisor1Error"></span>
         </div>
     </div>
     <div class="px-4 py-3 border-bottom border-secondary">
@@ -132,26 +132,27 @@ renderComponent('breadcrumb', [
     <div class="row gx-3 gy-2 px-4 py-3">
         <div class="col-12 col-md-6">
             <div class="d-flex flex-column gap-2">
-                <label for="certificateFile" class="text-sm">Certificate <span class="text-danger">*</span></label>
-                <input type="file" class="form-control form-control-sm" id="certificateFile" accept=".jpg, .jpeg, .png, .pdf">
-                <span class="text-xs text-danger" id="certificateFileError"></span>
+                <label for="achievementCertificateFile" class="text-sm">Certificate <span class="text-danger">*</span></label>
+                <input type="file" class="form-control form-control-sm" id="achievementCertificateFile" accept=".jpg, .jpeg, .png, .pdf">
+                <span class="text-xs text-danger" id="achievementCertificateFileError"></span>
             </div>
         </div>
         <div class="col-12 col-md-6">
             <div class="d-flex flex-column gap-2">
-                <label for="assigmentFile" class="text-sm">Letter of Assigment <span class="text-danger">*</span></label>
-                <input type="file" class="form-control form-control-sm" id="assigmentFile" accept=".jpg, .jpeg, .png, .pdf">
-                <span class="text-xs text-danger" id="assigmentFileError"></span>
+                <label for="achievementAssignmentFile" class="text-sm">Letter of Assigment <span class="text-danger">*</span></label>
+                <input type="file" class="form-control form-control-sm" id="achievementAssignmentFile" accept=".jpg, .jpeg, .png, .pdf">
+                <span class="text-xs text-danger" id="achievementAssignmentFileError"></span>
             </div>
         </div>
     </div>
     <div class="px-3 py-3 mt-4 border-top border-secondary">
         <div class="d-flex align-items-center gap-2 justify-content-end">
-            <button type="button" class="btn btn-sm btn-danger">Cancel</button>
+            <a href="#" class="btn btn-sm btn-danger">Cancel</a>
             <button type="button" class="btn btn-sm btn-primary" id="btnSubmitAchievement">Submit</button>
         </div>
     </div>
 </section>
+<script src="<?= js('achievement/add-new.js?v=' . time()) ?>"></script>
 
 <?php
 $content = ob_get_clean();
