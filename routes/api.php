@@ -17,14 +17,7 @@ $app->group('/api', function ($api) {
         $api->post('/login', AuthController::class . ':login');
         $api->post('/logout', AuthController::class . ':logout');
     });
-    $api->group('/departments', function ($api) {
-        $api->get('', DepartmentController::class . ':index');
-        $api->get('/{id}', DepartmentController::class . ':show');
-        $api->post('', DepartmentController::class . ':store');
-        $api->patch('/{id}', DepartmentController::class . ':update');
-        $api->delete('/{id}', DepartmentController::class . ':delete');
-    })->add(new CheckAuthMiddleware());
-
+    // Achievement Routes
     $api->group('/achievements', function ($api) {
         $api->post('/upload', AchievementController::class . ':createAchievement');
         $api->post('/approval/{id}', AchievementController::class . ':approveAchievement');
