@@ -1,18 +1,21 @@
 $(document).ready(function() {
+    // Init variables
     const alertMessageElement = $('#alertMessage');
     const showPerPagePagination = $('#showPerPagePagination');
     const prevButtonPagination = $('#prevButtonPagination');
     const nextButtonPagination = $('#nextButtonPagination');
-    const searchDepartmentInput = $('#searchDepartment');
+    const searchStudyProgramInput = $('#searchStudyProgram');
+    const createDepartmentIdSelectInput = $('#createDepartmentId');
+    const updateDepartmentIdSelectInput = $('#updateDepartmentId');
 
-    // Get and setup departments table
-    const fetchAndSetupDepartmentsTable = (page = 1, limit = showPerPagePagination, search = '') => {
-        const departmentsTableBody = $('#departmentsTableBody');
+    // Get and setup study programs table
+    const fetchAndSetupStudyProgramsTable = (page = 1, limit = showPerPagePagination, search = '') => {
+        const studyProgramsTableBody = $('#studyProgramsTableBody');
 
-        departmentsTableBody.empty();
+        studyProgramsTableBody.empty();
 
         $.ajax({
-            url: `${BASE_API_URL}/departments?page=${page}&limit=${limit}&search=${search}`,
+            url: `${BASE_API_URL}/study-programs?page=${page}&limit=${limit}&search=${search}`,
             method: 'GET',
             success: function(response) {
                 $('#showPerPageTotal').text(response.pagination.items_per_page);
@@ -20,13 +23,14 @@ $(document).ready(function() {
                 $('#currentPage').text(response.pagination.current_page);
                 $('#totalPages').text(response.pagination.total_pages);
                 for (let i = 0; i < response.data.length; i++) {
-                    const department = response.data[i];
-                    const departmentRow = `
+                    const studyProgram = response.data[i];
+                    const studyProgramRow = `
                         <tr>
                             <td class="px-md-4 py-md-3 text-sm">${i + 1}</td>
-                            <td class="px-md-4 py-md-3 text-sm">${department.department_name}</td>
-                            <td class="px-md-4 py-md-3 text-sm">${formatDateToIndonesian(department.department_createdat)}</td>
-                            <td class="px-md-4 py-md-3 text-sm">${formatDateToIndonesian(department.department_updatedat)}</td>
+                            <td class="px-md-4 py-md-3 text-sm">${studyProgram.studyprogram_name}</td>
+                            <td class="px-md-4 py-md-3 text-sm">${studyProgram.department_name}</td>
+                            <td class="px-md-4 py-md-3 text-sm">${formatDateToIndonesian(studyProgram.studyprogram_createdat)}</td>
+                            <td class="px-md-4 py-md-3 text-sm">${formatDateToIndonesian(studyProgram.studyprogram_updatedat)}</td>
                             <td class="px-md-4 py-md-3 text-sm">
                                 <div class="dropdown">
                                     <button class="btn btn-transparent d-block mx-auto p-0" id="actionsButton" data-bs-toggle="dropdown" aria-expanded="false">
@@ -34,12 +38,12 @@ $(document).ready(function() {
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="actionsButton">
                                         <li>
-                                            <button type="button" class="dropdown-item d-flex align-items-center gap-2" data-id="${department.department_id}" data-name="${department.department_name}" data-bs-toggle="modal" data-bs-target="#updateDepartmentModal" id="updateDepartmentAction">
+                                            <button type="button" class="dropdown-item d-flex align-items-center gap-2" data-id="${studyProgram.studyprogram_id}" data-name="${studyProgram.studyprogram_name}" data-department="${studyProgram.department_id}" data-bs-toggle="modal" data-bs-target="#updateStudyProgramModal" id="updateStudyProgramAction">
                                                 <i class="fa-solid fa-edit text-secondary"></i> Update
                                             </button>
                                         </li>
                                         <li>
-                                            <button type="button" class="dropdown-item d-flex align-items-center gap-2" data-id="${department.department_id}" data-bs-toggle="modal" data-bs-target="#deleteDepartmentModal" id="deleteDepartmentAction">
+                                            <button type="button" class="dropdown-item d-flex align-items-center gap-2" data-id="${studyProgram.studyprogram_id}" data-bs-toggle="modal" data-bs-target="#deleteStudyProgramModal" id="deleteStudyProgramAction">
                                                 <i class="fa-solid fa-trash text-secondary"></i> Delete
                                             </button>
                                         </li>
@@ -48,50 +52,59 @@ $(document).ready(function() {
                             </td>
                         </tr>
                     `;
-                    departmentsTableBody.append(departmentRow);
+                    studyProgramsTableBody.append(studyProgramRow);
                 }
 
-                // Delete department button action
-                document.querySelectorAll('#deleteDepartmentAction').forEach((button) => {
+                // Delete study program button action
+                document.querySelectorAll('#deleteStudyProgramAction').forEach((button) => {
                     button.addEventListener('click', function () {
-                        const departmentId = this.getAttribute('data-id');
+                        const studyProgramId = this.getAttribute('data-id');
             
-                        $('#deleteDepartmentId').val(departmentId);
+                        $('#deleteStudyProgramId').val(studyProgramId);
                     });
                 });
 
-                // Update department button action
-                document.querySelectorAll('#updateDepartmentAction').forEach((button) => {
+                // Update study program button action
+                document.querySelectorAll('#updateStudyProgramAction').forEach((button) => {
                     button.addEventListener('click', function () {
-                        const departmentId = this.getAttribute('data-id');
-                        const departmentName = this.getAttribute('data-name');
+                        const studyProgramId = this.getAttribute('data-id');
+                        const studyProgramName = this.getAttribute('data-name');
+                        const departmentId = this.getAttribute('data-department');
             
+                        $('#updateStudyProgramId').val(studyProgramId);
+                        $('#updateStudyProgramName').val(studyProgramName);
                         $('#updateDepartmentId').val(departmentId);
-                        $('#updateDepartmentName').val(departmentName);
                     });
                 });
             },
             error: function() {
-                console.log('Error while fetching departments data!');
+                console.log('Error while fetching study programs data!');
             }
         });
     };
 
-    // Create a new department
-    const createDepartment = () => {
-        const createDepartmentForm = $('#createDepartmentForm');
-        const createDepartmentModal = $('#createDepartmentModal');
-        const departmentName = $('#createDepartmentName');
+    // Create a new study program
+    const createStudyProgram = () => {
+        const createStudyProgramForm = $('#createStudyProgramForm');
+        const createStudyProgramModal = $('#createStudyProgramModal');
+        const studyProgramName = $('#createStudyProgramName');
+        const departmentId = $('#createDepartmentId');
         
-        createDepartmentForm.submit(function(event) {
+        createStudyProgramForm.submit(function(event) {
             event.preventDefault();
 
-            $('#createDepartmentNameError').text('');
+            $('#createStudyProgramNameError').text('');
+            $('#createDepartmentIdError').text('');
 
             let isValid = true;
 
-            if (departmentName.val() === '') {
-                $('#createDepartmentNameError').text('Department name is required');
+            if (studyProgramName.val() === '') {
+                $('#createStudyProgramNameError').text('Study program name is required');
+                isValid = false;
+            }
+
+            if (departmentId.val() === '') {
+                $('#createDepartmentIdError').text('Department name is required');
                 isValid = false;
             }
 
@@ -100,18 +113,19 @@ $(document).ready(function() {
             }
 
             const data = {
-                department_name: departmentName.val()
+                studyprogram_name: studyProgramName.val(),
+                department_id: departmentId.val()
             };
 
             $.ajax({
-                url: `${BASE_API_URL}/departments`,
+                url: `${BASE_API_URL}/study-programs`,
                 method: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(data),
                 success: function(response) {
-                    fetchAndSetupDepartmentsTable(1, 5);
-                    createDepartmentModal.modal('hide');
-                    createDepartmentForm[0].reset();
+                    fetchAndSetupStudyProgramsTable(1, 5);
+                    createStudyProgramModal.modal('hide');
+                    createStudyProgramForm[0].reset();
                     alertMessageElement.html(`
                         <div class="my-2 alert alert-success alert-dismissible fade show" role="alert">
                             <p class="my-0 text-sm">
@@ -122,12 +136,12 @@ $(document).ready(function() {
                     `);
                 },
                 error: function() {
-                    createDepartmentModal.modal('hide');
-                    createDepartmentForm[0].reset();
+                    createStudyProgramModal.modal('hide');
+                    createStudyProgramForm[0].reset();
                     alertMessageElement.html(`
                         <div class="my-2 alert alert-danger alert-dismissible fade show" role="alert">
                             <p class="my-0 text-sm">
-                                <strong>Failed!</strong> Department creation failed
+                                <strong>Failed!</strong> Failed when create study program data.
                             </p>
                             <button type="button" class="btn btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
@@ -137,25 +151,27 @@ $(document).ready(function() {
         });
     }
 
-    // Update a department
-    const updateDepartmentButton = $('#updateDepartmentButton');
-    updateDepartmentButton.click(function() {
+    // Update a study program
+    const updateStudyProgramButton = $('#updateStudyProgramButton');
+    updateStudyProgramButton.click(function() {
+        const studyProgramId = $('#updateStudyProgramId').val();
         const departmentId = $('#updateDepartmentId').val();
-        const departmentName = $('#updateDepartmentName').val();
-        const updateDepartmentModal = $('#updateDepartmentModal');
+        const studyProgramName = $('#updateStudyProgramName').val();
+        const updateStudyProgramModal = $('#updateStudyProgramModal');
 
         const data = {
-            department_name: departmentName
+            studyprogram_name: studyProgramName,
+            department_id: departmentId
         };
 
         $.ajax({
-            url: `${BASE_API_URL}/departments/${departmentId}`,
+            url: `${BASE_API_URL}/study-programs/${studyProgramId}`,
             method: 'PATCH',
             contentType: 'application/json',
             data: JSON.stringify(data),
             success: function(response)  {
-                updateDepartmentModal.modal('hide');
-                fetchAndSetupDepartmentsTable(1, 5);
+                updateStudyProgramModal.modal('hide');
+                fetchAndSetupStudyProgramsTable(1, 5);
                 alertMessageElement.html(`
                     <div class="my-2 alert alert-success alert-dismissible fade show" role="alert">
                         <p class="my-0 text-sm">
@@ -166,11 +182,11 @@ $(document).ready(function() {
                 `);
             },
             error: function() {
-                updateDepartmentModal.modal('hide');
+                updateStudyProgramModal.modal('hide');
                 alertMessageElement.html(`
                     <div class="my-2 alert alert-danger alert-dismissible fade show" role="alert">
                         <p class="my-0 text-sm">
-                            <strong>Failed!</strong> Failed when update department.
+                            <strong>Failed!</strong> Failed when update study program.
                         </p>
                         <button type="button" class="btn btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
@@ -179,18 +195,18 @@ $(document).ready(function() {
         });
     });
 
-    // Delete a department
-    const deleteDepartmentButton = $('#deleteDepartmentButton');
-    deleteDepartmentButton.click(function() {
-        const departmentId = $('#deleteDepartmentId').val();
-        const deleteDepartmentModal = $('#deleteDepartmentModal');
+    // Delete a study program
+    const deleteStudyProgramButton = $('#deleteStudyProgramButton');
+    deleteStudyProgramButton.click(function() {
+        const studyProgramId = $('#deleteStudyProgramId').val();
+        const deleteStudyProgramModal = $('#deleteStudyProgramModal');
 
         $.ajax({
-            url: `${BASE_API_URL}/departments/${departmentId}`,
+            url: `${BASE_API_URL}/study-programs/${studyProgramId}`,
             method: 'DELETE',
             success: function(response)  {
-                deleteDepartmentModal.modal('hide');
-                fetchAndSetupDepartmentsTable(1, 5);
+                deleteStudyProgramModal.modal('hide');
+                fetchAndSetupStudyProgramsTable(1, 5);
                 alertMessageElement.html(`
                     <div class="my-2 alert alert-success alert-dismissible fade show" role="alert">
                         <p class="my-0 text-sm">
@@ -201,11 +217,11 @@ $(document).ready(function() {
                 `);
             },
             error: function() {
-                deleteDepartmentModal.modal('hide');
+                deleteStudyProgramModal.modal('hide');
                 alertMessageElement.html(`
                     <div class="my-2 alert alert-danger alert-dismissible fade show" role="alert">
                         <p class="my-0 text-sm">
-                            <strong>Failed!</strong> Failed when delete department.
+                            <strong>Failed!</strong> Failed when delete study program.
                         </p>
                         <button type="button" class="btn btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
@@ -218,14 +234,14 @@ $(document).ready(function() {
     showPerPagePagination.change(function() {
         const limit = $(this).val();
 
-        fetchAndSetupDepartmentsTable(1, limit);
+        fetchAndSetupStudyProgramsTable(1, limit);
     });
 
     prevButtonPagination.click(function() {
         const currentPage = parseInt($('#currentPage').text());
 
         if (currentPage > 1) {
-            fetchAndSetupDepartmentsTable(currentPage - 1, showPerPagePagination.val());
+            fetchAndSetupStudyProgramsTable(currentPage - 1, showPerPagePagination.val());
         }
     });
 
@@ -234,22 +250,41 @@ $(document).ready(function() {
         const totalPages = parseInt($('#totalPages').text());
 
         if (currentPage < totalPages) {
-            fetchAndSetupDepartmentsTable(currentPage + 1, showPerPagePagination.val());
+            fetchAndSetupStudyProgramsTable(currentPage + 1, showPerPagePagination.val());
         }
     });
 
     let debounceTimeout;
-    searchDepartmentInput.keyup(function () {
+    searchStudyProgramInput.keyup(function () {
         const search = $(this).val();
     
         clearTimeout(debounceTimeout);
     
         debounceTimeout = setTimeout(function () {
-            fetchAndSetupDepartmentsTable(1, showPerPagePagination.val(), search);
+            fetchAndSetupStudyProgramsTable(1, showPerPagePagination.val(), search);
         }, 300);
-    });    
+    });
 
-    // Run the functions
-    fetchAndSetupDepartmentsTable(1, 5);
-    createDepartment();
+    // Setup study programs input
+    $.ajax({
+        url: `${BASE_API_URL}/departments?page=1&limit=100&search=`,
+        method: 'GET',
+        success: function(response) {
+            for (let i = 0; i < response.data.length; i++) {
+                const department = response.data[i];
+                const departmentIdOptionInput = `
+                    <option value="${department.department_id}">${department.department_name}</option>
+                `;
+                createDepartmentIdSelectInput.append(departmentIdOptionInput);
+                updateDepartmentIdSelectInput.append(departmentIdOptionInput);
+            }
+        },
+        error: function(response) {
+            console.log('Error while fetching departments data!');
+        }
+    });
+
+    // Run functions
+    fetchAndSetupStudyProgramsTable(1, 5);
+    createStudyProgram();
 });
