@@ -69,7 +69,7 @@ class User extends Model {
 
         $stmt->bindValue(':tableName', $this->table, PDO::PARAM_STR);
         $stmt->bindValue(':tableColumns', $tableColumns, PDO::PARAM_STR);
-        $stmt->bindValue(':searchColumnName', 'user_username', PDO::PARAM_STR);
+        $stmt->bindValue(':searchColumnName', $search == 'Student' || $search == 'Lecturer' ? 'role_name' : 'user_username', PDO::PARAM_STR);
         $stmt->bindValue(':searchValue', $search, PDO::PARAM_STR);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);

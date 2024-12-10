@@ -1,9 +1,10 @@
 $(document).ready(function() {
-    // container Elements
+    // Form Elements
+    const achievementForm = $('#achievementForm');
+    // Container Elements
     const supervisorContainer = $('#supervisorContainer');
     // Button Elements
     const btnAddNewSupervisor = $('#btnAddNewSupervisor');
-    const btnSubmitAchievement = $('#btnSubmitAchievement');
     // Input Elements
     const achievementTitle = $('#achievementTitle');
     const achievementDescription = $('#achievementDescription');
@@ -16,6 +17,9 @@ $(document).ready(function() {
     const achievementEventEnd = $('#achievementEventEnd');
     const achievementCertificateFile = $('#achievementCertificateFile');
     const achievementAssignmentFile = $('#achievementAssignmentFile');
+    const achievementCategories = $('#achievementCategories');
+    // Alert Elements
+    const alertMessageElement = $('#alertMessage');
     // Variables
     let supervisorCount = 2;
 
@@ -33,9 +37,6 @@ $(document).ready(function() {
                 <div class="d-flex align-items-center gap-2">
                     <select id="supervisor${uniqueId}" class="form-control form-control-sm w-100">
                         <option value="">- Select lecturer</option>
-                        <option value="International">International</option>
-                        <option value="National">National</option>
-                        <option value="Regional">Regional</option>
                     </select>
                     <button type="button" class="btn btn-sm btn-danger" data-id="${uniqueId}">
                         <i class="fa-solid fa-trash"></i>
@@ -45,6 +46,9 @@ $(document).ready(function() {
             </div>
         `;
         supervisorContainer.append(supervisorElement);
+
+        const newSupervisorElement = $(`#supervisor${uniqueId}`);
+        setupAchievementSupervisorsInput(newSupervisorElement);    
     });
 
     // Achievement Validations
@@ -77,6 +81,7 @@ $(document).ready(function() {
         $('#achievementEventEndError').text('');
         $('#achievementCertificateFileError').text('');
         $('#achievementCertificateAssignmentError').text('');
+        $('#achievementCategoriesError').text('');
 
         let isValid = true;
 
@@ -135,33 +140,126 @@ $(document).ready(function() {
             isValid = false;
         }
 
+        if (!achievementCategories.val() || achievementCategories.val().length === 0) {
+            $('#achievementCategoriesError').text('Categories is required');
+            isValid = false;
+        }
+
         const isSupervisorsValid = validateSupervisors();
 
         return isValid && isSupervisorsValid;
     };
 
-    btnSubmitAchievement.click(function() {
+    // Submit Achievement
+    const submitAchievement = (data) => {
+        $.ajax({
+            url: `${BASE_API_URL}/achievements`,
+            method: 'POST',
+            data: data,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                achievementForm[0].reset();
+                alertMessageElement.html(`
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <p class="my-0 text-sm">
+                            <strong>Success!</strong> ${response.message}
+                        </p>
+                        <button type="button" class="btn btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `);
+            },
+            error: function(response) {
+                alertMessageElement.html(`
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <p class="my-0 text-sm">
+                            <strong>Failed!</strong> Failed while creating achievement.
+                        </p>
+                        <button type="button" class="btn btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `);
+            }
+        });
+    };
+
+    achievementForm.submit(function(event) {
+        event.preventDefault();
         if (achievementValidations()) {
             let index = 0;
             const achievementFormData = new FormData();
     
-            achievementFormData.append('achievement_title', achievementTitle);
-            achievementFormData.append('achievement_description', achievementDescription);
-            achievementFormData.append('achievement_type', achievementType);
-            achievementFormData.append('achievement_eventlocation', achievementEventLocation);
-            achievementFormData.append('achievement_eventcity', achievementEventCity);
-            achievementFormData.append('achievement_eventstart', achievementEventStart);
-            achievementFormData.append('achievement_eventend', achievementEventEnd);
-            achievementFormData.append('achievement_scope', achievementScope);
-            achievementFormData.append('category_id', achievementCategoryId);
-            achievementFormData.append('files[0]', achievementCertificateFile);
-            achievementFormData.append('files[1]', achievementAssignmentFile);
+            achievementFormData.append('achievement_title', achievementTitle.val());
+            achievementFormData.append('achievement_description', achievementDescription.val());
+            achievementFormData.append('achievement_type', achievementType.val());
+            achievementFormData.append('achievement_eventlocation', achievementEventLocation.val());
+            achievementFormData.append('achievement_eventcity', achievementEventCity.val());
+            achievementFormData.append('achievement_eventstart', achievementEventStart.val());
+            achievementFormData.append('achievement_eventend', achievementEventEnd.val());
+            achievementFormData.append('achievement_scope', achievementScope.val());
+            achievementFormData.append('category_id', achievementCategoryId.val());
     
             supervisorContainer.find('select').each(function () {
                 const supervisorValue = $(this).val();
                 achievementFormData.append(`approvers[${index}][user_id]`, supervisorValue);
                 index++;
             });
+
+            const selectedCategories = achievementCategories.val();
+            selectedCategories.forEach((categoryId, index) => {
+                achievementFormData.append(`categories[${index}][category_id]`, categoryId);
+            });
+
+            achievementFormData.append('files[0]', achievementCertificateFile[0].files[0]);
+            achievementFormData.append('files[1]', achievementAssignmentFile[0].files[0]);         
+
+            submitAchievement(achievementFormData);
         }
-    });    
+    });
+
+    // Setup Inputs
+    const setupAchievementInputs = () => {
+        // Setup Achievement Categories
+        $.ajax({
+            url: `${BASE_API_URL}/achievement-categories?page=1&limit=100&search=`,
+            method: 'GET',
+            success: function(response) {
+                for (let i = 0; i < response.data.length; i++) {
+                    const category = response.data[i];
+                    const categoryOptionInput = `
+                        <option value="${category.category_id}">${category.category_name}</option>
+                    `;
+                    achievementCategories.append(categoryOptionInput);
+                }
+            },
+            error: function(response) {
+                console.log('Error while fetching achievement categories data!');
+            }
+        });
+    };
+    // Setup Achievement Supervisors (Lecturer)
+    const setupAchievementSupervisorsInput = (element) => {
+        $.ajax({
+            url: `${BASE_API_URL}/users?page=1&limit=100&search=Lecturer`,
+            method: 'GET',
+            success: function(response) {
+                for (let i = 0; i < response.data.length; i++) {
+                    const lecturer = response.data[i];
+                    const supervisorOptionInput = `
+                        <option value="${lecturer.user_id}">${lecturer.lecturer_name} - NIP ${lecturer.lecturer_nip}</option>
+                    `;
+                    element.append(supervisorOptionInput);
+                }
+            },
+            error: function(response) {
+                console.log('Error while fetching lecturer data!');
+            }
+        });
+    };
+
+    supervisorContainer.find('select').each(function() {
+        setupAchievementSupervisorsInput($(this));
+    });
+
+    // Run the Functions
+    setupAchievementInputs();
 });

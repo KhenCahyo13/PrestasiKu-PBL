@@ -1,4 +1,6 @@
 <?php
+
+use App\Controllers\AchievementCategoryController;
 use App\Controllers\AuthController;
 use App\Controllers\DepartmentController;
 use App\Controllers\RoleController;
@@ -27,6 +29,10 @@ $app->group('/api', function ($api) {
         $api->delete('/delete/{id}', AchievementController::class . ':deleteAchievement');
         $api->get('/grafic-scope', AchievementController::class . ':getAchievementScopePercentage');
     })->add(new CheckAuthMiddleware());
+    // Achievement Categories Routes
+    $api->group('/achievement-categories', function ($api) {
+        $api->get('', AchievementCategoryController::class . ':index');
+    });
     // Roles Routes
     $api->group('/roles', function ($api) {
         $api->get('', RoleController::class . ':index');
