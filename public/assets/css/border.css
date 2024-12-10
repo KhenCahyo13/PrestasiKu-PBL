@@ -1,3 +1,5 @@
+@import url('./variables.css');
+
 .border-secondary {
     border-color: var(--gray-200) !important;
 }

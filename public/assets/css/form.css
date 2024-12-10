@@ -1,3 +1,5 @@
+@import url('./variables.css');
+
 .form-control {
     border-radius: 8px;
 }
