@@ -17,7 +17,8 @@ renderComponent('breadcrumb', [
 ]);
 ?>
 <!-- Card Details Informations -->
-<section class="mt-1 bg-white rounded shadow-sm">
+<div class="my-2" id="alertMessage"></div>
+<section class="bg-white rounded shadow-sm">
     <div class="px-4 py-3 border-bottom border-secondary">
         <h2 class="my-0 heading-6">Account Details</h2>
     </div>
@@ -27,7 +28,6 @@ renderComponent('breadcrumb', [
     </div>
     <div class="px-4 py-3 gy-3 row" id="userDetailsContainer"></div>
 </section>
-<div class="px-4" id="alertMessage"></div>
 <!-- Card Verification Actions -->
 <section class="mt-2 bg-white rounded shadow-sm" id="actionsContainer"></section>
 <!-- Approve Modal -->
