@@ -1,7 +1,8 @@
 <?php
 
-use App\Middlewares\CheckAdminMiddleware;
-use App\Middlewares\CheckAuthMiddleware;
+use App\Middlewares\FECheckAdminMiddleware;
+use App\Middlewares\FECheckAuthMiddleware;
+use App\Middlewares\FECheckStudentMiddleware;
 
 $app->group('/web', function ($web) {
     // Auth Group Routes
@@ -27,14 +28,14 @@ $app->group('/web', function ($web) {
     $web->get('/dashboard', function ($request, $response) {
         include views('dashboard.php');
         return $response;
-    })->add(new CheckAuthMiddleware());
+    })->add(new FECheckAuthMiddleware());
     // Achievement Page Routes
     $web->group('/achievement', function ($achievement) {
         $achievement->get('/add-new', function ($request, $response) {
             include views('achievement/add-new.php');
             return $response;
-        });
-    })->add(new CheckAuthMiddleware());
+        })->add(new FECheckStudentMiddleware());
+    })->add(new FECheckAuthMiddleware());
     // Master Pages Routes
     $web->group('/master', function ($master) {
         $master->get('/department', function ($request, $response) {
@@ -59,6 +60,6 @@ $app->group('/web', function ($web) {
                 return $response;
             });
         });
-    })->add(new CheckAuthMiddleware())
-    ->add(new CheckAdminMiddleware());
+    })->add(new FECheckAuthMiddleware())
+    ->add(new FECheckAdminMiddleware());
 });

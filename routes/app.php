@@ -1,15 +1,20 @@
 <?php
-    use Slim\Factory\AppFactory;
 
-    $app = AppFactory::create();
+use App\Handlers\FENotFoundHandler;
+use Slim\Exception\HttpNotFoundException;
+use Slim\Factory\AppFactory;
 
-    $app->setBasePath('/PrestasiKu-PBL');
-    $app->addErrorMiddleware(true, true, true);
+$app = AppFactory::create();
+
+$app->setBasePath('/PrestasiKu-PBL');
 
 
-    require_once __DIR__ . '/../routes/resources.php';
-    require_once __DIR__ . '/../routes/api.php';
-    require_once __DIR__ . '/../routes/web.php';
+$errorMiddleware = $app->addErrorMiddleware(true, true, true);
+$errorMiddleware->setErrorHandler(HttpNotFoundException::class, new FENotFoundHandler());
 
-    $app->run();
-?>
+
+require_once __DIR__ . '/../routes/resources.php';
+require_once __DIR__ . '/../routes/api.php';
+require_once __DIR__ . '/../routes/web.php';
+
+$app->run();

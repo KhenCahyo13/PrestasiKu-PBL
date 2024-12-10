@@ -1,3 +1,5 @@
+@import url('./variables.css');
+
 .stepper-container {
     display: flex;
     align-items: center;
