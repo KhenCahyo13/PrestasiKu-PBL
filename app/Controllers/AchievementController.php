@@ -9,7 +9,9 @@ use Slim\Psr7\Response;
 use App\Helpers\ResponseHelper;
 use App\Helpers\UploadFileHelper;
 use App\Models\AchievementApprover;
+use App\Models\AchievementCategoryDetails;
 use App\Models\AchievementFile;
+use App\Models\AchievementVerification;
 use App\Models\Model;
 use Ramsey\Uuid\Uuid;
 use Slim\Psr7\UploadedFile;
@@ -19,12 +21,16 @@ class AchievementController extends Controller {
     private $achievementModel;
     private $achievementApproverModel;
     private $achievementFileModel;
+    private $achievementCategoryDetailsModel;
+    private $achievementVerificationModel;
 
     public function __construct() {
         $this->baseModel = new Model();
         $this->achievementModel = new Achievement();
         $this->achievementApproverModel = new AchievementApprover();
         $this->achievementFileModel = new AchievementFile();
+        $this->achievementCategoryDetailsModel = new AchievementCategoryDetails();
+        $this->achievementVerificationModel = new AchievementVerification();
     }
 
     public function store(Request $request, Response $response): ResponseInterface {
@@ -71,6 +77,20 @@ class AchievementController extends Controller {
             }
         }
 
+        $achievementCategoriesData = array();
+        foreach ($data['categories'] as $category) {
+            $achievementCategoriesData[] = array(
+                'achievement_id' => $achievementId,
+                'category_id' => $category['category_id'],
+            );
+        }
+
+        $achievementVerificationData = array(
+            'achievement_id' => $achievementId,
+            'verification_code' => 'MP',
+            'verification_status' => 'Menunggu Persetujuan',
+        );
+
         try {
             $this->baseModel->getDbConnection()->beginTransaction();
             // Transactions
@@ -83,6 +103,12 @@ class AchievementController extends Controller {
             foreach ($achievementFilesData as $file) {
                 $this->achievementFileModel->create($file);
             }
+
+            foreach ($achievementCategoriesData as $category) {
+                $this->achievementCategoryDetailsModel->create($category);
+            }
+
+            $this->achievementVerificationModel->create($achievementVerificationData);
             // End of Transactions
             $this->baseModel->getDbConnection()->commit();
 
