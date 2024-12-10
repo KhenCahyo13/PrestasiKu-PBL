@@ -15,7 +15,6 @@ class CheckStudentMiddleware extends Middleware implements MiddlewareInterface
     if (session_status() === PHP_SESSION_NONE) {
       session_start();
     }
-
     if (!isset($_SESSION['user']) || !isset($_SESSION['user']['id'])) {
       $responseData = [
         'success' => false,
@@ -34,7 +33,7 @@ class CheckStudentMiddleware extends Middleware implements MiddlewareInterface
 
     return $handler->handle($request);
   }
-
+  // response
   private function respondWithJson(array $data, int $status): ResponseInterface
   {
     $response = new Response();
