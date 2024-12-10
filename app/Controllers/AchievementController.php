@@ -33,6 +33,65 @@ class AchievementController extends Controller {
         $this->achievementVerificationModel = new AchievementVerification();
     }
 
+    public function index(Request $request, Response $response): Response {
+        $page = (int) ($request->getQueryParams()['page'] ?? 1);
+        $limit = (int) ($request->getQueryParams()['limit'] ?? 10);
+        $search = (string) ($request->getQueryParams()['search'] ?? '');
+        $offset = ($page - 1) * $limit;
+    
+        // Fetch raw achievements data
+        $achievements = $this->achievementModel->getAll($limit, $offset, $search);
+        $totalAchievements = $this->achievementModel->getTotalCount($search);
+        $totalPages = ceil($totalAchievements / $limit);
+    
+        $groupedAchievements = array();
+        foreach ($achievements as $achievement) {
+            $achievementId = $achievement['achievement_id'];
+    
+            if (!isset($groupedAchievements[$achievementId])) {
+                $groupedAchievements[$achievementId] = array(
+                    'achievement_id' => $achievement['achievement_id'],
+                    'achievement_title' => $achievement['achievement_title'],
+                    'achievement_description' => $achievement['achievement_description'],
+                    'achievement_type' => $achievement['achievement_type'],
+                    'achievement_scope' => $achievement['achievement_scope'],
+                    'achievement_eventlocation' => $achievement['achievement_eventlocation'],
+                    'achievement_eventcity' => $achievement['achievement_eventcity'],
+                    'achievement_eventstart' => $achievement['achievement_eventstart'],
+                    'achievement_eventend' => $achievement['achievement_eventend'],
+                    'achievement_createdat' => $achievement['achievement_createdat'],
+                    'achievement_updatedat' => $achievement['achievement_updatedat'],
+                    'achievement_verification' => null,
+                );
+            }
+    
+            if ($groupedAchievements[$achievementId]['achievement_verification'] === null) {
+                $groupedAchievements[$achievementId]['achievement_verification'] = array(
+                    'verification_id' => $achievement['verification_id'],
+                    'achievement_id' => $achievement['achievement_id'],
+                    'verification_code' => $achievement['verification_code'],
+                    'verification_status' => $achievement['verification_status'],
+                    'verification_isdone' => $achievement['verification_isdone'],
+                    'verification_notes' => $achievement['verification_notes'],
+                    'verification_createdat' => $achievement['verification_createdat'],
+                    'verification_updatedat' => $achievement['verification_updatedat'],
+                );
+            }
+        }
+    
+        $groupedAchievements = array_values($groupedAchievements);
+    
+        return ResponseHelper::withPagination(
+            $response,
+            $groupedAchievements,
+            $page,
+            $totalPages,
+            $totalAchievements,
+            $limit,
+            'Successfully retrieved achievements data.'
+        );
+    }    
+
     public function store(Request $request, Response $response): ResponseInterface {
         $data = $request->getParsedBody();
         $uploadedFiles = $request->getUploadedFiles();

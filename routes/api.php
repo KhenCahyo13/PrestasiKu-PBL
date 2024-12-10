@@ -21,6 +21,7 @@ $app->group('/api', function ($api) {
     });
     // Achievement Routes
     $api->group('/achievements', function ($api) {
+        $api->get('', AchievementController::class . ':index');
         $api->post('', AchievementController::class . ':store')->add(new BECheckStudentMiddleware());
         $api->post('/approval/{id}', AchievementController::class . ':approveAchievement');
         $api->get('/pending/{id}', AchievementController::class . ':getPendingAchievements');

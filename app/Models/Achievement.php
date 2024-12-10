@@ -9,6 +9,74 @@ class Achievement extends Model {
     protected string $table = "Achievement.Achievements";
     protected string $primaryKey = "achievement_id";
 
+    public function getTotalCount(string $search = ''): int {
+        $role = $_SESSION['user']['role'];
+        $userId = $_SESSION['user']['id'];
+        $query = '';
+
+        if ($role == 'Student') {
+            $query = "SELECT COUNT(Achievement.Achievements.user_id) AS Total
+                    FROM Achievement.Achievements
+                    WHERE Achievement.Achievements.user_id = :userId AND 
+                    Achievement.Achievements.achievement_title LIKE :search
+            ";
+        } else if ($role == 'Admin' || $role == 'Lecturer') {
+            $query = "SELECT COUNT(Achievement.AchievementApprovers.user_id) AS Total
+                    FROM Achievement.AchievementApprovers
+                    WHERE Achievement.AchievementApprovers.user_id = :userId AND 
+                    Achievement.Achievements.achievement_title LIKE :search
+            ";
+        }
+
+        $stmt = $this->getDbConnection()->prepare($query);
+
+        $stmt->bindValue(':userId', $userId, PDO::PARAM_STR);
+        $stmt->bindValue(':search', "%{$search}%", PDO::PARAM_STR);
+
+        $stmt->execute();
+        return (int) $stmt->fetch(PDO::FETCH_ASSOC)['Total'];
+    }
+
+    public function getAll(int $limit = 10, int $offset = 0, string $search = '', ): array {
+        $role = $_SESSION['user']['role'];
+        $userId = $_SESSION['user']['id'];
+
+        if ($role == 'Student') {
+            $query = "SELECT Achievement.Achievements.*, Achievement.AchievementApprovers.*, Achievement.AchievementVerifications.*
+                    FROM Achievement.Achievements 
+                    INNER JOIN Achievement.AchievementApprovers ON Achievement.Achievements.achievement_id = Achievement.AchievementApprovers.achievement_id 
+                    INNER JOIN Achievement.AchievementVerifications ON Achievement.Achievements.achievement_id = Achievement.AchievementVerifications.achievement_id 
+                    WHERE Achievement.Achievements.user_id = :userId AND 
+                    Achievement.Achievements.achievement_title LIKE :search
+                    ORDER BY Achievement.Achievements.achievement_id DESC 
+                    OFFSET :offset ROWS 
+                    FETCH NEXT :limit ROWS ONLY
+            ";    
+        } else if ($role == 'Admin' || $role == 'Lecturer') {
+            $query = "SELECT Achievement.Achievements.*, Achievement.AchievementApprovers.*, Achievement.AchievementVerifications.*
+                    FROM Achievement.Achievements 
+                    INNER JOIN Achievement.AchievementApprovers ON Achievement.Achievements.achievement_id = Achievement.AchievementApprovers.achievement_id 
+                    INNER JOIN Achievement.AchievementVerifications ON Achievement.Achievements.achievement_id = Achievement.AchievementVerifications.achievement_id 
+                    WHERE Achievement.AchievementApprovers.user_id = :userId AND 
+                    Achievement.Achievements.achievement_title LIKE :search
+                    ORDER BY Achievement.Achievements.achievement_id DESC 
+                    OFFSET :offset ROWS 
+                    FETCH NEXT :limit ROWS ONLY
+            ";
+        }
+
+        $stmt = $this->getDbConnection()->prepare($query);
+
+        $stmt->bindParam(':userId', $userId, PDO::PARAM_STR);
+        $stmt->bindValue(':search', "%{$search}%", PDO::PARAM_STR);
+        $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
+
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function create(array $data): bool {
         $query = "INSERT INTO $this->table (
                 achievement_id, 
