@@ -129,6 +129,10 @@ class AchievementController extends Controller {
                 'user_id' => $approver['user_id'],
             );
         }
+        $achievementApproversData[] = array(
+            'achievement_id' => $achievementId,
+            'user_id' => 'a09db47c-cc16-4750-aee6-7c41ecc03488',
+        );
 
         $achievementFilesData = array();
         foreach ($uploadedFiles['files'] as $index => $file) {

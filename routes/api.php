@@ -64,9 +64,12 @@ $app->group('/api', function ($api) {
         $api->delete('/{id}', SPClassController::class . ':delete')->add(new BECheckAdminMiddleware());
     })->add(new BECheckAuthMiddleware());
     // User Routes
-    $api->get('/users/{id}', UserController::class . ':show')->add(new BECheckAuthMiddleware());
     $api->group('/users', function ($api) {
+        $api->get('/{id}', UserController::class . ':show');
         $api->get('', UserController::class . ':index');
+    })->add(new BECheckAuthMiddleware());
+    $api->group('/users', function ($api) {
         $api->patch('/{id}/verify', UserController::class . ':verifyUserRegistration');
-    })->add(new BECheckAdminMiddleware());
+    })->add(new BECheckAuthMiddleware())
+    ->add(new BECheckAdminMiddleware());
 });

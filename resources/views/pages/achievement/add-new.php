@@ -127,14 +127,14 @@ renderComponent('breadcrumb', [
             <div class="col-12 col-md-6">
                 <div class="d-flex flex-column gap-2">
                     <label for="achievementCertificateFile" class="text-sm">Certificate <span class="text-danger">*</span></label>
-                    <input type="file" class="form-control form-control-sm" id="achievementCertificateFile" accept=".jpg, .jpeg, .png, .pdf">
+                    <input type="file" class="form-control form-control-sm" id="achievementCertificateFile" accept=".pdf">
                     <span class="text-xs text-danger" id="achievementCertificateFileError"></span>
                 </div>
             </div>
             <div class="col-12 col-md-6">
                 <div class="d-flex flex-column gap-2">
                     <label for="achievementAssignmentFile" class="text-sm">Letter of Assignment <span class="text-danger">*</span></label>
-                    <input type="file" class="form-control form-control-sm" id="achievementAssignmentFile" accept=".jpg, .jpeg, .png, .pdf">
+                    <input type="file" class="form-control form-control-sm" id="achievementAssignmentFile" accept=".pdf">
                     <span class="text-xs text-danger" id="achievementAssignmentFileError"></span>
                 </div>
             </div>
