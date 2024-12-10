@@ -4,120 +4,49 @@ namespace App\Models;
 
 use PDO;
 use App\Models\Model;
-use Ramsey\Uuid\Uuid;
 
-class Achievement extends Model
-{
-    protected string $tableAchievement = "Achievement.Achievements";
-    protected string $tableApprover = "Achievement.AchievementApprovers";
-
+class Achievement extends Model {
+    protected string $table = "Achievement.Achievements";
     protected string $primaryKey = "achievement_id";
 
+    public function create(array $data): bool {
+        $query = "INSERT INTO $this->table (
+                achievement_id, 
+                user_id, 
+                achievement_title, 
+                achievement_description, 
+                achievement_type, 
+                achievement_scope, 
+                achievement_eventlocation, 
+                achievement_eventcity, 
+                achievement_eventstart, 
+                achievement_eventend
+        ) VALUES (
+                :achievement_id, 
+                :user_id, 
+                :achievement_title, 
+                :achievement_description, 
+                :achievement_type, 
+                :achievement_scope, 
+                :achievement_eventlocation, 
+                :achievement_eventcity, 
+                :achievement_eventstart, 
+                :achievement_eventend
+        )";
+        $stmt = $this->getDbConnection()->prepare($query);
 
-    public function create(array $data): bool
-    {
-        $uuid = Uuid::uuid4();
-        $achievementId = $uuid->toString();
-        try {
-            $this->getDbConnection()->beginTransaction();
-
-            $sql = "INSERT INTO Achievement.Achievements (
-                    achievement_id, 
-                    user_id, 
-                    achievement_title, 
-                    achievement_description, 
-                    achievement_type, 
-                    achievement_event_location, 
-                    achievement_event_city, 
-                    achievement_event_start, 
-                    achievement_event_end, 
-                    achievement_scope
-                )
-                VALUES (
-                    :achievement_id, 
-                    :user_id, 
-                    :achievement_title, 
-                    :achievement_description, 
-                    :achievement_type, 
-                    :achievement_event_location, 
-                    :achievement_event_city, 
-                    :achievement_event_start, 
-                    :achievement_event_end,  
-                    :achievement_scope
-                )";
-            $stmt = $this->getDbConnection()->prepare($sql);
-            $stmt->bindParam(':achievement_id', $achievementId);
-            $stmt->bindParam(':user_id', $data['user_id']);
-            $stmt->bindParam(':achievement_title', $data['achievement_title']);
-            $stmt->bindParam(':achievement_description', $data['achievement_description']);
-            $stmt->bindParam(':achievement_type', $data['achievement_type']);
-            $stmt->bindParam(':achievement_event_location', $data['achievement_event_location']);
-            $stmt->bindParam(':achievement_event_city', $data['achievement_event_city']);
-            $stmt->bindParam(':achievement_event_start', $data['achievement_event_start']);
-            $stmt->bindParam(':achievement_event_end', $data['achievement_event_end']);
-            $stmt->bindParam(':achievement_scope', $data['achievement_scope']);
-            $stmt->execute();
-
-            if (!empty($data['approvers'])) {
-                $approverSql = "INSERT INTO Achievement.AchievementApprovers (achievement_id, user_id) 
-                            VALUES (:achievement_id, :user_id)";
-                foreach ($data['approvers'] as $approver) {
-                    $stmtApprover = $this->getDbConnection()->prepare($approverSql);
-                    $stmtApprover->bindParam(':achievement_id', $achievementId);
-                    $stmtApprover->bindParam(':user_id', $approver['user_id']);
-                    $stmtApprover->execute();
-                }
-            }
-
-            if (!empty($data['files'])) {
-                $fileSql = "INSERT INTO Achievement.AchievementFiles (achievement_id, file_title, file_description, file_path) 
-                        VALUES (:achievement_id, :file_title, :file_description, :file_path)";
-                foreach ($data['files'] as $file) {
-                    $stmtFile = $this->getDbConnection()->prepare($fileSql);
-                    $stmtFile->bindParam(':achievement_id', $achievementId);
-                    $stmtFile->bindParam(':file_title', $file['file_title']);
-                    $stmtFile->bindParam(':file_description', $file['file_description']);
-                    $stmtFile->bindParam(':file_path', $file['file_path']);
-                    $stmtFile->execute();
-                }
-            }
-
-
-            if (!empty($data['category_id'])) {
-                $categorySql = "INSERT INTO Achievement.AchievementCategoryDetails (achievement_id, category_id) 
-                            VALUES (:achievement_id, :category_id)";
-                $stmtCategory = $this->getDbConnection()->prepare($categorySql);
-                $stmtCategory->bindParam(':achievement_id', $achievementId);
-                $stmtCategory->bindParam(':category_id', $data['category_id']);
-                $stmtCategory->execute();
-            }
-
-            if (!empty($data['verification_code'])) {
-                $verificationSql = "INSERT INTO Achievement.AchievementVerifications (
-                                    achievement_id, verification_code, verification_status, verification_notes
-                                ) 
-                                VALUES (
-                                    :achievement_id, :verification_code, :verification_status, :verification_notes
-                                )";
-                $stmtVerification = $this->getDbConnection()->prepare($verificationSql);
-                $stmtVerification->bindParam(':achievement_id', $achievementId);
-                $stmtVerification->bindParam(':verification_code', $data['verification_code']);
-                $stmtVerification->bindParam(':verification_status', $data['verification_status']);
-                $stmtVerification->bindParam(':verification_notes', $data['verification_notes']);
-                $stmtVerification->execute();
-            }
-
-            $this->getDbConnection()->commit();
-            return true;
-        } catch (\PDOException $e) {
-            $this->getDbConnection()->rollBack();
-            error_log("Database error: " . $e->getMessage());
-            throw new \Exception("Database error: " . $e->getMessage());
-        } catch (\Exception $e) {
-            $this->getDbConnection()->rollBack();
-            error_log("Error: " . $e->getMessage());
-            throw new \Exception("Error: " . $e->getMessage());
-        }
+        $stmt->bindParam(':achievement_id', $data['achievement_id'], PDO::PARAM_STR);
+        $stmt->bindParam(':user_id', $data['user_id'], PDO::PARAM_STR);
+        $stmt->bindParam(':achievement_title', $data['achievement_title'], PDO::PARAM_STR);
+        $stmt->bindParam(':achievement_description', $data['achievement_description'], PDO::PARAM_STR);
+        $stmt->bindParam(':achievement_type', $data['achievement_type'], PDO::PARAM_STR);
+        $stmt->bindParam(':achievement_scope', $data['achievement_scope'], PDO::PARAM_STR);
+        $stmt->bindParam(':achievement_eventlocation', $data['achievement_eventlocation'], PDO::PARAM_STR);
+        $stmt->bindParam(':achievement_eventcity', $data['achievement_eventcity'], PDO::PARAM_STR);
+        $stmt->bindParam(':achievement_eventstart', $data['achievement_eventstart'], PDO::PARAM_STR);
+        $stmt->bindParam(':achievement_eventend', $data['achievement_eventend'], PDO::PARAM_STR);
+    
+        return $stmt->execute();
     }
 
     public function getPendingAchievementsByApprover(string $userId): array

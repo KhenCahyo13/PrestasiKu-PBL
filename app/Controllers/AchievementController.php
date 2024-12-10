@@ -7,86 +7,115 @@ use Psr\Http\Message\ResponseInterface;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
 use App\Helpers\ResponseHelper;
+use App\Helpers\UploadFileHelper;
+use App\Models\AchievementApprover;
+use App\Models\AchievementCategoryDetails;
+use App\Models\AchievementFile;
+use App\Models\AchievementVerification;
+use App\Models\Model;
+use Ramsey\Uuid\Uuid;
+use Slim\Psr7\UploadedFile;
 
-class AchievementController
-{
+class AchievementController extends Controller {
+    private $baseModel;
     private $achievementModel;
+    private $achievementApproverModel;
+    private $achievementFileModel;
+    private $achievementCategoryDetailsModel;
+    private $achievementVerificationModel;
 
-    public function __construct()
-    {
+    public function __construct() {
+        $this->baseModel = new Model();
         $this->achievementModel = new Achievement();
+        $this->achievementApproverModel = new AchievementApprover();
+        $this->achievementFileModel = new AchievementFile();
+        $this->achievementCategoryDetailsModel = new AchievementCategoryDetails();
+        $this->achievementVerificationModel = new AchievementVerification();
     }
 
-    public function createAchievement(Request $request, Response $response): ResponseInterface
-    {
+    public function store(Request $request, Response $response): ResponseInterface {
         $data = $request->getParsedBody();
         $uploadedFiles = $request->getUploadedFiles();
+        $achievementId = Uuid::uuid4()->toString();
+        $userId = $_SESSION['user']['id'];
 
-        if (empty($data['user_id']) || empty($data['achievement_title']) || empty($data['achievement_description'])) {
-            return ResponseHelper::error($response, 'Missing required fields: user_id, achievement_title, or achievement_description.', 400);
+        $achievementData = array(
+            'achievement_id' => $achievementId,
+            'user_id' => $userId,
+            'achievement_title' => $data['achievement_title'],
+            'achievement_description' => $data['achievement_description'],
+            'achievement_type' => $data['achievement_type'],
+            'achievement_eventlocation' => $data['achievement_eventlocation'],
+            'achievement_eventcity' => $data['achievement_eventcity'],
+            'achievement_eventstart' => $data['achievement_eventstart'],
+            'achievement_eventend' => $data['achievement_eventend'],
+            'achievement_scope' => $data['achievement_scope'],
+        );
+
+        $achievementApproversData = array();
+        foreach ($data['approvers'] as $approver) {
+            $achievementApproversData[] = array(
+                'achievement_id' => $achievementId,
+                'user_id' => $approver['user_id'],
+            );
         }
 
-        $approvers = $data['approvers'] ?? [];
-
-        $adminApprover = [
-            'user_id' => '2CC961F5-A938-426C-A81D-68D909ACC792',
-        ];
-
-        $approvers[] = $adminApprover;
-
-        $files = [];
-        if (!empty($uploadedFiles['files'])) {
-            foreach ($uploadedFiles['files'] as $file) {
-                $filePath = $this->uploadFile($file, $data['user_id']);
-                if ($filePath) {
-                    $files[] = [
-                        'file_title' => $file->getClientFilename(),
-                        'file_description' => 'Uploaded file for achievement',
-                        'file_path' => $filePath
-                    ];
+        $achievementFilesData = array();
+        foreach ($uploadedFiles['files'] as $index => $file) {
+            if ($file instanceof UploadedFile) {
+                $uploadFile = UploadFileHelper::upload($file, $userId, $index === 0 ? 'Certificate' : 'Assignment');
+        
+                if ($uploadFile['success']) {
+                    $achievementFilesData[] = array(
+                        'achievement_id' => $achievementId,
+                        'file_title' => $uploadFile['data']['filename'],
+                        'file_path' => $uploadFile['data']['filepath']
+                    );
                 }
-            }
-        }
-
-        $data['approvers'] = $approvers;
-        $data['files'] = $files;
-        $data['achievement_type'] = $data['achievement_type'] ?? 'Individual';
-        $data['achievement_event_location'] = $data['achievement_event_location'] ?? '';
-        $data['achievement_event_city'] = $data['achievement_event_city'] ?? '';
-        $data['achievement_scope'] = $data['achievement_scope'] ?? 'Regional';
-        $data['verification_code'] = $data['verification_code'] ?? 'MP';
-        $data['verification_status'] = $data['verification_status'] ?? 'Pending';
-        $data['verification_notes'] = $data['verification_notes'] ?? 'Pending';
-
-        try {
-            $result = $this->achievementModel->create($data);
-
-            if ($result) {
-                return ResponseHelper::success($response, $data, 'Achievement created successfully!', 201);
             } else {
-                return ResponseHelper::error($response, 'Failed to create achievement.', 500);
+                return ResponseHelper::error($response, 'Invalid file format.', 400);
             }
-        } catch (\Exception $e) {
-            return ResponseHelper::error($response, 'Error: ' . $e->getMessage(), 500);
-        }
-    }
-
-    private function uploadFile($file, $userId)
-    {
-        $directory = __DIR__ . '/../../public/uploads/' . $userId;
-
-        if (!is_dir($directory)) {
-            mkdir($directory, 0777, true);
         }
 
-        $filename = $file->getClientFilename();
-        $filePath = $directory . '/' . $filename;
+        $achievementCategoriesData = array();
+        foreach ($data['categories'] as $category) {
+            $achievementCategoriesData[] = array(
+                'achievement_id' => $achievementId,
+                'category_id' => $category['category_id'],
+            );
+        }
+
+        $achievementVerificationData = array(
+            'achievement_id' => $achievementId,
+            'verification_code' => 'MP',
+            'verification_status' => 'Menunggu Persetujuan',
+        );
 
         try {
-            $file->moveTo($filePath);
-            return '/uploads/' . $userId . '/' . $filename;
+            $this->baseModel->getDbConnection()->beginTransaction();
+            // Transactions
+            $this->achievementModel->create($achievementData);
+
+            foreach ($achievementApproversData as $approver) {
+                $this->achievementApproverModel->create($approver);
+            }
+
+            foreach ($achievementFilesData as $file) {
+                $this->achievementFileModel->create($file);
+            }
+
+            foreach ($achievementCategoriesData as $category) {
+                $this->achievementCategoryDetailsModel->create($category);
+            }
+
+            $this->achievementVerificationModel->create($achievementVerificationData);
+            // End of Transactions
+            $this->baseModel->getDbConnection()->commit();
+
+            return ResponseHelper::success($response, [], 'Successfully created achievement.');
         } catch (\Exception $e) {
-            return false;
+            $this->baseModel->getDbConnection()->rollBack();
+            return ResponseHelper::error($response, $e->getMessage(), 500);
         }
     }
 

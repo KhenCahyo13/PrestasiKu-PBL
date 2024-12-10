@@ -34,7 +34,7 @@ $app->group('/web', function ($web) {
             include views('achievement/add-new.php');
             return $response;
         });
-    });
+    })->add(new CheckAuthMiddleware());
     // Master Pages Routes
     $web->group('/master', function ($master) {
         $master->get('/department', function ($request, $response) {

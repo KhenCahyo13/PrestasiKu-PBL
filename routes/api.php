@@ -1,4 +1,6 @@
 <?php
+
+use App\Controllers\AchievementCategoryController;
 use App\Controllers\AuthController;
 use App\Controllers\DepartmentController;
 use App\Controllers\RoleController;
@@ -19,13 +21,17 @@ $app->group('/api', function ($api) {
     });
     // Achievement Routes
     $api->group('/achievements', function ($api) {
-        $api->post('/upload', AchievementController::class . ':createAchievement');
+        $api->post('', AchievementController::class . ':store');
         $api->post('/approval/{id}', AchievementController::class . ':approveAchievement');
         $api->get('/pending/{id}', AchievementController::class . ':getPendingAchievements');
         $api->get('/approved/{id}', AchievementController::class . ':getApprovedAchievements');
         $api->get('/notification/{id}', AchievementController::class . ':getNotifications');
         $api->delete('/delete/{id}', AchievementController::class . ':deleteAchievement');
         $api->get('/grafic-scope', AchievementController::class . ':getAchievementScopePercentage');
+    })->add(new CheckAuthMiddleware());
+    // Achievement Categories Routes
+    $api->group('/achievement-categories', function ($api) {
+        $api->get('', AchievementCategoryController::class . ':index');
     });
     // Roles Routes
     $api->group('/roles', function ($api) {
