@@ -23,6 +23,8 @@ class Achievement extends Model {
         } else if ($role == 'Admin' || $role == 'Lecturer') {
             $query = "SELECT COUNT(Achievement.AchievementApprovers.user_id) AS Total
                     FROM Achievement.AchievementApprovers
+                    INNER JOIN Achievement.Achievements 
+                    ON Achievement.AchievementApprovers.achievement_id = Achievement.Achievements.achievement_id
                     WHERE Achievement.AchievementApprovers.user_id = :userId AND 
                     Achievement.Achievements.achievement_title LIKE :search
             ";

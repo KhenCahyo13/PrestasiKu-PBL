@@ -1,9 +1,8 @@
 <?php
-$title = 'PrestasiKu - User';
-$pageTitle = 'User';
+$title = 'PrestasiKu - Achievement';
+$pageTitle = 'Achievement';
 $breadcrumbItems = [
-    ['label' => 'Master', 'url' => '/'],
-    ['label' => 'User', 'url' => '#'],
+    ['label' => 'Achievement', 'url' => '#'],
 ];
 ob_start();
 ?>
@@ -16,13 +15,25 @@ renderComponent('breadcrumb', [
 ]);
 ?>
 
+<!-- Card Achievement List -->
 <section class="my-1 bg-white rounded shadow-sm">
     <div class="px-4 py-3 border-bottom border-secondary">
         <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between gap-3">
-            <h2 class="my-0 heading-6">User List</h2>
+            <h2 class="my-0 heading-6">Achievement List</h2>
             <div class="d-flex align-items-center gap-2">
-                <input type="text" placeholder="Search data ..." class="form-control form-control-sm" id="searchUser">
-                
+                <input type="text" placeholder="Search data ..." class="form-control form-control-sm" id="searchAchievement">
+                <?php
+                if ($_SESSION['user']['role'] == 'Student') {
+                ?>
+                    <a href="<?= url('achievement/add-new') ?>" class="btn btn-dark btn-sm">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fa-solid fa-plus"></i>
+                            <span style="white-space: nowrap;">Add New</span>
+                        </div>
+                    </a>
+                <?php
+                }
+                ?>
             </div>
         </div>
     </div>
@@ -31,14 +42,15 @@ renderComponent('breadcrumb', [
             <thead class="table-secondary">
                 <tr>
                     <th class="px-md-4 py-md-3 text-sm font-medium">No</th>
-                    <th class="px-md-4 py-md-3 text-sm font-medium">Fullname</th>
-                    <th class="px-md-4 py-md-3 text-sm font-medium">Role</th>
-                    <th class="px-md-4 py-md-3 text-sm font-medium">NIM/NIP</th>
+                    <th class="px-md-4 py-md-3 text-sm font-medium">Title</th>
+                    <th class="px-md-4 py-md-3 text-sm font-medium">Type</th>
+                    <th class="px-md-4 py-md-3 text-sm font-medium">Scope</th>
                     <th class="px-md-4 py-md-3 text-sm font-medium text-center">Verification Status</th>
+                    <th class="px-md-4 py-md-3 text-sm font-medium">Created at</th>
                     <th class="px-md-4 py-md-3 text-sm font-medium text-center">Actions</th>
                 </tr>
             </thead>
-            <tbody id="userTableBody"></tbody>
+            <tbody id="achievementsTableBody"></tbody>
         </table>
     </div>
     <div class="px-4 py-2">
@@ -61,7 +73,7 @@ renderComponent('breadcrumb', [
         </div>
     </div>
 </section>
-<script src="<?= js('user/list.js?v=' . time()) ?>"></script>
+<script src="<?= js('achievement/list.js?v=' . time()) ?>"></script>
 
 <?php
 $content = ob_get_clean();

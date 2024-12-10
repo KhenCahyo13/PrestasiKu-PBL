@@ -2,8 +2,7 @@
 $title = 'PrestasiKu - Achievement';
 $pageTitle = 'Achievement';
 $breadcrumbItems = [
-    ['label' => 'Master', 'url' => '//PrestasiKu-PBL/web/dasshboard'],
-    ['label' => 'Achievement', 'url' => '/PrestasiKu-PBL/web/master/achievement'],
+    ['label' => 'Achievement', 'url' => '/PrestasiKu-PBL/web/achievement'],
     ['label' => 'Add New', 'url' => '#'],
 ];
 ob_start();
@@ -142,7 +141,7 @@ renderComponent('breadcrumb', [
         </div>
         <div class="px-3 py-3 mt-4 border-top border-secondary">
             <div class="d-flex align-items-center gap-2 justify-content-end">
-                <a href="#" class="btn btn-sm btn-danger">Cancel</a>
+                <a href="<?= url('achievement') ?>" class="btn btn-sm btn-danger">Cancel</a>
                 <button type="submit" class="btn btn-sm btn-primary">Submit</button>
             </div>
         </div>
