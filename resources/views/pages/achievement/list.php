@@ -73,6 +73,22 @@ renderComponent('breadcrumb', [
         </div>
     </div>
 </section>
+<!-- Approver List Modal -->
+<div class="modal fade" id="approverListModal" tabindex="-1" aria-labelledby="approverListModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header justify-content-between px-3 py-3">
+                <p class="heading-6 my-0">Approver List</p>
+                <button type="button" class="btn btn-transparent p-0" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex flex-column gap-3" id="approverListElement"></div>
+            </div>
+        </div>
+    </div>
+</div>
 <script src="<?= js('achievement/list.js?v=' . time()) ?>"></script>
 
 <?php

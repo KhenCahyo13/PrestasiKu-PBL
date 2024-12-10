@@ -20,20 +20,20 @@ $(document).ready(() => {
                 $('#currentPage').text(response.pagination.current_page);
                 $('#totalPages').text(response.pagination.total_pages);
 
-                if (response.data.length === 0) {
+                if (response.data.length == 0) {
                     achievementsTableBody.append(`
                         <tr>
                             <td colspan="7" class="text-center py-3 text-sm text-secondary">Achievements data is still empty.</td>
                         </tr>
                     `);
+
                     return;
                 } else {
-                    for (let i = 0; i < response.data.length; i++) {
-                        const achievement = response.data[i];
+                    response.data.forEach((achievement, index) => {
                         const statusBadgeType = achievement.achievement_verification.verification_status == 'Menunggu Persetujuan' ? 'text-bg-warning' : achievement.achievement_verification.verification_status == 'Ditolak' ? 'text-bg-danger' : 'text-bg-success'; 
                         const achievementRow = `
                             <tr>
-                                <td class="px-md-4 py-md-3 text-sm">${i + 1}</td>
+                                <td class="px-md-4 py-md-3 text-sm">${index + 1}</td>
                                 <td class="px-md-4 py-md-3 text-sm">${achievement.achievement_title}</td>
                                 <td class="px-md-4 py-md-3 text-sm">${achievement.achievement_type}</td>
                                 <td class="px-md-4 py-md-3 text-sm">${achievement.achievement_scope}</td>
@@ -58,9 +58,9 @@ $(document).ready(() => {
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="#" class="dropdown-item d-flex align-items-center gap-2">
+                                                <button type="button" class="dropdown-item d-flex align-items-center gap-2" data-id="${achievement.achievement_id}" data-bs-toggle="modal" data-bs-target="#approverListModal" id="approverListAction">
                                                     <i class="fa-solid fa-users text-secondary"></i> Approver List
-                                                </a>
+                                                </button>
                                             </li>
                                         </ul>
                                     </div>
@@ -69,7 +69,43 @@ $(document).ready(() => {
                         `;
     
                         achievementsTableBody.append(achievementRow);
-                    }
+                    });
+
+                // Approver List Action
+                    document.querySelectorAll('#approverListAction').forEach((button) => {
+                        button.addEventListener('click', function () {
+                            const achievementId = this.getAttribute('data-id');
+                            const approverListElement = $('#approverListElement');
+
+                            approverListElement.empty();
+
+                            $.ajax({
+                                url: `${BASE_API_URL}/achievements/${achievementId}/approver-list`,
+                                method: 'GET',
+                                success: function(response) {
+                                    for (let i = 0; i < response.data.length; i++) {
+                                        const approver = response.data[i];
+                                        const approverRow = `
+                                            <div class="d-flex align-items-center gap-3">
+                                                <div class="rounded-profile-letter">
+                                                    <p class="heading-6 my-0">${approver.user_username == 'admin' ? 'A' : approver.lecturer_name[0]}</p>
+                                                </div>
+                                                <div class="d-flex flex-column">
+                                                    <p class="my-0 text-sm font-medium">${approver.user_username == 'admin' ? 'Admin' : approver.lecturer_name}</p>
+                                                    <p class="my-0 text-xs text-secondary">NIP: ${approver.user_username == 'admin' ? '-' : approver.lecturer_nip}</p>
+                                                </div>
+                                            </div>
+                                        `;
+        
+                                        approverListElement.append(approverRow);
+                                    }
+                                },
+                                error: function(error) {
+                                    console.log('Error while fetching achievement approver list!');
+                                }
+                            });
+                        });
+                    });
                 }
             },
             error: function(error) {

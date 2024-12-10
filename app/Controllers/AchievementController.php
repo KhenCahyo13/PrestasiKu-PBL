@@ -90,7 +90,18 @@ class AchievementController extends Controller {
             $limit,
             'Successfully retrieved achievements data.'
         );
-    }    
+    }  
+    
+    public function getApproverList(Request $request, Response $response, array $args): Response {
+        $achievementId = $args['id'];
+        $achievementApprovers = $this->achievementApproverModel->getApproversByAchievementId($achievementId);
+
+        if (!$achievementApprovers) {
+            return ResponseHelper::error($response, 'Achievement approvers not found.', 404);
+        }
+
+        return ResponseHelper::success($response, $achievementApprovers, 'Successfully get achievement approvers.');
+    }
 
     public function store(Request $request, Response $response): ResponseInterface {
         $data = $request->getParsedBody();

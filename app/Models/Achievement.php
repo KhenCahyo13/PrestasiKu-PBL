@@ -44,9 +44,8 @@ class Achievement extends Model {
         $userId = $_SESSION['user']['id'];
 
         if ($role == 'Student') {
-            $query = "SELECT Achievement.Achievements.*, Achievement.AchievementApprovers.*, Achievement.AchievementVerifications.*
+            $query = "SELECT Achievement.Achievements.*, Achievement.AchievementVerifications.*
                     FROM Achievement.Achievements 
-                    INNER JOIN Achievement.AchievementApprovers ON Achievement.Achievements.achievement_id = Achievement.AchievementApprovers.achievement_id 
                     INNER JOIN Achievement.AchievementVerifications ON Achievement.Achievements.achievement_id = Achievement.AchievementVerifications.achievement_id 
                     WHERE Achievement.Achievements.user_id = :userId AND 
                     Achievement.Achievements.achievement_title LIKE :search

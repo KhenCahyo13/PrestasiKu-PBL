@@ -23,6 +23,7 @@ $app->group('/api', function ($api) {
     $api->group('/achievements', function ($api) {
         $api->get('', AchievementController::class . ':index');
         $api->post('', AchievementController::class . ':store')->add(new BECheckStudentMiddleware());
+        $api->get('/{id}/approver-list', AchievementController::class . ':getApproverList');
         $api->post('/approval/{id}', AchievementController::class . ':approveAchievement');
         $api->get('/pending/{id}', AchievementController::class . ':getPendingAchievements');
         $api->get('/approved/{id}', AchievementController::class . ':getApprovedAchievements');
