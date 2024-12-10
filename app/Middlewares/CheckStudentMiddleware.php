@@ -18,7 +18,7 @@ class CheckStudentMiddleware extends Middleware implements MiddlewareInterface
     if (!isset($_SESSION['user']) || !isset($_SESSION['user']['id'])) {
       $responseData = [
         'success' => false,
-        'message' => 'Unauthorized access! Please log in.',
+        'message' => 'Unauthorized access! Please login',
       ];
       return $this->respondWithJson($responseData, 401);
     }
@@ -26,14 +26,13 @@ class CheckStudentMiddleware extends Middleware implements MiddlewareInterface
     if (!isset($_SESSION['user']['role']) || $_SESSION['user']['role'] !== '39DC23CD-CB63-4073-A15A-2D8A878A3F58') {
       $responseData = [
         'success' => false,
-        'message' => 'Access denied! Student only.',
+        'message' => 'Access denied! Students only',
       ];
       return $this->respondWithJson($responseData, 403);
     }
 
     return $handler->handle($request);
   }
-  // response
   private function respondWithJson(array $data, int $status): ResponseInterface
   {
     $response = new Response();
