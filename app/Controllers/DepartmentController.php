@@ -11,23 +11,29 @@ class DepartmentController extends Controller
 {
     private $departmentModel;
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->departmentModel = new Department();
     }
 
-    public function index(Request $request, Response $response): Response
-    {
+    public function index(Request $request, Response $response): Response {
         $page = (int) ($request->getQueryParams()['page'] ?? 1);
         $limit = (int) ($request->getQueryParams()['limit'] ?? 10);
+        $search = (string) ($request->getQueryParams()['search'] ?? '');
         $offset = ($page - 1) * $limit;
 
-        $departments = $this->departmentModel->getAll($limit, $offset);
-        $totalDepartments = $this->departmentModel->getTotalCount();;
+        $departments = $this->departmentModel->getAll($limit, $offset, $search);
+        $totalDepartments = 0;
+
+        if (empty($search) || $search === '') {
+            $totalDepartments = $this->departmentModel->getTotalCount();
+        } else {
+            $totalDepartments = count($departments);
+        }
+        
         $totalPages = ceil($totalDepartments / $limit);
 
         if (empty($departments)) {
-            return ResponseHelper::error($response, 'No departments found', 404);
+            return ResponseHelper::error($response, 'No departments found.', 404);
         }
 
         return ResponseHelper::withPagination(
@@ -36,24 +42,23 @@ class DepartmentController extends Controller
             $page,
             $totalPages,
             $totalDepartments,
-            $limit
+            $limit,
+            'Successfully get departments data.'
         );
     }
 
-    public function show(Request $request, Response $response, array $args): Response
-    {
+    public function show(Request $request, Response $response, array $args): Response {
         $id = $args['id'];
         $department = $this->departmentModel->getById($id);
 
         if (!$department) {
-            return ResponseHelper::error($response, 'Department not found', 404);
+            return ResponseHelper::error($response, 'Department not found.', 404);
         }
 
-        return ResponseHelper::success($response, $department, 'Department fetched successfully');
+        return ResponseHelper::success($response, $department, 'Successfully get department.');
     }
 
-    public function store(Request $request, Response $response): Response
-    {
+    public function store(Request $request, Response $response): Response {
         $data = json_decode($request->getBody(), true);
 
         $departmentName = $data['department_name'] ?? '';
@@ -72,11 +77,10 @@ class DepartmentController extends Controller
             return ResponseHelper::error($response, 'Failed to create department', 500);
         }
 
-        return ResponseHelper::success($response, $insertData, 'Department created successfully', 201);
+        return ResponseHelper::success($response, $insertData, 'Successfully created department.', 201);
     }
 
-    public function update(Request $request, Response $response, array $args): Response
-    {
+    public function update(Request $request, Response $response, array $args): Response {
         $id = $args['id'] ?? null;
 
         if (!$id) {
@@ -98,22 +102,21 @@ class DepartmentController extends Controller
         $result = $this->departmentModel->update($data);
 
         if (!$result) {
-            return ResponseHelper::error($response, 'Failed to update department', 500);
+            return ResponseHelper::error($response, 'Failed to update department.', 500);
         }
 
-        return ResponseHelper::success($response, [], 'Department updated successfully');
+        return ResponseHelper::success($response, [], 'Successfully updated department.');
     }
 
-    public function delete(Request $request, Response $response, array $args): Response
-    {
+    public function delete(Request $request, Response $response, array $args): Response {
         $id = $args['id'];
 
         $result = $this->departmentModel->delete($id);
 
         if (!$result) {
-            return ResponseHelper::error($response, 'Failed to delete department', 500);
+            return ResponseHelper::error($response, 'Failed to delete department.', 500);
         }
 
-        return ResponseHelper::success($response, [], 'Department deleted successfully');
+        return ResponseHelper::success($response, [], 'Successfully deleted department.');
     }
 }

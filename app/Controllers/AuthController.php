@@ -2,6 +2,8 @@
 
 namespace App\Controllers;
 
+use App\Helpers\ResponseHelper;
+use App\Models\Role;
 use App\Models\User;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Psr7\Request;
@@ -10,148 +12,166 @@ use Ramsey\Uuid\Uuid;
 
 class AuthController
 {
-  private $userModel;
+	private $userModel;
+	private $roleModel;
 
-  public function __construct()
-  {
-    $this->userModel = new User();
-  }
+	public function __construct() {
+		$this->userModel = new User();
+		$this->roleModel = new Role();
+	}
 
-  public function register(Request $request, Response $response): ResponseInterface
-  {
-    $data = json_decode($request->getBody(), true);
-    $uuid = Uuid::uuid4();
+	public function register(Request $request, Response $response): ResponseInterface {
+		$data = json_decode($request->getBody(), true);
+		$detailsId = Uuid::uuid4();
 
-    $passwordPattern = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/';
-    if (!preg_match($passwordPattern, $data['user_password'])) {
-      $response->getBody()->write(json_encode(['success' => false, 'message' => 'Password must contain at least one uppercase letter, one lowercase letter, one number, one special character, and be at least 8 characters long.']));
-      return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
-    }
+		// Check Password Pattern
+		$passwordPattern = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/';
+		if (!preg_match($passwordPattern, $data['user_password'])) {
+			return ResponseHelper::error(
+				$response,
+				'Password must contain at least one uppercase letter, one lowercase letter, one number, one special character, and be at least 8 characters long.',
+				400
+			);
+		}
 
-    $existingUser = $this->userModel->getUserByUsername($data['user_username']);
-    if ($existingUser) {
-      $response->getBody()->write(json_encode(['success' => false, 'message' => 'Username already exists!']));
-      return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
-    }
+		// Check if username already exists
+		$existingUser = $this->userModel->getByUsername($data['user_username']);
+		if ($existingUser) {
+			return ResponseHelper::error(
+				$response,
+				'Username already exists.',
+				400
+			);
+		}
 
-    if (!isset($data['role_id']) || !in_array($data['role_id'], ['39DC23CD-CB63-4073-A15A-2D8A878A3F58', 'FBA2D7AA-4F83-4C48-9C9A-4EB7F8A253F8'])) {
-      $response->getBody()->write(json_encode(['success' => false, 'message' => 'Invalid role!']));
-      return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
-    }
+		// Check role
+		$role = $this->roleModel->getById($data['role_id']);
+		if (!$role) {
+			return ResponseHelper::error(
+				$response,
+				'Role not found.',
+				400
+			);
+		}
 
-    $insertData = [
-      'user_id' => $uuid->toString(),
-      'user_username' => $data['user_username'],
-      'user_password' => password_hash($data['user_password'], PASSWORD_DEFAULT),
-      'role_id' => $data['role_id'],
-      'detail_id' => $uuid->toString()
-    ];
+		$results = false;
+		$userData = array(
+			'role_id' => $data['role_id'],
+			'user_username' => $data['user_username'],
+			'user_password' => password_hash($data['user_password'], PASSWORD_DEFAULT),
+		);
 
-    if ($data['role_id'] === '39DC23CD-CB63-4073-A15A-2D8A878A3F58') {
-      $insertData += [
-        'spclass_id' => $data['spclass_id'],
-        'detail_name' => $data['detail_name'],
-        'detail_nim' => $data['detail_nim'],
-        'detail_date_of_birth' => $data['detail_date_of_birth'],
-        'detail_phone_number' => $data['detail_phone_number'],
-        'detail_email' => $data['detail_email'],
-        'detail_profile' => $data['detail_profile']
-      ];
-      $result = $this->userModel->createStudent($insertData);
-    } else {
-      $insertData += [
-        'department_id' => $data['department_id'],
-        'detail_name' => $data['detail_name'],
-        'detail_nip' => $data['detail_nip'],
-        'detail_phone_number' => $data['detail_phone_number'],
-        'detail_email' => $data['detail_email'],
-        'detail_profile' => $data['detail_profile']
-      ];
-      $result = $this->userModel->createLecture($insertData);
-    }
+		if ($role['role_name'] == 'Student') {
+			$userData['details_student_id'] = $detailsId->toString();
+			$studentDetailsData = array(
+				'detail_id' => $detailsId->toString(),
+				'spclass_id' => $data['spclass_id'],
+				'detail_name' => $data['detail_name'],
+				'detail_nim' => $data['detail_nim'],
+				'detail_dateofbirth' => $data['detail_dateofbirth'],
+				'detail_phonenumber' => $data['detail_phonenumber'],
+				'detail_email' => $data['detail_email'],
+			);
+			$results = $this->userModel->createStudent($userData, $studentDetailsData);
+		} else if ($role['role_name'] == 'Lecturer') {
+			$userData['details_lecturer_id'] = $detailsId->toString();
+			$lecturerDetailsData = array(
+				'detail_id' => $detailsId->toString(),
+				'department_id' => $data['department_id'],
+				'detail_name' => $data['detail_name'],
+				'detail_nip' => $data['detail_nip'],
+				'detail_phonenumber' => $data['detail_phonenumber'],
+				'detail_email' => $data['detail_email'],
+			);
+			$results = $this->userModel->createLecture($userData, $lecturerDetailsData);
+		}
 
-    if ($result) {
-      $responseData = ['success' => true, 'message' => 'Registration successful!', 'data' => $insertData];
-    } else {
-      $responseData = ['success' => false, 'message' => 'Failed to register user.'];
-    }
+		if ($results) {
+			return ResponseHelper::success(
+				$response,
+				array(),
+				'Successfully register.',
+				201
+			);
+		} else {
+			return ResponseHelper::error(
+				$response,
+				'Failed to register.',
+				400
+			);
+		}
+	}
 
-    $response->getBody()->write(json_encode($responseData));
-    return $response->withHeader('Content-Type', 'application/json')->withStatus($result ? 201 : 500);
-  }
+	public function login(Request $request, Response $response): ResponseInterface {
+		$body = $request->getBody();
+		$data = json_decode($body, true);
 
-  public function login(Request $request, Response $response): ResponseInterface
-  {
-    $body = $request->getBody();
-    $data = json_decode($body, true);
+		if (!empty($data['user_username']) || !empty($data['user_password'])) {
+			$user = $this->userModel->getByUsername($data['user_username']);
 
-    if (!empty($data['user_username']) && !empty($data['user_password'])) {
-      $user = $this->userModel->getUserByUsername($data['user_username']);
+			if ($user) {
+				if (password_verify($data['user_password'], $user['user_password'])) {
+					if ($user['user_isverified'] == 1) {
+						$_SESSION['user'] = [
+							'id' => $user['user_id'],
+							'username' => $user['user_username'],
+							'role' => $user['role_name']
+						];
 
-      if ($user) {
-        if (password_verify($data['user_password'], $user['user_password'])) {
-          if ($user['user_isverified'] == 1) {
-            $_SESSION['user'] = [
-              'id' => $user['user_id'],
-              'username' => $user['user_username'],
-              'role' => $user['role_id']
-            ];
-
-            $responseData = [
-              'success' => true,
-              'message' => 'Login successful!',
-              'data' => $_SESSION['user']
-            ];
-          } else {
-            $responseData = [
-              'success' => false,
-              'message' => 'You are not verified by the admin!',
-            ];
-          }
-        } else {
-          $responseData = [
-            'success' => false,
-            'message' => 'Invalid password!',
-          ];
-        }
-      } else {
-        $responseData = [
-          'success' => false,
-          'message' => 'User not found!',
-        ];
-      }
-    } else {
-      $responseData = [
-        'success' => false,
-        'message' => 'Username and password are required!',
-      ];
-    }
-
-    $response->getBody()->write(json_encode($responseData));
-    return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
-  }
+						return ResponseHelper::success(
+							$response,
+							$user,
+							'Successfully login.',
+							200
+						);
+					} else {
+						return ResponseHelper::error(
+							$response,
+							'Your account is not verified yet.',
+							400
+						);
+					}
+				} else {
+					return ResponseHelper::error(
+						$response,
+						'Username or password is incorrect.',
+						400
+					);
+				}
+			} else {
+				return ResponseHelper::error(
+					$response,
+					'Username or password is incorrect.',
+					400
+				);
+			}
+		} else {
+			return ResponseHelper::error(
+				$response,
+				'Username or password is required',
+				400
+			);
+		}
+	}
 
 
-  public function logout(Request $request, Response $response): ResponseInterface
-  {
-    if (!isset($_SESSION['user'])) {
-      $responseData = [
-        'success' => false,
-        'message' => 'You are not logged in!',
-      ];
-      $response->getBody()->write(json_encode($responseData));
-      return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
-    }
+	public function logout(Request $request, Response $response): ResponseInterface {
+		if (!isset($_SESSION['user'])) {
+			return ResponseHelper::error(
+				$response,
+				'You are not logged in.',
+				400
+			);
+		}
 
-    unset($_SESSION['user']);
-    session_destroy();
+		unset($_SESSION['user']);
+		session_destroy();
 
-    $responseData = [
-      'success' => true,
-      'message' => 'Logout successful!',
-    ];
-
-    $response->getBody()->write(json_encode($responseData));
-    return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
-  }
+		return ResponseHelper::success(
+			$response,
+			array(),
+			'Successfully logged out.',
+			200
+		);
+	}
 }
