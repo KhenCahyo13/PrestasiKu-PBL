@@ -1,7 +1,23 @@
 <nav class="navbar d-flex align-items-center justify-content-between px-3 py-2 shadow-sm rounded" style="background-color: white;" id="navbarElement">
-    <button class="btn btn-transparent p-0" id="navbarButton">
-        <i class="fa-solid fa-bars" style="font-size: 1rem;" id="navbarButtonIcon"></i>
-    </button>
+    <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-transparent p-0" id="navbarButton">
+            <i class="fa-solid fa-bars" style="font-size: 1rem;" id="navbarButtonIcon"></i>
+        </button>
+        <p class="my-0 text-sm font-medium d-none d-md-block">
+            <?php
+                if ($_SESSION['user']['role'] == 'Admin') {
+                    echo 'PrestasiKu Admin as ';
+                } else {
+                    echo $_SESSION['user']['fullname'] . ' as ';
+                }
+            ?>
+            <span class="text-primary">
+                <?php
+                    echo $_SESSION['user']['role'];
+                ?>
+            </span>
+        </p>
+    </div>
     <div class="d-flex align-items-center gap-3">
         <button class="btn btn-transparent p-0 rounded-icon" id="notificationButton">
             <i class="fa-regular fa-bell" style="font-size: 1rem;"></i>

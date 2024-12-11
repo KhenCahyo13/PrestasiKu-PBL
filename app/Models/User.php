@@ -33,8 +33,15 @@ class User extends Model {
         ';
         $stmt = $this->getDbConnection()->prepare($query);
 
-        $tableColumns = 'Master.Users.user_id, Master.Users.user_username, Master.Users.user_password, Master.Users.user_isverified, Master.Roles.role_name';
-        $joinConditions = 'INNER JOIN Master.Roles ON Master.Users.role_id = Master.Roles.role_id';
+        $tableColumns = 'Master.Users.user_id, Master.Users.user_username, Master.Users.user_password, Master.Users.user_isverified, 
+                        Master.Roles.role_name, 
+                        Master.UserStudentDetails.detail_name AS student_name, 
+                        Master.UserLecturerDetails.detail_name AS lecturer_name
+        ';
+        $joinConditions = 'INNER JOIN Master.Roles ON Master.Users.role_id = Master.Roles.role_id 
+                        LEFT JOIN Master.UserStudentDetails ON Master.UserStudentDetails.detail_id = Master.Users.details_student_id
+                        LEFT JOIN Master.UserLecturerDetails ON Master.UserLecturerDetails.detail_id = Master.Users.details_lecturer_id
+        ';
 
         $stmt->bindValue(':tableName', $this->table, PDO::PARAM_STR);
         $stmt->bindValue(':tableColumns', $tableColumns, PDO::PARAM_STR);

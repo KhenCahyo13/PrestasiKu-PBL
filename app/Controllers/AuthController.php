@@ -112,11 +112,12 @@ class AuthController
 			if ($user) {
 				if (password_verify($data['user_password'], $user['user_password'])) {
 					if ($user['user_isverified'] == 1) {
-						$_SESSION['user'] = [
+						$_SESSION['user'] = array(
 							'id' => $user['user_id'],
 							'username' => $user['user_username'],
-							'role' => $user['role_name']
-						];
+							'role' => $user['role_name'],
+							'fullname' => $user['student_name'] ?? $user['lecturer_name'],
+						);
 
 						return ResponseHelper::success(
 							$response,
