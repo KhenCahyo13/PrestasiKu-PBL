@@ -103,8 +103,8 @@
                 <div class="px-3 py-3 rounded shadow-sm bg-white">
                     <div class="d-flex flex-column gap-4">
                         <div class="d-flex flex-column">
-                            <p class="heading-6 my-0">Total Achievement Ranking <span class="text-primary">- Top 10</span></p>
-                            <p class="text-sm text-secondary my-0">Total Student Achievement Ranking</p>
+                            <p class="heading-6 my-0">Total Achievements Ranking <span class="text-primary">- Top 10</span></p>
+                            <p class="text-sm text-secondary my-0">Total Student Achievements Ranking</p>
                         </div>
                         <div class="d-flex flex-column gap-4" id="top10StudentAchievementContainer"></div>
                     </div>
