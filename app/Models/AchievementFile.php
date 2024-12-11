@@ -10,21 +10,20 @@ class AchievementFile extends Model {
     protected string $primaryKey = "file_id";
 
     public function create(array $data): bool {
-        $query = "INSERT INTO $this->table (
-            achievement_id,
-            file_title,
-            file_path
-        ) VALUES (
-                :achievement_id, 
-                :file_title, 
-                :file_path
-        )";
+        $query = 'EXEC CRUD.InsertTableData @TableName = :tableName, @Columns = :columns, @Values = :values';
         $stmt = $this->getDbConnection()->prepare($query);
-
-        $stmt->bindParam(':achievement_id', $data['achievement_id'], PDO::PARAM_STR);
-        $stmt->bindParam(':file_title', $data['file_title'], PDO::PARAM_STR);
-        $stmt->bindParam(':file_path', $data['file_path'], PDO::PARAM_STR);
-
+        
+        $stmt->bindParam(':tableName', $this->table, PDO::PARAM_STR);
+        
+        $columns = implode(',', array_keys($data));
+        $stmt->bindParam(':columns', $columns, PDO::PARAM_STR);
+    
+        $values = array_map(function($value) {
+            return is_string($value) ? "'" . addslashes($value) . "'" : $value;
+        }, array_values($data));
+        $values = implode(',', $values);
+        $stmt->bindParam(':values', $values, PDO::PARAM_STR);
+    
         return $stmt->execute();
     }
 }

@@ -128,58 +128,26 @@ class Achievement extends Model
     }
 
     public function create(array $data): bool {
-        $query = "INSERT INTO $this->table (
-                achievement_id, 
-                user_id, 
-                achievement_title, 
-                achievement_description, 
-                achievement_type, 
-                achievement_scope, 
-                achievement_eventlocation, 
-                achievement_eventcity, 
-                achievement_eventstart, 
-                achievement_eventend
-        ) VALUES (
-                :achievement_id, 
-                :user_id, 
-                :achievement_title, 
-                :achievement_description, 
-                :achievement_type, 
-                :achievement_scope, 
-                :achievement_eventlocation, 
-                :achievement_eventcity, 
-                :achievement_eventstart, 
-                :achievement_eventend
-        )";
+        $query = 'EXEC CRUD.InsertTableData @TableName = :tableName, @Columns = :columns, @Values = :values';
         $stmt = $this->getDbConnection()->prepare($query);
-
-        $stmt->bindParam(':achievement_id', $data['achievement_id'], PDO::PARAM_STR);
-        $stmt->bindParam(':user_id', $data['user_id'], PDO::PARAM_STR);
-        $stmt->bindParam(':achievement_title', $data['achievement_title'], PDO::PARAM_STR);
-        $stmt->bindParam(':achievement_description', $data['achievement_description'], PDO::PARAM_STR);
-        $stmt->bindParam(':achievement_type', $data['achievement_type'], PDO::PARAM_STR);
-        $stmt->bindParam(':achievement_scope', $data['achievement_scope'], PDO::PARAM_STR);
-        $stmt->bindParam(':achievement_eventlocation', $data['achievement_eventlocation'], PDO::PARAM_STR);
-        $stmt->bindParam(':achievement_eventcity', $data['achievement_eventcity'], PDO::PARAM_STR);
-        $stmt->bindParam(':achievement_eventstart', $data['achievement_eventstart'], PDO::PARAM_STR);
-        $stmt->bindParam(':achievement_eventend', $data['achievement_eventend'], PDO::PARAM_STR);
-
+        
+        $stmt->bindParam(':tableName', $this->table, PDO::PARAM_STR);
+        
+        $columns = implode(',', array_keys($data));
+        $stmt->bindParam(':columns', $columns, PDO::PARAM_STR);
+    
+        $values = array_map(function($value) {
+            return is_string($value) ? "'" . addslashes($value) . "'" : $value;
+        }, array_values($data));
+        $values = implode(',', $values);
+        $stmt->bindParam(':values', $values, PDO::PARAM_STR);
+    
         return $stmt->execute();
     }
 
     public function getTotalBasedOnScope(): array {
         try {
-            $query = "WITH PossibleScopes AS (
-                        SELECT 'International' AS scope
-                        UNION ALL
-                        SELECT 'National'
-                        UNION ALL
-                        SELECT 'Regional'
-                    )
-                    SELECT  PossibleScopes.scope, COUNT(Achievement.Achievements.achievement_id) AS total FROM PossibleScopes 
-                    LEFT JOIN Achievement.Achievements ON PossibleScopes.scope = Achievement.Achievements.achievement_scope
-                    GROUP BY PossibleScopes.scope;
-            ";
+            $query = 'SELECT * FROM Metadata.TotalAchievementsBasedOnScope';
 
             $stmt = $this->getDbConnection()->prepare($query);
 
@@ -193,35 +161,10 @@ class Achievement extends Model
 
     public function getTotalPerMonthInOneYear($year): array {
         try {
-            $query = "WITH Calendar AS (
-                        SELECT 1 AS month_number, 'January' AS month_name
-                        UNION ALL SELECT 2, 'February'
-                        UNION ALL SELECT 3, 'March'
-                        UNION ALL SELECT 4, 'April'
-                        UNION ALL SELECT 5, 'May'
-                        UNION ALL SELECT 6, 'June'
-                        UNION ALL SELECT 7, 'July'
-                        UNION ALL SELECT 8, 'August'
-                        UNION ALL SELECT 9, 'September'
-                        UNION ALL SELECT 10, 'October'
-                        UNION ALL SELECT 11, 'November'
-                        UNION ALL SELECT 12, 'December'
-                    )
-                    SELECT 
-                        Calendar.month_name AS month,
-                        :yearColumn AS year,
-                        COUNT(Achievements.achievement_id) AS total
-                    FROM Calendar
-                    LEFT JOIN Achievement.Achievements 
-                        ON MONTH(Achievements.achievement_createdat) = Calendar.month_number
-                        AND YEAR(Achievements.achievement_createdat) = :yearValue
-                    GROUP BY Calendar.month_name, Calendar.month_number
-                    ORDER BY Calendar.month_number;
-            ";
+            $query = 'EXEC Metadata.GetTotalAchievementsPerMonthInOneYear @Year = :year';
             $stmt = $this->getDbConnection()->prepare($query);
 
-            $stmt->bindParam(':yearColumn', $year, PDO::PARAM_STR);
-            $stmt->bindParam(':yearValue', $year, PDO::PARAM_STR);
+            $stmt->bindParam(':year', $year, PDO::PARAM_STR);
 
             $stmt->execute();
 
@@ -240,36 +183,9 @@ class Achievement extends Model
             $query = '';
 
             if ($role == 'Student') {
-                $query = "SELECT 
-                            COUNT(Achievement.Achievements.achievement_id) AS total, 
-                            VerificationStatus.status,
-                            Achievement.Achievements.user_id
-                        FROM 
-                            (SELECT 'Menunggu Persetujuan' AS status
-                            UNION ALL
-                            SELECT 'Disetujui'
-                            UNION ALL
-                            SELECT 'Ditolak') AS VerificationStatus
-                        LEFT JOIN Achievement.AchievementVerifications ON Achievement.AchievementVerifications.verification_status = VerificationStatus.status
-                        LEFT JOIN Achievement.Achievements ON Achievement.Achievements.achievement_id = Achievement.AchievementVerifications.achievement_id AND Achievement.Achievements.user_id = :userId
-                        GROUP BY VerificationStatus.status, Achievement.Achievements.user_id;
-                ";
+                $query = 'EXEC Metadata.GetTotalAchievementsStudentBasedOnVerificationStatus @UserId = :userId';
             } else if ($role == 'Admin' || $role == 'Lecturer') {
-                $query = "SELECT 
-                            COUNT(Achievement.Achievements.achievement_id) AS total, 
-                            VerificationStatus.status,
-                            Achievement.AchievementApprovers.user_id
-                        FROM 
-                            (SELECT 'Menunggu Persetujuan' AS status
-                            UNION ALL
-                            SELECT 'Disetujui'
-                            UNION ALL
-                            SELECT 'Ditolak') AS VerificationStatus
-                        LEFT JOIN Achievement.AchievementVerifications ON Achievement.AchievementVerifications.verification_status = VerificationStatus.status
-                        LEFT JOIN Achievement.Achievements ON Achievement.Achievements.achievement_id = Achievement.AchievementVerifications.achievement_id
-                        LEFT JOIN Achievement.AchievementApprovers ON Achievement.AchievementApprovers.achievement_id = Achievement.Achievements.achievement_id AND Achievement.AchievementApprovers.user_id = :userId
-                        GROUP BY VerificationStatus.status, Achievement.AchievementApprovers.user_id
-                ";
+                $query = 'EXEC Metadata.GetTotalAchievementsAdminLecturerBasedOnVerificationStatus @UserId = :userId';
             }
             $stmt = $this->getDbConnection()->prepare($query);
 
@@ -286,24 +202,7 @@ class Achievement extends Model
 
     public function getTop10ByStudent(): array {
         try {
-            $query = "SELECT TOP 10 
-                        Achievement.Achievements.user_id, 
-                        COUNT(Achievement.Achievements.achievement_id) AS total,
-                        Master.UserStudentDetails.detail_name,
-                        Master.StudyPrograms.studyprogram_name,
-                        Master.SPClass.spclass_name
-                    FROM Achievement.Achievements
-                    INNER JOIN Master.Users ON Master.Users.user_id = Achievement.Achievements.user_id
-                    INNER JOIN Master.UserStudentDetails ON Master.UserStudentDetails.detail_id = Master.Users.details_student_id
-                    INNER JOIN Master.SPClass ON Master.SPClass.spclass_id = Master.UserStudentDetails.spclass_id
-                    INNER JOIN Master.StudyPrograms ON Master.StudyPrograms.studyprogram_id = Master.SPClass.studyprogram_id
-                    GROUP BY 
-                        Achievement.Achievements.user_id,
-                        Master.UserStudentDetails.detail_name,
-                        Master.StudyPrograms.studyprogram_name,
-                        Master.SPClass.spclass_name
-                    ORDER BY total DESC
-            ";
+            $query = 'SELECT * FROM Metadata.Top10TotalAchievementsRankingByStudent';
 
             $stmt = $this->getDbConnection()->prepare($query);
             $stmt->execute();

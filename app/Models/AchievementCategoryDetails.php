@@ -10,18 +10,20 @@ class AchievementCategoryDetails extends Model {
     protected string $primaryKey = "detail_id";
 
     public function create(array $data): bool {
-        $query = "INSERT INTO $this->table (
-            achievement_id,
-            category_id
-        ) VALUES (
-                :achievement_id, 
-                :category_id
-        )";
+        $query = 'EXEC CRUD.InsertTableData @TableName = :tableName, @Columns = :columns, @Values = :values';
         $stmt = $this->getDbConnection()->prepare($query);
-
-        $stmt->bindParam(':achievement_id', $data['achievement_id'], PDO::PARAM_STR);
-        $stmt->bindParam(':category_id', $data['category_id'], PDO::PARAM_STR);
-
+        
+        $stmt->bindParam(':tableName', $this->table, PDO::PARAM_STR);
+        
+        $columns = implode(',', array_keys($data));
+        $stmt->bindParam(':columns', $columns, PDO::PARAM_STR);
+    
+        $values = array_map(function($value) {
+            return is_string($value) ? "'" . addslashes($value) . "'" : $value;
+        }, array_values($data));
+        $values = implode(',', $values);
+        $stmt->bindParam(':values', $values, PDO::PARAM_STR);
+    
         return $stmt->execute();
     }
 }
