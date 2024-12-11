@@ -5,11 +5,13 @@ namespace App\Models;
 use PDO;
 use App\Models\Model;
 
-class Achievement extends Model {
+class Achievement extends Model
+{
     protected string $table = "Achievement.Achievements";
     protected string $primaryKey = "achievement_id";
 
-    public function create(array $data): bool {
+    public function create(array $data): bool
+    {
         $query = "INSERT INTO $this->table (
                 achievement_id, 
                 user_id, 
@@ -45,7 +47,7 @@ class Achievement extends Model {
         $stmt->bindParam(':achievement_eventcity', $data['achievement_eventcity'], PDO::PARAM_STR);
         $stmt->bindParam(':achievement_eventstart', $data['achievement_eventstart'], PDO::PARAM_STR);
         $stmt->bindParam(':achievement_eventend', $data['achievement_eventend'], PDO::PARAM_STR);
-    
+
         return $stmt->execute();
     }
 
@@ -262,6 +264,31 @@ class Achievement extends Model {
 
             $stmt = $this->getDbConnection()->prepare($sql);
             $stmt->bindParam(':user_id', $userId);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            error_log("Database error: " . $e->getMessage());
+            throw new \Exception("Database error: " . $e->getMessage());
+        }
+    }
+
+    public function rankingAchievementStudent(): array
+    {
+        try {
+            $sql = "SELECT TOP 10
+                ds.detail_name AS student_name,
+                COUNT(a.achievement_id) AS total_achievements
+            FROM Achievement.AchievementApprovers aa
+            JOIN Achievement.Achievements a ON aa.achievement_id = a.achievement_id
+            JOIN Achievement.AchievementVerifications v ON a.achievement_id = v.achievement_id
+            JOIN Master.Users u ON aa.user_id = u.user_id
+            JOIN Master.StudentDetailUsers ds ON u.detail_student_id = ds.detail_id
+            WHERE v.verification_isdone = 1
+            GROUP BY ds.detail_name
+            ORDER BY total_achievements DESC";
+
+            $stmt = $this->getDbConnection()->prepare($sql);
             $stmt->execute();
 
             return $stmt->fetchAll(PDO::FETCH_ASSOC);

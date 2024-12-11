@@ -13,10 +13,10 @@ class Database {
     private PDO $dbConnection;
 
     public function __construct() {
-        $this->dbHost = 'localhost';
+        $this->dbHost = 'KHOIRUL';
         $this->dbName = 'PrestasiKu';
-        $this->dbUsername = 'SA';
-        $this->dbPassword = 'Khencahyo@130402';
+        $this->dbUsername = '';
+        $this->dbPassword = '';
 
         try {
             $dsn = "sqlsrv:server=$this->dbHost;Database=$this->dbName";

@@ -200,6 +200,21 @@ class AchievementController extends Controller {
         }
     }
 
+    public function getRankingAchievementStudent(Request $request, Response $response, array $args): ResponseInterface
+    {
+        try {
+            $students = $this->achievementModel->rankingAchievementStudent();
+
+            if (empty($students)) {
+                return ResponseHelper::error($response, "No students found with approved achievements.", 404);
+            }
+
+            return ResponseHelper::success($response, $students, 'Top 10 students with approved achievements retrieved successfully.');
+        } catch (\Exception $e) {
+            return ResponseHelper::error($response, 'Error: ' . $e->getMessage(), 500);
+        }
+    }
+
     public function getAchievementScopePercentage(Request $request, Response $response): ResponseInterface
     {
         try {

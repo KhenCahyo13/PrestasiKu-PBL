@@ -24,6 +24,7 @@ $app->group('/api', function ($api) {
         $api->post('', AchievementController::class . ':store');
         $api->post('/approval/{id}', AchievementController::class . ':approveAchievement');
         $api->get('/approver/{id}', AchievementController::class . ':getAchievements');
+        $api->get('/ranking', AchievementController::class . ':getRankingAchievementStudent');
         $api->get('/notification/{id}', AchievementController::class . ':getNotifications');
         $api->delete('/delete/{id}', AchievementController::class . ':deleteAchievement');
         $api->get('/grafic-scope', AchievementController::class . ':getAchievementScopePercentage');
