@@ -21,6 +21,7 @@ $app->group('/api', function ($api) {
     });
     // Achievement Routes
     $api->group('/achievements', function ($api) {
+        $api->get('/student/{id}', AchievementController::class . ':getAllAchievementStudentById');
         $api->post('', AchievementController::class . ':store');
         $api->post('/approval/{id}', AchievementController::class . ':approveAchievement');
         $api->get('/approver/{id}', AchievementController::class . ':getAchievements');

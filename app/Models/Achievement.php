@@ -51,6 +51,38 @@ class Achievement extends Model
         return $stmt->execute();
     }
 
+    public function getAllAchievementStudentById(string $userId):array{
+        try {
+            $sql = "SELECT 
+                    a.achievement_id,
+                    a.achievement_title,
+                    a.achievement_description,
+                    a.achievement_type,
+                    a.achievement_scope,
+                    a.achievement_eventlocation,
+                    a.achievement_eventcity,
+                    a.achievement_eventstart,
+                    a.achievement_eventend,
+                    aa.approver_status,
+                    av.verification_code,
+                    av.verification_status
+                FROM Achievement.Achievements a
+                JOIN Achievement.AchievementApprovers aa ON aa.achievement_id = a.achievement_id
+                JOIN Achievement.AchievementVerifications av ON av.achievement_id = a.achievement_id
+                WHERE a.user_id = :user_id
+                ORDER BY a.achievement_createdat DESC";
+
+            $stmt = $this->getDbConnection()->prepare($sql);
+            $stmt->bindParam(':user_id', $userId, PDO::PARAM_STR);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            error_log("Database error: " . $e->getMessage());
+            throw new \Exception("Database error: " . $e->getMessage());
+        }
+    }
+
     public function getPendingAchievementsByApprover(string $userId): array
     {
         try {

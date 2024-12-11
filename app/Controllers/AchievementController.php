@@ -202,6 +202,7 @@ class AchievementController extends Controller {
 
     public function getRankingAchievementStudent(Request $request, Response $response, array $args): ResponseInterface
     {
+        
         try {
             $students = $this->achievementModel->rankingAchievementStudent();
 
@@ -214,6 +215,21 @@ class AchievementController extends Controller {
             return ResponseHelper::error($response, 'Error: ' . $e->getMessage(), 500);
         }
     }
+
+    public function getAllAchievementStudentById(Request $request, Response $response, array $args): ResponseInterface{
+        $achievementId = $args['id'] ?? null;
+        try{
+            $achievement = $this->achievementModel->getAllAchievementStudentById($achievementId);
+
+            if (empty($achievement)){
+                return ResponseHelper::error($response, "No Achievement", 404);
+            }
+
+            return ResponseHelper::success($response, $achievement, 'All achievement');
+        } catch (\Exception $e) {
+            return ResponseHelper::error($response, 'Error: ' . $e->getMessage(), 500);
+        }
+    } 
 
     public function getAchievementScopePercentage(Request $request, Response $response): ResponseInterface
     {
