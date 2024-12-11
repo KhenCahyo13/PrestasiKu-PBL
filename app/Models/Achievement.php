@@ -4,6 +4,8 @@ namespace App\Models;
 
 use PDO;
 use App\Models\Model;
+use Exception;
+use PDOException;
 
 class Achievement extends Model
 {
@@ -165,371 +167,151 @@ class Achievement extends Model
         return $stmt->execute();
     }
 
-    public function getAllAchievementStudentById(string $userId):array{
+    public function getTotalBasedOnScope(): array {
         try {
-            $sql = "SELECT 
-                    a.achievement_id,
-                    a.achievement_title,
-                    a.achievement_description,
-                    a.achievement_type,
-                    a.achievement_scope,
-                    a.achievement_eventlocation,
-                    a.achievement_eventcity,
-                    a.achievement_eventstart,
-                    a.achievement_eventend,
-                    aa.approver_status,
-                    av.verification_code,
-                    av.verification_status
-                FROM Achievement.Achievements a
-                JOIN Achievement.AchievementApprovers aa ON aa.achievement_id = a.achievement_id
-                JOIN Achievement.AchievementVerifications av ON av.achievement_id = a.achievement_id
-                WHERE a.user_id = :user_id
-                ORDER BY a.achievement_createdat DESC";
+            $query = "WITH PossibleScopes AS (
+                        SELECT 'International' AS scope
+                        UNION ALL
+                        SELECT 'National'
+                        UNION ALL
+                        SELECT 'Regional'
+                    )
+                    SELECT  PossibleScopes.scope, COUNT(Achievement.Achievements.achievement_id) AS total FROM PossibleScopes 
+                    LEFT JOIN Achievement.Achievements ON PossibleScopes.scope = Achievement.Achievements.achievement_scope
+                    GROUP BY PossibleScopes.scope;
+            ";
 
-            $stmt = $this->getDbConnection()->prepare($sql);
-            $stmt->bindParam(':user_id', $userId, PDO::PARAM_STR);
+            $stmt = $this->getDbConnection()->prepare($query);
+
             $stmt->execute();
 
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (\PDOException $e) {
-            error_log("Database error: " . $e->getMessage());
-            throw new \Exception("Database error: " . $e->getMessage());
+        } catch (PDOException $e) {
+            throw new Exception("Database error: " . $e->getMessage());
         }
     }
 
-    public function getPendingAchievementsByApprover(string $userId): array
-    {
+    public function getTotalPerMonthInOneYear($year): array {
         try {
-            $sql = "SELECT 
-                    a.achievement_id,
-                    a.achievement_title,
-                    a.achievement_description,
-                    a.achievement_type,
-                    v.verification_status,
-                    v.verification_notes,
-                    v.verification_updatedat
-                FROM Achievement.AchievementApprovers aa
-                JOIN Achievement.Achievements a ON aa.achievement_id = a.achievement_id
-                JOIN Achievement.AchievementVerifications v ON a.achievement_id = v.achievement_id
-                WHERE aa.user_id = :user_id 
-                  AND v.verification_status = 'Pending'";
+            $query = "WITH Calendar AS (
+                        SELECT 1 AS month_number, 'January' AS month_name
+                        UNION ALL SELECT 2, 'February'
+                        UNION ALL SELECT 3, 'March'
+                        UNION ALL SELECT 4, 'April'
+                        UNION ALL SELECT 5, 'May'
+                        UNION ALL SELECT 6, 'June'
+                        UNION ALL SELECT 7, 'July'
+                        UNION ALL SELECT 8, 'August'
+                        UNION ALL SELECT 9, 'September'
+                        UNION ALL SELECT 10, 'October'
+                        UNION ALL SELECT 11, 'November'
+                        UNION ALL SELECT 12, 'December'
+                    )
+                    SELECT 
+                        Calendar.month_name AS month,
+                        :yearColumn AS year,
+                        COUNT(Achievements.achievement_id) AS total
+                    FROM Calendar
+                    LEFT JOIN Achievement.Achievements 
+                        ON MONTH(Achievements.achievement_createdat) = Calendar.month_number
+                        AND YEAR(Achievements.achievement_createdat) = :yearValue
+                    GROUP BY Calendar.month_name, Calendar.month_number
+                    ORDER BY Calendar.month_number;
+            ";
+            $stmt = $this->getDbConnection()->prepare($query);
 
-            $stmt = $this->getDbConnection()->prepare($sql);
-            $stmt->bindParam(':user_id', $userId);
+            $stmt->bindParam(':yearColumn', $year, PDO::PARAM_STR);
+            $stmt->bindParam(':yearValue', $year, PDO::PARAM_STR);
+
             $stmt->execute();
 
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             error_log("Database error: " . $e->getMessage());
-            throw new \Exception("Database error: " . $e->getMessage());
+            throw new Exception("Database error: " . $e->getMessage());
         }
     }
 
-    public function getApprovedAchievementsByApprover(string $userId): array
-    {
+    public function getTotalBasedOnVerificationStatus(): array {
         try {
-            $sql = "SELECT 
-                    a.achievement_id,
-                    a.achievement_title,
-                    a.achievement_description,
-                    a.achievement_type,
-                    aa.approver_status,
-                    v.verification_status,
-                    v.verification_notes,
-                    v.verification_updatedat
-                FROM Achievement.AchievementApprovers aa
-                JOIN Achievement.Achievements a ON aa.achievement_id = a.achievement_id
-                JOIN Achievement.AchievementVerifications v ON a.achievement_id = v.achievement_id
-                WHERE aa.user_id = :user_id 
-                  AND aa.approver_is_done = 1";
+            $role = $_SESSION['user']['role'];
+            $userId = $_SESSION['user']['id'];
 
-            $stmt = $this->getDbConnection()->prepare($sql);
-            $stmt->bindParam(':user_id', $userId);
-            $stmt->execute();
+            $query = '';
 
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (\PDOException $e) {
-            error_log("Database error: " . $e->getMessage());
-            throw new \Exception("Database error: " . $e->getMessage());
-        }
-    }
-
-
-    public function processApproveAchievement(array $data): bool
-    {
-        try {
-            $this->getDbConnection()->beginTransaction();
-
-            $sqlUser = "SELECT role_id FROM Master.Users WHERE user_id = :user_id";
-            $stmtUser = $this->getDbConnection()->prepare($sqlUser);
-            $stmtUser->bindParam(':user_id', $data['user_id']);
-            $stmtUser->execute();
-            $user = $stmtUser->fetch(PDO::FETCH_ASSOC);
-
-            if (!$user) {
-                throw new \Exception("User not found.");
+            if ($role == 'Student') {
+                $query = "SELECT 
+                            COUNT(Achievement.Achievements.achievement_id) AS total, 
+                            VerificationStatus.status,
+                            Achievement.Achievements.user_id
+                        FROM 
+                            (SELECT 'Menunggu Persetujuan' AS status
+                            UNION ALL
+                            SELECT 'Disetujui'
+                            UNION ALL
+                            SELECT 'Ditolak') AS VerificationStatus
+                        LEFT JOIN Achievement.AchievementVerifications ON Achievement.AchievementVerifications.verification_status = VerificationStatus.status
+                        LEFT JOIN Achievement.Achievements ON Achievement.Achievements.achievement_id = Achievement.AchievementVerifications.achievement_id AND Achievement.Achievements.user_id = :userId
+                        GROUP BY VerificationStatus.status, Achievement.Achievements.user_id;
+                ";
+            } else if ($role == 'Admin' || $role == 'Lecturer') {
+                $query = "SELECT 
+                            COUNT(Achievement.Achievements.achievement_id) AS total, 
+                            VerificationStatus.status,
+                            Achievement.AchievementApprovers.user_id
+                        FROM 
+                            (SELECT 'Menunggu Persetujuan' AS status
+                            UNION ALL
+                            SELECT 'Disetujui'
+                            UNION ALL
+                            SELECT 'Ditolak') AS VerificationStatus
+                        LEFT JOIN Achievement.AchievementVerifications ON Achievement.AchievementVerifications.verification_status = VerificationStatus.status
+                        LEFT JOIN Achievement.Achievements ON Achievement.Achievements.achievement_id = Achievement.AchievementVerifications.achievement_id
+                        LEFT JOIN Achievement.AchievementApprovers ON Achievement.AchievementApprovers.achievement_id = Achievement.Achievements.achievement_id AND Achievement.AchievementApprovers.user_id = :userId
+                        GROUP BY VerificationStatus.status, Achievement.AchievementApprovers.user_id
+                ";
             }
+            $stmt = $this->getDbConnection()->prepare($query);
 
-            $roleId = $user['role_id'];
+            $stmt->bindParam(':userId', $userId, PDO::PARAM_STR);
 
-            if ($roleId === '6EC386D9-7313-4659-8C7D-B11148750B7A') {
-                $sqlCheck = " SELECT COUNT(*) AS pending_lecturers 
-                    FROM Achievement.AchievementApprovers 
-                    WHERE achievement_id = :achievement_id 
-                    AND approver_is_done = 0 
-                    AND user_id IN (SELECT user_id FROM Master.Users WHERE role_id = 'FBA2D7AA-4F83-4C48-9C9A-4EB7F8A253F8')";
-                $stmtCheck = $this->getDbConnection()->prepare($sqlCheck);
-                $stmtCheck->bindParam(':achievement_id', $data['achievement_id']);
-                $stmtCheck->execute();
-                $checkResult = $stmtCheck->fetch(PDO::FETCH_ASSOC);
-
-                if ($checkResult['pending_lecturers'] > 0) {
-                    throw new \Exception("Admin cannot approve before all lecturers finish approval.");
-                }
-            }
-
-            $sqlRejection = " SELECT COUNT(*) AS rejected_count 
-                FROM Achievement.AchievementApprovers 
-                WHERE achievement_id = :achievement_id 
-                AND approver_status = 'rejected'";
-            $stmtRejection = $this->getDbConnection()->prepare($sqlRejection);
-            $stmtRejection->bindParam(':achievement_id', $data['achievement_id']);
-            $stmtRejection->execute();
-            $rejectionResult = $stmtRejection->fetch(PDO::FETCH_ASSOC);
-
-            if ($rejectionResult['rejected_count'] > 0) {
-                throw new \Exception("Approval cannot proceed as previous approver has rejected.");
-            }
-
-            $sqlUpdate = " UPDATE Achievement.AchievementApprovers 
-                SET approver_is_done = 1, approver_updatedat = GETDATE(), approver_status = :status 
-                WHERE achievement_id = :achievement_id AND user_id = :user_id";
-            $stmtUpdate = $this->getDbConnection()->prepare($sqlUpdate);
-            $stmtUpdate->bindParam(':status', $data['action']);
-            $stmtUpdate->bindParam(':achievement_id', $data['achievement_id']);
-            $stmtUpdate->bindParam(':user_id', $data['user_id']);
-            $stmtUpdate->execute();
-
-            $logMessage = $data['action'] === 'approved'
-                ? "User {$data['user_id']} approved achievement {$data['achievement_id']}."
-                : "User {$data['user_id']} rejected achievement {$data['achievement_id']}.";
-            $sqlLog = "INSERT INTO Achievement.AchievementLogs (achievement_id, log_message) 
-               VALUES (:achievement_id, :log_message)";
-            $stmtLog = $this->getDbConnection()->prepare($sqlLog);
-            $stmtLog->bindParam(':achievement_id', $data['achievement_id']);
-            $stmtLog->bindParam(':log_message', $logMessage);
-            $stmtLog->execute();
-
-            $verificationStatus = $this->determineVerificationStatus($data['achievement_id']);
-
-            $sqlUpdateVerification = "UPDATE Achievement.AchievementVerifications
-                               SET verification_code = :verification_code,
-                                   verification_status = :verification_status,
-                                   verification_is_done = :verification_is_done,
-                                   verification_updatedat = GETDATE()
-                               WHERE achievement_id = :achievement_id";
-            $stmtVerification = $this->getDbConnection()->prepare($sqlUpdateVerification);
-            $stmtVerification->bindParam(':verification_code', $verificationStatus['code']);
-            $stmtVerification->bindParam(':verification_status', $verificationStatus['status']);
-            $stmtVerification->bindParam(':verification_is_done', $verificationStatus['isDone']);
-            $stmtVerification->bindParam(':achievement_id', $data['achievement_id']);
-            $stmtVerification->execute();
-
-            $this->getDbConnection()->commit();
-            return true;
-        } catch (\PDOException $e) {
-            $this->getDbConnection()->rollBack();
-            throw new \Exception("Database error: " . $e->getMessage());
-        } catch (\Exception $e) {
-            $this->getDbConnection()->rollBack();
-            throw $e;
-        }
-    }
-
-    private function determineVerificationStatus(string $achievementId): array
-    {
-        $sql = " SELECT 
-            COUNT(*) AS total_approvers,
-            SUM(CASE WHEN approver_status = 'approved' THEN 1 ELSE 0 END) AS approved_count,
-            SUM(CASE WHEN approver_status = 'rejected' THEN 1 ELSE 0 END) AS rejected_count,
-            COUNT(*) - SUM(CASE WHEN approver_is_done = 1 THEN 1 ELSE 0 END) AS pending_count
-            FROM Achievement.AchievementApprovers
-            WHERE achievement_id = :achievement_id";
-        $stmt = $this->getDbConnection()->prepare($sql);
-        $stmt->bindParam(':achievement_id', $achievementId);
-        $stmt->execute();
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        $totalApprovers = $result['total_approvers'];
-        $approvedCount = $result['approved_count'];
-        $rejectedCount = $result['rejected_count'];
-        $pendingCount = $result['pending_count'];
-
-        if ($rejectedCount > 0) {
-            return [
-                'code' => 'DT',
-                'status' => 'Achievement ditolak',
-                'isDone' => $pendingCount === 0 ? 1 : 0
-            ];
-        }
-
-        if ($pendingCount > 0) {
-            return [
-                'code' => 'DS' . $approvedCount . 'BS' . $pendingCount,
-                'status' => "Disetujui $approvedCount approver, menunggu persetujuan $pendingCount approver",
-                'isDone' => 0
-            ];
-        }
-
-        return [
-            'code' => 'DS' . $approvedCount . str_repeat(' ', $totalApprovers - $approvedCount),
-            'status' => 'Achievement disetujui oleh semua approver',
-            'isDone' => 1
-        ];
-    }
-
-
-
-    public function getNotificationsByUserId(string $userId): array
-    {
-        try {
-            $sql = "SELECT 
-                    al.log_message,
-                    av.verification_status,
-                    av.verification_code,
-                    av.verification_updatedat
-                FROM Achievement.AchievementLogs al
-                JOIN Achievement.AchievementVerifications av 
-                    ON al.achievement_id = av.achievement_id
-                WHERE al.achievement_id IN (
-                    SELECT achievement_id 
-                    FROM Achievement.Achievements 
-                    WHERE user_id = :user_id
-                )
-                ORDER BY av.verification_updatedat DESC";
-
-            $stmt = $this->getDbConnection()->prepare($sql);
-            $stmt->bindParam(':user_id', $userId);
             $stmt->execute();
 
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             error_log("Database error: " . $e->getMessage());
-            throw new \Exception("Database error: " . $e->getMessage());
+            throw new Exception("Database error: " . $e->getMessage());
         }
     }
 
-    public function getAchievementUploadsPerMonth(string $startDate, string $endDate): array
-    {
-        $sql = "SELECT 
-                DATENAME(MONTH, a.achievement_createdat) AS month_name,
-                YEAR(a.achievement_createdat) AS year,
-                COUNT(a.achievement_id) AS total_achievements
-            FROM Achievement.Achievements a
-            WHERE a.achievement_createdat BETWEEN :start_date AND :end_date
-            GROUP BY DATENAME(MONTH, a.achievement_createdat), YEAR(a.achievement_createdat),
-                     MONTH(a.achievement_createdat)
-            ORDER BY YEAR(a.achievement_createdat) ASC, MONTH(a.achievement_createdat) ASC";
-
+    public function getTop10ByStudent(): array {
         try {
-            $stmt = $this->getDbConnection()->prepare($sql);
-            $stmt->bindParam(':start_date', $startDate, PDO::PARAM_STR);
-            $stmt->bindParam(':end_date', $endDate, PDO::PARAM_STR);
+            $query = "SELECT TOP 10 
+                        Achievement.Achievements.user_id, 
+                        COUNT(Achievement.Achievements.achievement_id) AS total,
+                        Master.UserStudentDetails.detail_name,
+                        Master.StudyPrograms.studyprogram_name,
+                        Master.SPClass.spclass_name
+                    FROM Achievement.Achievements
+                    INNER JOIN Master.Users ON Master.Users.user_id = Achievement.Achievements.user_id
+                    INNER JOIN Master.UserStudentDetails ON Master.UserStudentDetails.detail_id = Master.Users.details_student_id
+                    INNER JOIN Master.SPClass ON Master.SPClass.spclass_id = Master.UserStudentDetails.spclass_id
+                    INNER JOIN Master.StudyPrograms ON Master.StudyPrograms.studyprogram_id = Master.SPClass.studyprogram_id
+                    GROUP BY 
+                        Achievement.Achievements.user_id,
+                        Master.UserStudentDetails.detail_name,
+                        Master.StudyPrograms.studyprogram_name,
+                        Master.SPClass.spclass_name
+                    ORDER BY total DESC
+            ";
+
+            $stmt = $this->getDbConnection()->prepare($query);
             $stmt->execute();
 
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             error_log("Database error: " . $e->getMessage());
-            throw new \Exception("Database error: " . $e->getMessage());
-        }
-    }
-
-    public function rankingAchievementStudent(): array
-    {
-        try {
-            $sql = "SELECT TOP 10
-                ds.detail_name AS student_name,
-                COUNT(a.achievement_id) AS total_achievements
-            FROM Achievement.AchievementApprovers aa
-            JOIN Achievement.Achievements a ON aa.achievement_id = a.achievement_id
-            JOIN Achievement.AchievementVerifications v ON a.achievement_id = v.achievement_id
-            JOIN Master.Users u ON aa.user_id = u.user_id
-            JOIN Master.StudentDetailUsers ds ON u.detail_student_id = ds.detail_id
-            WHERE v.verification_isdone = 1
-            GROUP BY ds.detail_name
-            ORDER BY total_achievements DESC";
-
-            $stmt = $this->getDbConnection()->prepare($sql);
-            $stmt->execute();
-
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (\PDOException $e) {
-            error_log("Database error: " . $e->getMessage());
-            throw new \Exception("Database error: " . $e->getMessage());
-        }
-    }
-
-    public function deleteAchievement(string $achievementId): bool
-    {
-        try {
-            $this->getDbConnection()->beginTransaction();
-
-            $logSql = "DELETE FROM Achievement.AchievementLogs WHERE achievement_id = :achievement_id";
-            $stmtLog = $this->getDbConnection()->prepare($logSql);
-            $stmtLog->bindParam(':achievement_id', $achievementId);
-            $stmtLog->execute();
-
-            $fileSql = "DELETE FROM Achievement.AchievementFiles WHERE achievement_id = :achievement_id";
-            $stmtFile = $this->getDbConnection()->prepare($fileSql);
-            $stmtFile->bindParam(':achievement_id', $achievementId);
-            $stmtFile->execute();
-
-            $categorySql = "DELETE FROM Achievement.AchievementCategoryDetails WHERE achievement_id = :achievement_id";
-            $stmtCategory = $this->getDbConnection()->prepare($categorySql);
-            $stmtCategory->bindParam(':achievement_id', $achievementId);
-            $stmtCategory->execute();
-
-            $approverSql = "DELETE FROM Achievement.AchievementApprovers WHERE achievement_id = :achievement_id";
-            $stmtApprover = $this->getDbConnection()->prepare($approverSql);
-            $stmtApprover->bindParam(':achievement_id', $achievementId);
-            $stmtApprover->execute();
-            $verificationSql = "DELETE FROM Achievement.AchievementVerifications WHERE achievement_id = :achievement_id";
-            $stmtVerification = $this->getDbConnection()->prepare($verificationSql);
-            $stmtVerification->bindParam(':achievement_id', $achievementId);
-            $stmtVerification->execute();
-
-            $achievementSql = "DELETE FROM Achievement.Achievements WHERE achievement_id = :achievement_id";
-            $stmtAchievement = $this->getDbConnection()->prepare($achievementSql);
-            $stmtAchievement->bindParam(':achievement_id', $achievementId);
-            $stmtAchievement->execute();
-
-            $this->getDbConnection()->commit();
-            return true;
-        } catch (\PDOException $e) {
-            $this->getDbConnection()->rollBack();
-            error_log("Database error: " . $e->getMessage());
-            throw new \Exception("Database error: " . $e->getMessage());
-        } catch (\Exception $e) {
-            $this->getDbConnection()->rollBack();
-            error_log("Error: " . $e->getMessage());
-            throw new \Exception("Error: " . $e->getMessage());
-        }
-    }
-
-    public function getAchievementScopeCounts(): array
-    {
-        try {
-            $sql = "SELECT achievement_scope, COUNT(*) AS count
-                FROM Achievement.Achievements
-                GROUP BY achievement_scope";
-
-            $stmt = $this->getDbConnection()->prepare($sql);
-            $stmt->execute();
-
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (\PDOException $e) {
-            error_log("Database error: " . $e->getMessage());
-            throw new \Exception("Database error: " . $e->getMessage());
+            throw new Exception("Database error: " . $e->getMessage());
         }
     }
 }

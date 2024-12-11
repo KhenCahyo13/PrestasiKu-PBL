@@ -7,6 +7,7 @@ use App\Controllers\RoleController;
 use App\Controllers\SPClassController;
 use App\Controllers\StudyProgramController;
 use App\Controllers\AchievementController;
+use App\Controllers\DashboardController;
 use App\Controllers\UserController;
 use App\Middlewares\BECheckAdminMiddleware;
 use App\Middlewares\BECheckAdminOrLecturerMiddleware;
@@ -21,18 +22,17 @@ $app->group('/api', function ($api) {
         $api->post('/logout', AuthController::class . ':logout');
     });
 
+    $api->group('/dashboard', function ($api) {
+        $api->get('', DashboardController::class . ':index');
+    });
+
     // Achievement Routes
     $api->group('/achievements', function ($api) {
-        $api->get('/grafic-scope', AchievementController::class . ':getAchievementScopePercentage');
         $api->get('', AchievementController::class . ':index');
         $api->get('/{id}', AchievementController::class . ':show');
         $api->patch('/{id}/approval', AchievementController::class . ':approveAchievement')->add(new BECheckAdminOrLecturerMiddleware());
         $api->get('/{id}/approver-list', AchievementController::class . ':getApproverList');
         $api->post('', AchievementController::class . ':store')->add(new BECheckStudentMiddleware());
-        $api->get('/pending/{id}', AchievementController::class . ':getPendingAchievements');
-        $api->get('/approved/{id}', AchievementController::class . ':getApprovedAchievements');
-        $api->get('/notification/{id}', AchievementController::class . ':getNotifications');
-        $api->delete('/delete/{id}', AchievementController::class . ':deleteAchievement');
     })->add(new BECheckAuthMiddleware());
 
     // Achievement Categories Routes
