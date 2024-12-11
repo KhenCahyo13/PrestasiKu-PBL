@@ -31,14 +31,18 @@ $app->group('/web', function ($web) {
     })->add(new FECheckAuthMiddleware());
     // Achievement Page Routes
     $web->group('/achievement', function ($achievement) {
-        $achievement->get('', function ($request, $response) {
-            include views('achievement/list.php');
-            return $response;
-        });
         $achievement->get('/add-new', function ($request, $response) {
             include views('achievement/add-new.php');
             return $response;
         })->add(new FECheckStudentMiddleware());
+        $achievement->get('', function ($request, $response) {
+            include views('achievement/list.php');
+            return $response;
+        });
+        $achievement->get('/{id}', function ($request, $response) {
+            include views('achievement/details.php');
+            return $response;
+        });
     })->add(new FECheckAuthMiddleware());
     // Master Pages Routes
     $web->group('/master', function ($master) {

@@ -6,7 +6,7 @@ $(document).ready(() => {
     const searchAchievementInput = $('#searchAchievement');
 
     // Setup Achievements Table Body
-    const fetchAndSetupDepartmentsTable = (page = 1, limit = showPerPagePagination, search = '') => {
+    const fetchAndSetupAchievementsTable = (page = 1, limit = showPerPagePagination, search = '') => {
         const achievementsTableBody = $('#achievementsTableBody');
 
         achievementsTableBody.empty();
@@ -48,7 +48,7 @@ $(document).ready(() => {
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="actionsButton">
                                             <li>
-                                                <a href="#" class="dropdown-item d-flex align-items-center gap-2">
+                                                <a href="/PrestasiKu-PBL/web/achievement/${achievement.achievement_id}" class="dropdown-item d-flex align-items-center gap-2">
                                                     <i class="fa-solid fa-edit text-secondary"></i> Open
                                                 </a>
                                             </li>
@@ -118,14 +118,14 @@ $(document).ready(() => {
     showPerPagePagination.change(function() {
         const limit = $(this).val();
 
-        fetchAndSetupDepartmentsTable(1, limit);
+        fetchAndSetupAchievementsTable(1, limit);
     });
 
     prevButtonPagination.click(function() {
         const currentPage = parseInt($('#currentPage').text());
 
         if (currentPage > 1) {
-            fetchAndSetupDepartmentsTable(currentPage - 1, showPerPagePagination.val());
+            fetchAndSetupAchievementsTable(currentPage - 1, showPerPagePagination.val());
         }
     });
 
@@ -134,7 +134,7 @@ $(document).ready(() => {
         const totalPages = parseInt($('#totalPages').text());
 
         if (currentPage < totalPages) {
-            fetchAndSetupDepartmentsTable(currentPage + 1, showPerPagePagination.val());
+            fetchAndSetupAchievementsTable(currentPage + 1, showPerPagePagination.val());
         }
     });
 
@@ -145,10 +145,10 @@ $(document).ready(() => {
         clearTimeout(debounceTimeout);
     
         debounceTimeout = setTimeout(function () {
-            fetchAndSetupDepartmentsTable(1, showPerPagePagination.val(), search);
+            fetchAndSetupAchievementsTable(1, showPerPagePagination.val(), search);
         }, 300);
     });
 
     // Run the Functions
-    fetchAndSetupDepartmentsTable(1, 5);
+    fetchAndSetupAchievementsTable(1, 5);
 });

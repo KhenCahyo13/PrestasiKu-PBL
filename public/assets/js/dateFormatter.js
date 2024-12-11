@@ -9,3 +9,12 @@ const formatDateToIndonesian = (dateString) => {
         second: '2-digit',
     }).format(date);
 };
+
+const formatOnlyDateToIndonesian = (dateString) => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('id-ID', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+    }).format(date);
+};

@@ -90,7 +90,84 @@ class AchievementController extends Controller {
             $limit,
             'Successfully retrieved achievements data.'
         );
-    }  
+    }
+
+    public function show(Request $request, Response $response, array $args): Response {
+        $achievementId = $args['id'];
+        $achievements = $this->achievementModel->getById($achievementId);
+    
+        if (!$achievements) {
+            return ResponseHelper::error($response, 'Achievement not found.', 404);
+        }
+
+        $achievement_approvers = [];
+        $achievement_files = [];
+        $achievement_category_details = [];
+
+        foreach ($achievements as $achievementRow) {
+            $approver = array(
+                'approver_id' => $achievementRow['approver_user_id'],
+                'approver_name' => $achievementRow['approver_username'] === 'admin' ? 'Admin' : $achievementRow['lecturer_name'],
+                'approver_nip' => $achievementRow['lecturer_nip'],
+                'approver_email' => $achievementRow['lecturer_email'],
+                'approver_phonenumber' => $achievementRow['lecturer_phonenumber'],
+            );
+
+            if (!in_array($approver, $achievement_approvers)) {
+                $achievement_approvers[] = $approver;
+            }
+
+            $file = array(
+                'file_id' => $achievementRow['file_id'],
+                'file_title' => $achievementRow['file_title'],
+                'file_path' => $achievementRow['file_path'],
+            );
+
+            if (!in_array($file, $achievement_files)) {
+                $achievement_files[] = $file;
+            }
+
+            $category = array(
+                'category_id' => $achievementRow['category_id'],
+                'category_name' => $achievementRow['category_name'],
+            );
+
+            if (!in_array($category, $achievement_category_details)) {
+                $achievement_category_details[] = $category;
+            }
+        }
+
+        $achievement = array(
+            'achievement_id' => $achievements[0]['achievement_id'],
+            'achievement_title' => $achievements[0]['achievement_title'],
+            'achievement_description' => $achievements[0]['achievement_description'],
+            'achievement_type' => $achievements[0]['achievement_type'],
+            'achievement_scope' => $achievements[0]['achievement_scope'],
+            'achievement_eventlocation' => $achievements[0]['achievement_eventlocation'],
+            'achievement_eventcity' => $achievements[0]['achievement_eventcity'],
+            'achievement_eventstart' => $achievements[0]['achievement_eventstart'],
+            'achievement_eventend' => $achievements[0]['achievement_eventend'],
+            'achievement_createdat' => $achievements[0]['achievement_createdat'],
+            'achievement_updatedat' => $achievements[0]['achievement_updatedat'],
+            'student_id' => $achievements[0]['student_user_id'],
+            'student_name' => $achievements[0]['student_name'],
+            'student_nim' => $achievements[0]['student_nim'],
+            'student_email' => $achievements[0]['student_email'],
+            'student_phonenumber' => $achievements[0]['student_phonenumber'],
+            'achievement_verification' => array(
+                'verification_id' => $achievements[0]['verification_id'],
+                'verification_code' => $achievements[0]['verification_code'],
+                'verification_status' => $achievements[0]['verification_status'],
+                'verification_isdone' => $achievements[0]['verification_isdone'],
+                'verification_notes' => $achievements[0]['verification_notes'],
+            ),
+            'achievement_approvers' => $achievement_approvers,
+            'achievement_files' => $achievement_files,
+            'achievement_category_details' => $achievement_category_details,
+        );
+
+        return ResponseHelper::success($response, $achievement, 'Successfully get achievement.');
+    }    
     
     public function getApproverList(Request $request, Response $response, array $args): Response {
         $achievementId = $args['id'];

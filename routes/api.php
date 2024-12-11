@@ -21,15 +21,16 @@ $app->group('/api', function ($api) {
     });
     // Achievement Routes
     $api->group('/achievements', function ($api) {
+        $api->get('/grafic-scope', AchievementController::class . ':getAchievementScopePercentage');
         $api->get('', AchievementController::class . ':index');
-        $api->post('', AchievementController::class . ':store')->add(new BECheckStudentMiddleware());
+        $api->get('/{id}', AchievementController::class . ':show');
         $api->get('/{id}/approver-list', AchievementController::class . ':getApproverList');
+        $api->post('', AchievementController::class . ':store')->add(new BECheckStudentMiddleware());
         $api->post('/approval/{id}', AchievementController::class . ':approveAchievement');
         $api->get('/pending/{id}', AchievementController::class . ':getPendingAchievements');
         $api->get('/approved/{id}', AchievementController::class . ':getApprovedAchievements');
         $api->get('/notification/{id}', AchievementController::class . ':getNotifications');
         $api->delete('/delete/{id}', AchievementController::class . ':deleteAchievement');
-        $api->get('/grafic-scope', AchievementController::class . ':getAchievementScopePercentage');
     })->add(new BECheckAuthMiddleware());
     // Achievement Categories Routes
     $api->group('/achievement-categories', function ($api) {

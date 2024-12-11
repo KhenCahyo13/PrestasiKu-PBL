@@ -1,0 +1,27 @@
+@import url('./variables.css');
+
+.tab-container {
+    padding: 0px 20px;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.tab-container .tab-items {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.tab-container .tab-items .tab-item {
+    padding: 16px 0px 8px 0px;
+    cursor: pointer;
+    color: var(--gray-400);
+}
+
+.tab-container .tab-items .tab-item:hover {
+    color: var(--blue-500);
+}
+
+.tab-container .tab-items .tab-item.tab-item-active {
+    color: var(--blue-500);
+    border-bottom: 1px solid var(--blue-500);
+}

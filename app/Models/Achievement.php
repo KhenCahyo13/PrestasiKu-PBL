@@ -78,6 +78,52 @@ class Achievement extends Model {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function getById(string $achievementId): array | null {
+        $query = 'EXEC CRUD.SelectTableDataByColumnWithJoins
+            @TableName = :tableName,
+            @TableColumns = :tableColumns,
+            @ColumnName = :columnName,
+            @ColumnValue = :columnValue,
+            @JoinConditions = :joinConditions
+        ';
+        $stmt = $this->getDbConnection()->prepare($query);
+
+        $tableColumns = '
+            Achievement.Achievements.*, 
+            Achievement.AchievementVerifications.*, 
+            Achievement.AchievementApprovers.*, 
+            Achievement.AchievementFiles.*, 
+            Achievement.AchievementCategoryDetails.*, 
+            Achievement.AchievementCategories.*,
+            StudentUsers.user_id AS student_user_id, 
+            Master.UserStudentDetails.detail_name AS student_name, Master.UserStudentDetails.detail_nim AS student_nim, Master.UserStudentDetails.detail_email AS student_email, Master.UserStudentDetails.detail_phonenumber AS student_phonenumber, 
+            ApproverUsers.user_id AS approver_user_id, ApproverUsers.user_username AS approver_username,
+            Master.UserLecturerDetails.detail_name AS lecturer_name, Master.UserLecturerDetails.detail_nip AS lecturer_nip, Master.UserLecturerDetails.detail_email AS lecturer_email, Master.UserLecturerDetails.detail_phonenumber AS lecturer_phonenumber
+        ';    
+    
+        $joinConditions = 'INNER JOIN Achievement.AchievementVerifications ON Achievement.Achievements.achievement_id = Achievement.AchievementVerifications.achievement_id
+                        INNER JOIN Achievement.AchievementApprovers ON Achievement.AchievementApprovers.achievement_id = Achievement.Achievements.achievement_id
+                        INNER JOIN Achievement.AchievementFiles ON Achievement.AchievementFiles.achievement_id = Achievement.Achievements.achievement_id
+                        INNER JOIN Achievement.AchievementCategoryDetails ON Achievement.AchievementCategoryDetails.achievement_id = Achievement.Achievements.achievement_id
+                        INNER JOIN Achievement.AchievementCategories ON Achievement.AchievementCategories.category_id = Achievement.AchievementCategoryDetails.category_id
+                        INNER JOIN Master.Users AS StudentUsers ON StudentUsers.user_id = Achievement.Achievements.user_id
+                        LEFT JOIN Master.Users AS ApproverUsers ON ApproverUsers.user_id = Achievement.AchievementApprovers.user_id
+                        LEFT JOIN Master.UserStudentDetails ON Master.UserStudentDetails.detail_id = StudentUsers.details_student_id
+                        LEFT JOIN Master.UserLecturerDetails ON Master.UserLecturerDetails.detail_id = ApproverUsers.details_lecturer_id
+        ';    
+
+        $stmt->bindValue(':tableName', $this->table, PDO::PARAM_STR);
+        $stmt->bindValue(':tableColumns', $tableColumns, PDO::PARAM_STR);
+        $stmt->bindValue(':columnName', 'Achievement.Achievements.achievement_id', PDO::PARAM_STR);
+        $stmt->bindValue(':columnValue', $achievementId, PDO::PARAM_STR);
+        $stmt->bindValue(':joinConditions', $joinConditions, PDO::PARAM_STR);
+
+        $stmt->execute();
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return $results ?: null;
+    }
+
     public function create(array $data): bool {
         $query = "INSERT INTO $this->table (
                 achievement_id, 

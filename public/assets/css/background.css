@@ -1,0 +1,5 @@
+@import url('./variables.css');
+
+.bg-secondary {
+    background-color: var(--gray-200) !important;
+}
