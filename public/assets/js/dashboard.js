@@ -187,9 +187,13 @@ $(document).ready(() => {
         const totalAchievementsNotApprovedElement = $('#totalAchievementsNotApproved');
         const totalAchievementsDataElement = $('#totalAchievementsData');
 
-        const totalAchievementsApproved = data.data.find((item) => item.status == 'Disetujui').total;
-        const totalAchievementsRejected = data.data.find((item) => item.status == 'Ditolak').total;
-        const totalAchievementsNotApproved = data.data.find((item) => item.status == 'Menunggu Persetujuan').total;
+        const approvedAchievement = data.data.find((item) => item.status == 'Disetujui' && item.user_id !== null);
+        const rejectedAchievement = data.data.find((item) => item.status == 'Ditolak' && item.user_id !== null);
+        const notApprovedAchievement = data.data.find((item) => item.status == 'Menunggu Persetujuan' && item.user_id !== null);
+
+        const totalAchievementsApproved = approvedAchievement ? approvedAchievement.total : 0;
+        const totalAchievementsRejected = rejectedAchievement ? rejectedAchievement.total : 0;
+        const totalAchievementsNotApproved = notApprovedAchievement ? notApprovedAchievement.total : 0;
         const totalAchievementsData = Number(totalAchievementsApproved) + Number(totalAchievementsRejected) + Number(totalAchievementsNotApproved);
 
         totalAchievementsApprovedElement.text(totalAchievementsApproved);
