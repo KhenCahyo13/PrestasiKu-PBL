@@ -94,6 +94,8 @@ class AchievementController extends Controller {
 
     public function show(Request $request, Response $response, array $args): Response {
         $achievementId = $args['id'];
+        $userId = $_SESSION['user']['id'];
+        $userRole = $_SESSION['user']['role'];
         $achievements = $this->achievementModel->getById($achievementId);
     
         if (!$achievements) {
@@ -106,11 +108,13 @@ class AchievementController extends Controller {
 
         foreach ($achievements as $achievementRow) {
             $approver = array(
-                'approver_id' => $achievementRow['approver_user_id'],
+                'approver_id' => $achievementRow['approver_id'],
+                'user_id' => $achievementRow['approver_user_id'],
                 'approver_name' => $achievementRow['approver_username'] === 'admin' ? 'Admin' : $achievementRow['lecturer_name'],
                 'approver_nip' => $achievementRow['lecturer_nip'],
                 'approver_email' => $achievementRow['lecturer_email'],
                 'approver_phonenumber' => $achievementRow['lecturer_phonenumber'],
+                'approver_isdone' => $achievementRow['approver_isdone'],
             );
 
             if (!in_array($approver, $achievement_approvers)) {
@@ -135,6 +139,78 @@ class AchievementController extends Controller {
             if (!in_array($category, $achievement_category_details)) {
                 $achievement_category_details[] = $category;
             }
+        }
+
+        $achievement_approvalaction = null;
+
+        if ($userRole == 'Admin') {
+            $allApproverApproved = true;
+            $adminAlreadyApprove = true;
+
+            foreach ($achievements as $achievementRow) {
+                $isAdmin = $achievementRow['approver_username'] === 'admin';
+                $isApproved = $achievementRow['approver_isdone'] == 1;
+
+                if ($isAdmin) {
+                    $adminAlreadyApprove = $isApproved;
+                } elseif (!$isApproved) {
+                    $allApproverApproved = false;
+                    break;
+                }
+            }
+
+            if (!$allApproverApproved) {
+                $achievement_approvalaction = array(
+                    'action_canapprove' => false,
+                    'action_messagetype' => 'warning',
+                    'action_message' => 'You can\'t approve before all lecturers already finish approval.',
+                );
+            } elseif ($adminAlreadyApprove) {
+                $achievement_approvalaction = array(
+                    'action_canapprove' => false,
+                    'action_messagetype' => 'warning',
+                    'action_message' => 'You already approve this achievement.',
+                );
+            } else {
+                $achievement_approvalaction = array(
+                    'action_canapprove' => true,
+                    'action_messagetype' => 'success',
+                    'action_message' => 'You can approve this achievement.',
+                );
+            }
+        } else if ($userRole == 'Lecturer') {
+            $lecturerAlreadyApprove = false;
+        
+            foreach ($achievements as $achievementRow) {
+                if ($achievementRow['user_id'] == $userId) {
+                    if ($achievementRow['approver_isdone'] == 1) {
+                        $lecturerAlreadyApprove = true;
+                        break;
+                    }
+                }
+            }
+        
+            if (!$lecturerAlreadyApprove) {
+                $achievement_approvalaction = array(
+                    'action_canapprove' => true,
+                    'action_messagetype' => 'success',
+                    'action_message' => 'You can approve this achievement.',
+                );
+            } else {
+                $achievement_approvalaction = array(
+                    'action_canapprove' => false,
+                    'action_messagetype' => 'warning',
+                    'action_message' => 'You already approved this achievement.',
+                );
+            }
+        }
+        
+        if ($achievements[0]['verification_isdone'] == 1 || $achievements[0]['verification_isdone'] == 0) {
+            $achievement_approvalaction = array(
+                'action_canapprove' => false,
+                'action_messagetype' => 'warning',
+                'action_message' => 'This achievement has already been approved.',
+            );
         }
 
         $achievement = array(
@@ -164,6 +240,7 @@ class AchievementController extends Controller {
             'achievement_approvers' => $achievement_approvers,
             'achievement_files' => $achievement_files,
             'achievement_category_details' => $achievement_category_details,
+            'achievement_approvalaction' => $achievement_approvalaction
         );
 
         return ResponseHelper::success($response, $achievement, 'Successfully get achievement.');
@@ -171,7 +248,7 @@ class AchievementController extends Controller {
     
     public function getApproverList(Request $request, Response $response, array $args): Response {
         $achievementId = $args['id'];
-        $achievementApprovers = $this->achievementApproverModel->getApproversByAchievementId($achievementId);
+        $achievementApprovers = $this->achievementApproverModel->getByAchievementId($achievementId);
 
         if (!$achievementApprovers) {
             return ResponseHelper::error($response, 'Achievement approvers not found.', 404);
@@ -270,6 +347,93 @@ class AchievementController extends Controller {
         }
     }
 
+    public function approveAchievement(Request $request, Response $response, array $args): ResponseInterface {
+        $achievementId = $args['id'];
+        $userId = $_SESSION['user']['id'];
+        $data = json_decode($request->getBody(), true);
+        $approvalAction = (string) ($request->getQueryParams()['action'] ?? '');
+
+        if (empty($data['approver_id'])) {
+            return ResponseHelper::error($response, 'approver_id is required.', 400);
+        }
+
+        if (empty($data['verification_id'])) {
+            return ResponseHelper::error($response, 'verification_id is required.', 400);
+        }
+
+        if (empty($approvalAction)) {
+            return ResponseHelper::error($response, 'Approval action is required.', 400);
+        }
+
+        if ($approvalAction == 'reject') {
+            if (empty($data['reject_notes'])) {
+                return ResponseHelper::error($response, 'Notes is required.', 400);
+            }
+        }
+
+        $allApproversApproved = true;
+        $verificationData = array();
+        $approvers = $this->achievementApproverModel->getByAchievementId($achievementId);
+        $approverData = array(
+            'approver_id' => $data['approver_id'],
+            'approver_isdone' => 1,
+        );
+
+        $userExists = !empty(array_filter($approvers, function ($approver) use ($userId) {
+            return $approver['user_id'] == $userId;
+        }));
+
+        if (!$userExists) {
+            return ResponseHelper::error($response, 'You are not allowed to approve this achievement.', 403);
+        }
+
+        if ($approvalAction == 'reject') {
+            $verificationData = array(
+                'verification_id' => $data['verification_id'],
+                'verification_code' => 'DT',
+                'verification_status' => 'Ditolak',
+                'verification_notes' => $data['reject_notes'],
+                'verification_isdone' => 0,
+            );
+        } else if ($approvalAction == 'approve') {
+            foreach ($approvers as $approver) {
+                if ($approver['user_username'] === 'admin') {
+                    continue;
+                }
+
+                if ($approver['approver_isdone'] != 1) {
+                    $allApproversApproved = false;
+                    break;
+                }
+            }
+
+            if ($allApproversApproved) {
+                $verificationData = array(
+                    'verification_id' => $data['verification_id'],
+                    'verification_code' => 'DS',
+                    'verification_status' => 'Disetujui',
+                    'verification_notes' => null,
+                    'verification_isdone' => 1
+                );
+            }
+        }
+        try {
+            $this->baseModel->getDbConnection()->beginTransaction();
+            // Transactions
+            $this->achievementApproverModel->update($approverData);
+            if ($approvalAction == 'reject' || $allApproversApproved) {
+                $this->achievementVerificationModel->update($verificationData);
+            }
+            // End of Transactions
+            $this->baseModel->getDbConnection()->commit();
+
+            return ResponseHelper::success($response, [], 'Successfully approve achievement.');
+        } catch (\Exception $e) {
+            $this->baseModel->getDbConnection()->rollBack();
+            return ResponseHelper::error($response, $e->getMessage(), 500);
+        }
+    }
+
     public function getPendingAchievements(Request $request, Response $response, array $args): ResponseInterface
     {
         $userId = $args['id'] ?? null;
@@ -307,34 +471,6 @@ class AchievementController extends Controller {
             }
 
             return ResponseHelper::success($response, $approvedAchievements, 'Approved achievements retrieved successfully.');
-        } catch (\Exception $e) {
-            return ResponseHelper::error($response, 'Error: ' . $e->getMessage(), 500);
-        }
-    }
-
-    public function approveAchievement(Request $request, Response $response, array $args): ResponseInterface
-    {
-        $userId = $args['id'];
-        $data = $request->getParsedBody();
-
-        if (empty($data['achievement_id']) || empty($data['action'])) {
-            return ResponseHelper::error($response, 'Missing required fields: achievement_id or action.', 400);
-        }
-
-        $data['user_id'] = $userId;
-
-        if (empty($userId)) {
-            return ResponseHelper::error($response, 'Missing required field: user_id.', 400);
-        }
-
-        try {
-            $result = $this->achievementModel->processApproveAchievement($data);
-
-            if ($result) {
-                return ResponseHelper::success($response, [], 'Achievement approval process successful.');
-            } else {
-                return ResponseHelper::error($response, 'Failed to process achievement approval.', 500);
-            }
         } catch (\Exception $e) {
             return ResponseHelper::error($response, 'Error: ' . $e->getMessage(), 500);
         }

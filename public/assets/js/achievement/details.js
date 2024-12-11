@@ -3,17 +3,29 @@ $(document).ready(() => {
     const pathname = window.location.pathname;
     const segments = pathname.split('/');
     const achievementId = segments[segments.length - 1];
+    const userId = userIdSessionValue;
+    let approverId = null;
+    let verificationId = null;
 
-    let activeTab = 'Information';
+    // Modal Elements
+    const rejectModal = $('#rejectModal');
+    const approveModal = $('#approveModal');
+
     // Tab Elements
     const btnInformationsTab = $('#btnInformationsTab');
     const btnFilesTab = $('#btnFilesTab');
     const informationTabContainer = $('#informationTabContainer');
     const filesTabContainer = $('#filesTabContainer');
 
+    // Button Elements
+    const btnApprove = $('#btnApprove');
+    const btnReject = $('#btnReject');
+
+    // Alert Elements
+    const alertMessageElement = $('#alertMessage');
+
     // Setup Tabs
     btnInformationsTab.on('click', function() {
-        activeTab = 'Information';
         informationTabContainer.removeClass('d-none');
         filesTabContainer.addClass('d-none');
         btnInformationsTab.addClass('tab-item-active');
@@ -21,7 +33,6 @@ $(document).ready(() => {
     });
 
     btnFilesTab.on('click', function() {
-        activeTab = 'Files';
         informationTabContainer.addClass('d-none');
         filesTabContainer.removeClass('d-none');
         btnInformationsTab.removeClass('tab-item-active');
@@ -34,12 +45,23 @@ $(document).ready(() => {
         const achievementDetailsContainer = $('#achievementDetailsContainer');
         const verificationDetailsContainer = $('#verificationDetailsContainer');
         const fileDetailsContainer = $('#fileDetailsContainer');
+        const actionsContainer = $('#actionsContainer');
+
+        approverId = null;
+        verificationId = null;
+        studentDetailsContainer.empty();
+        achievementDetailsContainer.empty();
+        verificationDetailsContainer.empty();
+        fileDetailsContainer.empty();
+        actionsContainer.empty();
 
         $.ajax({
             url: `${BASE_API_URL}/achievements/${achievementId}`,
             method: 'GET',
             success: function(response) {
                 const achievement = response.data;
+                approverId = achievement.achievement_approvers.find((approver) => approver.user_id == userId).approver_id;
+                verificationId = achievement.achievement_verification.verification_id;
                 // Setup Student Details Container
                 const studentDetailsRow = `
                     <div class="col-12 col-md-4 col-lg-3">
@@ -184,12 +206,105 @@ $(document).ready(() => {
                 ).join('');
 
                 fileDetailsContainer.html(fileDetailsRow);
+
+                // Setup Actions
+                if (achievement.achievement_approvalaction !== null) {
+                    const textType = achievement.achievement_approvalaction.action_messagetype == 'success' ? 'text-success' : achievement.achievement_approvalaction.action_messagetype == 'warning' ? 'text-danger' : '';
+                    const actionsRow = `
+                        <div class="px-3 py-2 d-flex align-items-center justify-content-between">
+                            <p class="my-0 text-xs ${textType}">${achievement.achievement_approvalaction.action_message}</p>
+                            ${achievement.achievement_approvalaction.action_canapprove ? `
+                                <div class="d-flex align-items-center gap-2">
+                                    <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#rejectModal">Reject</button>
+                                    <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#approveModal">Approve</button>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+
+                    actionsContainer.html(actionsRow);
+                }
             },
             error: function(error) {
                 console.log('Error while fetching achievement data!');
             }
         });
     };
+
+    // Approval Actions
+    const approveAchievement = (approvalAction) => {
+        const rejectNotes = $('#rejectNotes').val();
+        let approvalData = {
+            approver_id: approverId,
+            verification_id: verificationId,
+        };
+
+        $('#rejectNotesError').text('');
+
+        if (approvalAction == 'reject') {
+            if (rejectNotes == '') {
+                $('#rejectNotesError').text('Notes is required!');
+                return;
+            }
+
+            approvalData = {
+                ...approvalData,
+                reject_notes: rejectNotes
+            };
+        }
+
+        $.ajax({
+            url: `${BASE_API_URL}/achievements/${achievementId}/approval?action=${approvalAction}`,
+            method: 'PATCH',
+            data: JSON.stringify(approvalData),
+            contentType: 'application/json',
+            success: function (response) {
+                if (approvalAction == 'reject') {
+                    $('#rejectModal').modal('hide');
+                } else if (approvalAction == 'approve') {
+                    $('#approveModal').modal('hide');
+                }
+
+                if (response.success) {
+                    if (approvalAction == 'reject') {
+                        $('#rejectModal').modal('hide');
+                    } else if (approvalAction == 'approve') {
+                        $('#approveModal').modal('hide');
+                    }
+                    
+                    fetchAndSetupDetailsData();
+                    alertMessageElement.html(`
+                        <div class="my-0 alert alert-success alert-dismissible fade show" role="alert">
+                            <p class="my-0 text-sm">
+                                <strong>Success!</strong> ${response.message}
+                            </p>
+                            <button type="button" class="btn btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    `);
+                } else {
+                    alertMessageElement.html(`
+                        <div class="my-0 alert alert-danger alert-dismissible fade show" role="alert">
+                            <p class="my-0 text-sm">
+                                <strong>Failed!</strong> ${response.message}
+                            </p>
+                            <button type="button" class="btn btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    `);
+                }
+            },
+            error: function (error) {
+                console.log('Error while approve achievement user.');
+            }
+        });
+    };
+
+    btnReject.on('click', function() {
+        approveAchievement('reject');
+    });
+
+    btnApprove.on('click', function() {
+        approveAchievement('approve');
+    });
 
     // Run the Functions
     fetchAndSetupDetailsData();

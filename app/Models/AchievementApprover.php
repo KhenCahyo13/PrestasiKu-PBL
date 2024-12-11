@@ -4,6 +4,7 @@ namespace App\Models;
 
 use PDO;
 use App\Models\Model;
+use PDOException;
 
 class AchievementApprover extends Model {
     protected string $table = "Achievement.AchievementApprovers";
@@ -25,7 +26,7 @@ class AchievementApprover extends Model {
         return $stmt->execute();
     }
 
-    public function getApproversByAchievementId(string $achievementId): array {
+    public function getByAchievementId(string $achievementId): array {
         $query = 'EXEC CRUD.SelectTableDataByColumnWithJoins
             @TableName = :tableName,
             @TableColumns = :tableColumns,
@@ -53,5 +54,20 @@ class AchievementApprover extends Model {
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         return $results ?: null;
+    }
+
+    public function update(array $data): bool {
+        try {
+            $sql = "UPDATE $this->table SET approver_isdone = :approver_isdone WHERE approver_id = :approver_id";
+            $stmt = $this->getDbConnection()->prepare($sql);
+
+            $stmt->bindParam(':approver_isdone', $data['approver_isdone'], PDO::PARAM_INT);
+            $stmt->bindParam(':approver_id', $data['approver_id'], PDO::PARAM_STR);
+
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log("Failed to update achievement approver: " . $e->getMessage());
+            return false;
+        }
     }
 }
