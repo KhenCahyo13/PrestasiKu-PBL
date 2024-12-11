@@ -68,7 +68,7 @@
                         <div class="d-flex flex-column gap-4">
                             <div class="d-flex flex-column">
                                 <p class="heading-6 my-0">Total Achievements Based on Category</p>
-                                <p class="text-sm text-secondary my-0">2023 January - 2023 December</p>
+                                <p class="text-sm text-secondary my-0">All time periods</p>
                             </div>
                             <div class="chart-container">
                                 <canvas id="totalAchievementsBasedOnCategoryChartContainer"></canvas>
@@ -79,9 +79,12 @@
                 <div class="col-12">
                     <div class="px-3 py-3 rounded shadow-sm bg-white">
                         <div class="d-flex flex-column gap-4">
-                            <div class="d-flex flex-column">
-                                <p class="heading-6 my-0">Total Achievements per Month in 1 Year</p>
-                                <p class="text-sm text-secondary my-0">2023 January - 2023 December</p>
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="d-flex flex-column">
+                                    <p class="heading-6 my-0">Total Achievements per Month in 1 Year</p>
+                                    <p class="text-sm text-secondary my-0" id="yearAchievementPerMonthValue"></p>
+                                </div>
+                                <input type="date" class="form-control form-control-sm" id="filterYearAchievementPerMonth" style="width: fit-content;">
                             </div>
                             <div class="chart-container">
                                 <canvas id="totalAchievementsPerMonthInOneYearChartContainer"></canvas>

@@ -1,13 +1,15 @@
-$(document).ready(function() {
+$(document).ready(() => {
     // Variables
     const userRole = userRoleSessionValues;
 
     // Fetch and setup dashboard
-    const fetchAndSetupDashboard = () => {
+    const fetchAndSetupDashboard = (year) => {
         $.ajax({
-            url: `${BASE_API_URL}/dashboard`,
+            url: `${BASE_API_URL}/dashboard?year=${year}`,
             method: 'GET',
             success: function(response) {
+                $('#yearAchievementPerMonthValue').empty();
+                $('#yearAchievementPerMonthValue').text(`January ${year} - December ${year}`);
                 const totalAchievementsPerMonthInOneYearData = response.data.find((item) => item.type == 'Chart Per Month in One Year');
                 const totalAchievementsBasedOnScopeData = response.data.find((item) => item.type == 'Chart Based on Scope');
                 const top10StudentAchievementData = response.data.find((item) => item.type == 'Chart Top 10 by Student');
@@ -22,7 +24,7 @@ $(document).ready(function() {
                 }
             },
             error: function(response) {
-                console.error('Error while fetching dashboard data');
+                console.error('Error while fetching dashboard data.');
             }
         });
     };
@@ -55,10 +57,11 @@ $(document).ready(function() {
     };
 
     // Setup Chart Total Achievements Based on Category
+    let totalAchievementsBasedOnCategoryChartInstance = null;
     const setupTotalAchievementsBasedOnCategoryChart = (data) => {
         const categories = data.data.map((item) => item.scope);
         const totalAchievements = data.data.map((item) => parseInt(item.total, 10));
-    
+
         // Chart Data
         const chartData = {
             labels: categories,
@@ -78,7 +81,7 @@ $(document).ready(function() {
                 borderWidth: 1
             }]
         };
-    
+
         // Chart Configuration
         const config = {
             type: 'doughnut',
@@ -97,12 +100,26 @@ $(document).ready(function() {
             }
         };
 
+        // Destroy the existing chart if it exists
+        if (totalAchievementsBasedOnCategoryChartInstance) {
+            totalAchievementsBasedOnCategoryChartInstance.destroy();
+        }
+
         // Render Chart
         const totalAchievementsBasedOnCategoryChartContainer = document.getElementById('totalAchievementsBasedOnCategoryChartContainer').getContext('2d');
-        new Chart(totalAchievementsBasedOnCategoryChartContainer, config);
+        totalAchievementsBasedOnCategoryChartInstance = new Chart(totalAchievementsBasedOnCategoryChartContainer, config);
     };
 
     // Setup Chart Total Achievements per Month in One Year
+    // Chart Filter
+    const filterYearAchievementPerMonthElement = $('#filterYearAchievementPerMonth');
+    filterYearAchievementPerMonthElement.on('change', (event) => {
+        const dateValue = event.target.value;
+        const year = dateValue.split('-')[0];
+        
+        fetchAndSetupDashboard(year);
+    });
+    let totalAchievementsPerMonthInOneYearChartInstance = null;
     const setupTotalAchievementsPerMonthInOneYearChart = (data) => {
         const months = data.data.map((item) => item.month);
         const totalAchievements = data.data.map((item) => parseInt(item.total, 10));
@@ -153,9 +170,14 @@ $(document).ready(function() {
             }
         };
 
+        // Destroy the existing chart if it exists
+        if (totalAchievementsPerMonthInOneYearChartInstance) {
+            totalAchievementsPerMonthInOneYearChartInstance.destroy();
+        }
+
         // Render Chart
-        const ctx = document.getElementById('totalAchievementsPerMonthInOneYearChartContainer').getContext('2d');
-        new Chart(ctx, config);
+        const totalAchievementsPerMonthInOneYearChartContainer = document.getElementById('totalAchievementsPerMonthInOneYearChartContainer').getContext('2d');
+        totalAchievementsPerMonthInOneYearChartInstance = new Chart(totalAchievementsPerMonthInOneYearChartContainer, config);
     };
 
     // Setup Dashboard Card
@@ -176,6 +198,7 @@ $(document).ready(function() {
         totalAchievementsDataElement.text(totalAchievementsData);
     };
 
+
     // Run the Functions
-    fetchAndSetupDashboard();
+    fetchAndSetupDashboard(new Date().getFullYear());
 });
