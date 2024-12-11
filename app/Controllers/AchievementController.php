@@ -205,7 +205,7 @@ class AchievementController extends Controller {
             }
         }
         
-        if ($achievements[0]['verification_isdone'] == 1 || $achievements[0]['verification_isdone'] == 0) {
+        if ($achievements[0]['verification_isdone'] !== NULL) {
             $achievement_approvalaction = array(
                 'action_canapprove' => false,
                 'action_messagetype' => 'warning',
