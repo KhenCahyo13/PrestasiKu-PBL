@@ -252,4 +252,26 @@ class AchievementController extends Controller {
             return ResponseHelper::error($response, 'Error: ' . $e->getMessage(), 500);
         }
     }
+
+    public function getAchievementUploadsPerMonth(Request $request, Response $response): ResponseInterface
+    {
+        $queryParams = $request->getQueryParams();
+
+        $year = $queryParams['year'] ?? date('Y');
+
+        $startDate = "{$year}-01-01";
+        $endDate = "{$year}-12-31";
+
+        try {
+            $data = $this->achievementModel->getAchievementUploadsPerMonth($startDate, $endDate);
+
+            if (empty($data)) {
+                return ResponseHelper::error($response, "No data found for year {$year}", 404);
+            }
+
+            return ResponseHelper::success($response, $data, "Achievement uploads for year {$year}");
+        } catch (\Exception $e) {
+            return ResponseHelper::error($response, 'Error: ' . $e->getMessage(), 500);
+        }
+    }
 }

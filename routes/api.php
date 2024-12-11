@@ -11,6 +11,7 @@ use App\Controllers\UserController;
 use App\Middlewares\CheckAdminMiddleware;
 
 use App\Middlewares\CheckAuthMiddleware;
+use App\Models\Achievement;
 
 $app->group('/api', function ($api) {
     // Auth Routes
@@ -28,7 +29,10 @@ $app->group('/api', function ($api) {
         $api->get('/ranking', AchievementController::class . ':getRankingAchievementStudent');
         $api->get('/notification/{id}', AchievementController::class . ':getNotifications');
         $api->delete('/delete/{id}', AchievementController::class . ':deleteAchievement');
-        $api->get('/grafic-scope', AchievementController::class . ':getAchievementScopePercentage');
+        
+            $api->get('/graph-scope', AchievementController::class . ':getAchievementScopePercentage');
+            $api->get('/graph-achievement-upload', AchievementController::class . ':getAchievementUploadsPerMonth');
+        
     })->add(new CheckAuthMiddleware());
     // Achievement Categories Routes
     $api->group('/achievement-categories', function ($api) {

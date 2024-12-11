@@ -305,6 +305,31 @@ class Achievement extends Model
         }
     }
 
+    public function getAchievementUploadsPerMonth(string $startDate, string $endDate): array
+    {
+        $sql = "SELECT 
+                DATENAME(MONTH, a.achievement_createdat) AS month_name,
+                YEAR(a.achievement_createdat) AS year,
+                COUNT(a.achievement_id) AS total_achievements
+            FROM Achievement.Achievements a
+            WHERE a.achievement_createdat BETWEEN :start_date AND :end_date
+            GROUP BY DATENAME(MONTH, a.achievement_createdat), YEAR(a.achievement_createdat),
+                     MONTH(a.achievement_createdat)
+            ORDER BY YEAR(a.achievement_createdat) ASC, MONTH(a.achievement_createdat) ASC";
+
+        try {
+            $stmt = $this->getDbConnection()->prepare($sql);
+            $stmt->bindParam(':start_date', $startDate, PDO::PARAM_STR);
+            $stmt->bindParam(':end_date', $endDate, PDO::PARAM_STR);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            error_log("Database error: " . $e->getMessage());
+            throw new \Exception("Database error: " . $e->getMessage());
+        }
+    }
+
     public function rankingAchievementStudent(): array
     {
         try {
