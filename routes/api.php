@@ -20,6 +20,7 @@ $app->group('/api', function ($api) {
         $api->post('/login', AuthController::class . ':login');
         $api->post('/logout', AuthController::class . ':logout');
     });
+
     // Achievement Routes
     $api->group('/achievements', function ($api) {
         $api->get('/grafic-scope', AchievementController::class . ':getAchievementScopePercentage');
@@ -33,14 +34,17 @@ $app->group('/api', function ($api) {
         $api->get('/notification/{id}', AchievementController::class . ':getNotifications');
         $api->delete('/delete/{id}', AchievementController::class . ':deleteAchievement');
     })->add(new BECheckAuthMiddleware());
+
     // Achievement Categories Routes
     $api->group('/achievement-categories', function ($api) {
         $api->get('', AchievementCategoryController::class . ':index');
     });
+
     // Roles Routes
     $api->group('/roles', function ($api) {
         $api->get('', RoleController::class . ':index');
     });
+
     // Department Routes
     $api->get('/departments', DepartmentController::class . ':index');
     $api->group('/departments', function ($api) {
@@ -49,6 +53,7 @@ $app->group('/api', function ($api) {
         $api->patch('/{id}', DepartmentController::class . ':update')->add(new BECheckAdminMiddleware());
         $api->delete('/{id}', DepartmentController::class . ':delete')->add(new BECheckAdminMiddleware());
     })->add(new BECheckAuthMiddleware());
+
     // Study Program Routes
     $api->group('/study-programs', function ($api) {
         $api->get('', StudyProgramController::class . ':index');
@@ -57,6 +62,7 @@ $app->group('/api', function ($api) {
         $api->patch('/{id}', StudyProgramController::class . ':update')->add(new BECheckAdminMiddleware());
         $api->delete('/{id}', StudyProgramController::class . ':delete')->add(new BECheckAdminMiddleware());
     })->add(new BECheckAuthMiddleware());
+
     // SP Class Routes
     $api->get('/sp-classes', SPClassController::class . ':index');
     $api->group('/sp-classes', function ($api) {
@@ -65,13 +71,11 @@ $app->group('/api', function ($api) {
         $api->patch('/{id}', SPClassController::class . ':update')->add(new BECheckAdminMiddleware());
         $api->delete('/{id}', SPClassController::class . ':delete')->add(new BECheckAdminMiddleware());
     })->add(new BECheckAuthMiddleware());
+
     // User Routes
     $api->group('/users', function ($api) {
         $api->get('/{id}', UserController::class . ':show');
         $api->get('', UserController::class . ':index');
+        $api->patch('/{id}/verify', UserController::class . ':verifyUserRegistration')->add(new BECheckAdminMiddleware());
     })->add(new BECheckAuthMiddleware());
-    $api->group('/users', function ($api) {
-        $api->patch('/{id}/verify', UserController::class . ':verifyUserRegistration');
-    })->add(new BECheckAuthMiddleware())
-    ->add(new BECheckAdminMiddleware());
 });

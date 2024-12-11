@@ -434,64 +434,17 @@ class AchievementController extends Controller {
         }
     }
 
-    public function getPendingAchievements(Request $request, Response $response, array $args): ResponseInterface
+    public function getRankingAchievementStudent(Request $request, Response $response, array $args): ResponseInterface
     {
-        $userId = $args['id'] ?? null;
-
-        if (empty($userId)) {
-            return ResponseHelper::error($response, 'user_id is required.', 400);
-        }
-
+        
         try {
-            $pendingAchievements = $this->achievementModel->getPendingAchievementsByApprover($userId);
+            $students = $this->achievementModel->rankingAchievementStudent();
 
-            if (empty($pendingAchievements)) {
-                return ResponseHelper::error($response, 'No pending achievements found.', 404);
+            if (empty($students)) {
+                return ResponseHelper::error($response, "No students found with approved achievements.", 404);
             }
 
-            return ResponseHelper::success($response, $pendingAchievements, 'Pending achievements retrieved successfully.');
-        } catch (\Exception $e) {
-            return ResponseHelper::error($response, 'Error: ' . $e->getMessage(), 500);
-        }
-    }
-
-    public function getApprovedAchievements(Request $request, Response $response, array $args): ResponseInterface
-    {
-        $userId = $args['id'] ?? null;
-
-        if (empty($userId)) {
-            return ResponseHelper::error($response, 'user_id is required.', 400);
-        }
-
-        try {
-            $approvedAchievements = $this->achievementModel->getApprovedAchievementsByApprover($userId);
-
-            if (empty($approvedAchievements)) {
-                return ResponseHelper::error($response, 'No approved achievements found.', 404);
-            }
-
-            return ResponseHelper::success($response, $approvedAchievements, 'Approved achievements retrieved successfully.');
-        } catch (\Exception $e) {
-            return ResponseHelper::error($response, 'Error: ' . $e->getMessage(), 500);
-        }
-    }
-
-    public function deleteAchievement(Request $request, Response $response, array $args): ResponseInterface
-    {
-        $achievementId = $args['id'] ?? null;
-
-        if (empty($achievementId)) {
-            return ResponseHelper::error($response, 'Achievement ID is required.', 400);
-        }
-
-        try {
-            $result = $this->achievementModel->deleteAchievement($achievementId);
-
-            if ($result) {
-                return ResponseHelper::success($response, [], 'Achievement deleted successfully.');
-            } else {
-                return ResponseHelper::error($response, 'Failed to delete achievement.', 500);
-            }
+            return ResponseHelper::success($response, $students, 'Top 10 students with approved achievements retrieved successfully.');
         } catch (\Exception $e) {
             return ResponseHelper::error($response, 'Error: ' . $e->getMessage(), 500);
         }
@@ -514,6 +467,28 @@ class AchievementController extends Controller {
             }, $scopeData);
 
             return ResponseHelper::success($response, $scopePercentage, 'Achievement scope percentages retrieved successfully.');
+        } catch (\Exception $e) {
+            return ResponseHelper::error($response, 'Error: ' . $e->getMessage(), 500);
+        }
+    }
+
+    public function getAchievementUploadsPerMonth(Request $request, Response $response): ResponseInterface
+    {
+        $queryParams = $request->getQueryParams();
+
+        $year = $queryParams['year'] ?? date('Y');
+
+        $startDate = "{$year}-01-01";
+        $endDate = "{$year}-12-31";
+
+        try {
+            $data = $this->achievementModel->getAchievementUploadsPerMonth($startDate, $endDate);
+
+            if (empty($data)) {
+                return ResponseHelper::error($response, "No data found for year {$year}", 404);
+            }
+
+            return ResponseHelper::success($response, $data, "Achievement uploads for year {$year}");
         } catch (\Exception $e) {
             return ResponseHelper::error($response, 'Error: ' . $e->getMessage(), 500);
         }

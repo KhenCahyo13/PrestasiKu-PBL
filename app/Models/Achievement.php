@@ -5,7 +5,8 @@ namespace App\Models;
 use PDO;
 use App\Models\Model;
 
-class Achievement extends Model {
+class Achievement extends Model
+{
     protected string $table = "Achievement.Achievements";
     protected string $primaryKey = "achievement_id";
 
@@ -160,8 +161,40 @@ class Achievement extends Model {
         $stmt->bindParam(':achievement_eventcity', $data['achievement_eventcity'], PDO::PARAM_STR);
         $stmt->bindParam(':achievement_eventstart', $data['achievement_eventstart'], PDO::PARAM_STR);
         $stmt->bindParam(':achievement_eventend', $data['achievement_eventend'], PDO::PARAM_STR);
-    
+
         return $stmt->execute();
+    }
+
+    public function getAllAchievementStudentById(string $userId):array{
+        try {
+            $sql = "SELECT 
+                    a.achievement_id,
+                    a.achievement_title,
+                    a.achievement_description,
+                    a.achievement_type,
+                    a.achievement_scope,
+                    a.achievement_eventlocation,
+                    a.achievement_eventcity,
+                    a.achievement_eventstart,
+                    a.achievement_eventend,
+                    aa.approver_status,
+                    av.verification_code,
+                    av.verification_status
+                FROM Achievement.Achievements a
+                JOIN Achievement.AchievementApprovers aa ON aa.achievement_id = a.achievement_id
+                JOIN Achievement.AchievementVerifications av ON av.achievement_id = a.achievement_id
+                WHERE a.user_id = :user_id
+                ORDER BY a.achievement_createdat DESC";
+
+            $stmt = $this->getDbConnection()->prepare($sql);
+            $stmt->bindParam(':user_id', $userId, PDO::PARAM_STR);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            error_log("Database error: " . $e->getMessage());
+            throw new \Exception("Database error: " . $e->getMessage());
+        }
     }
 
     public function getPendingAchievementsByApprover(string $userId): array
@@ -377,6 +410,56 @@ class Achievement extends Model {
 
             $stmt = $this->getDbConnection()->prepare($sql);
             $stmt->bindParam(':user_id', $userId);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            error_log("Database error: " . $e->getMessage());
+            throw new \Exception("Database error: " . $e->getMessage());
+        }
+    }
+
+    public function getAchievementUploadsPerMonth(string $startDate, string $endDate): array
+    {
+        $sql = "SELECT 
+                DATENAME(MONTH, a.achievement_createdat) AS month_name,
+                YEAR(a.achievement_createdat) AS year,
+                COUNT(a.achievement_id) AS total_achievements
+            FROM Achievement.Achievements a
+            WHERE a.achievement_createdat BETWEEN :start_date AND :end_date
+            GROUP BY DATENAME(MONTH, a.achievement_createdat), YEAR(a.achievement_createdat),
+                     MONTH(a.achievement_createdat)
+            ORDER BY YEAR(a.achievement_createdat) ASC, MONTH(a.achievement_createdat) ASC";
+
+        try {
+            $stmt = $this->getDbConnection()->prepare($sql);
+            $stmt->bindParam(':start_date', $startDate, PDO::PARAM_STR);
+            $stmt->bindParam(':end_date', $endDate, PDO::PARAM_STR);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            error_log("Database error: " . $e->getMessage());
+            throw new \Exception("Database error: " . $e->getMessage());
+        }
+    }
+
+    public function rankingAchievementStudent(): array
+    {
+        try {
+            $sql = "SELECT TOP 10
+                ds.detail_name AS student_name,
+                COUNT(a.achievement_id) AS total_achievements
+            FROM Achievement.AchievementApprovers aa
+            JOIN Achievement.Achievements a ON aa.achievement_id = a.achievement_id
+            JOIN Achievement.AchievementVerifications v ON a.achievement_id = v.achievement_id
+            JOIN Master.Users u ON aa.user_id = u.user_id
+            JOIN Master.StudentDetailUsers ds ON u.detail_student_id = ds.detail_id
+            WHERE v.verification_isdone = 1
+            GROUP BY ds.detail_name
+            ORDER BY total_achievements DESC";
+
+            $stmt = $this->getDbConnection()->prepare($sql);
             $stmt->execute();
 
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
