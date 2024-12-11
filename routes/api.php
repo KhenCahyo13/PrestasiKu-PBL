@@ -23,8 +23,7 @@ $app->group('/api', function ($api) {
     $api->group('/achievements', function ($api) {
         $api->post('', AchievementController::class . ':store');
         $api->post('/approval/{id}', AchievementController::class . ':approveAchievement');
-        $api->get('/pending/{id}', AchievementController::class . ':getPendingAchievements');
-        $api->get('/approved/{id}', AchievementController::class . ':getApprovedAchievements');
+        $api->get('/approver/{id}', AchievementController::class . ':getAchievements');
         $api->get('/notification/{id}', AchievementController::class . ':getNotifications');
         $api->delete('/delete/{id}', AchievementController::class . ':deleteAchievement');
         $api->get('/grafic-scope', AchievementController::class . ':getAchievementScopePercentage');

@@ -119,47 +119,37 @@ class AchievementController extends Controller {
         }
     }
 
-    public function getPendingAchievements(Request $request, Response $response, array $args): ResponseInterface
+    public function getAchievements(Request $request, Response $response, array $args): ResponseInterface
     {
         $userId = $args['id'] ?? null;
-
+        $status = $request->getQueryParams()['status'] ?? null;
         if (empty($userId)) {
             return ResponseHelper::error($response, 'user_id is required.', 400);
         }
 
-        try {
-            $pendingAchievements = $this->achievementModel->getPendingAchievementsByApprover($userId);
+        if (empty($status) || !in_array($status, ['pending', 'approved'])) {
+            return ResponseHelper::error($response, 'Valid status is required (pending or approved).', 400);
+        }
 
-            if (empty($pendingAchievements)) {
-                return ResponseHelper::error($response, 'No pending achievements found.', 404);
+        try {
+            $achievements = [];
+
+            if ($status === 'pending') {
+                $achievements = $this->achievementModel->getPendingAchievementsByApprover($userId);
+            } elseif ($status === 'approved') {
+                $achievements = $this->achievementModel->getApprovedAchievementsByApprover($userId);
             }
 
-            return ResponseHelper::success($response, $pendingAchievements, 'Pending achievements retrieved successfully.');
+            if (empty($achievements)) {
+                return ResponseHelper::error($response, "No $status achievements found.", 404);
+            }
+
+            return ResponseHelper::success($response, $achievements, ucfirst($status) . ' achievements retrieved successfully.');
         } catch (\Exception $e) {
             return ResponseHelper::error($response, 'Error: ' . $e->getMessage(), 500);
         }
     }
 
-    public function getApprovedAchievements(Request $request, Response $response, array $args): ResponseInterface
-    {
-        $userId = $args['id'] ?? null;
-
-        if (empty($userId)) {
-            return ResponseHelper::error($response, 'user_id is required.', 400);
-        }
-
-        try {
-            $approvedAchievements = $this->achievementModel->getApprovedAchievementsByApprover($userId);
-
-            if (empty($approvedAchievements)) {
-                return ResponseHelper::error($response, 'No approved achievements found.', 404);
-            }
-
-            return ResponseHelper::success($response, $approvedAchievements, 'Approved achievements retrieved successfully.');
-        } catch (\Exception $e) {
-            return ResponseHelper::error($response, 'Error: ' . $e->getMessage(), 500);
-        }
-    }
 
     public function approveAchievement(Request $request, Response $response, array $args): ResponseInterface
     {
