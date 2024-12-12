@@ -1,3 +1,8 @@
+<?php
+    $fullname = $_SESSION['user']['fullname'];
+    $first_letter = $fullname[0] ?? 'A';
+?>
+
 <nav class="navbar d-flex align-items-center justify-content-between px-3 py-2 shadow-sm rounded" style="background-color: white;" id="navbarElement">
     <div class="d-flex align-items-center gap-3">
         <button class="btn btn-transparent p-0" id="navbarButton">
@@ -25,8 +30,8 @@
         <div class="dropdown">
             <button class="btn btn-transparent p-0" id="profileButton" data-bs-toggle="dropdown" aria-expanded="false">
                 <div class="d-flex align-items-center gap-2">
-                    <div class="rounded-profile">
-                        <img src="<?= images('sample-profile1.png') ?>" alt="Profile Image">
+                    <div class="rounded-profile-letter">
+                        <p class="heading-6 my-0"><?= $first_letter ?></p>
                     </div>
                     <i class="fa-solid fa-chevron-down" style="font-size: 10px;"></i>
                 </div>
