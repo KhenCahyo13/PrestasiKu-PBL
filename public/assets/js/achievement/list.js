@@ -53,9 +53,9 @@ $(document).ready(() => {
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="#" class="dropdown-item d-flex align-items-center gap-2">
-                                                    <i class="fa-solid fa-clock-rotate-left text-secondary"></i> History
-                                                </a>
+                                                <button type="button" class="dropdown-item d-flex align-items-center gap-2" data-id="${achievement.achievement_id}" data-bs-toggle="modal" data-bs-target="#historyLogsModal" id="historyLogsAction">
+                                                    <i class="fa-solid fa-clock-rotate-left text-secondary"></i> History Logs
+                                                </button>
                                             </li>
                                             <li>
                                                 <button type="button" class="dropdown-item d-flex align-items-center gap-2" data-id="${achievement.achievement_id}" data-bs-toggle="modal" data-bs-target="#approverListModal" id="approverListAction">
@@ -86,7 +86,7 @@ $(document).ready(() => {
                                     for (let i = 0; i < response.data.length; i++) {
                                         const approver = response.data[i];
                                         const approverRow = `
-                                            <div class="d-flex align-items-center gap-3">
+                                            <div class="d-flex align-items-center gap-3 pb-3 border-bottom border-secondary">
                                                 <div class="rounded-profile-letter">
                                                     <p class="heading-6 my-0">${approver.user_username == 'admin' ? 'A' : approver.lecturer_name[0]}</p>
                                                 </div>
@@ -102,6 +102,56 @@ $(document).ready(() => {
                                 },
                                 error: function(error) {
                                     console.log('Error while fetching achievement approver list!');
+                                }
+                            });
+                        });
+                    });
+
+                    // History Logs Action
+                    document.querySelectorAll('#historyLogsAction').forEach((button) => {
+                        button.addEventListener('click', function () {
+                            const achievementId = this.getAttribute('data-id');
+                            const historyLogsElement = $('#historyLogsElement');
+
+                            historyLogsElement.empty();
+
+                            $.ajax({
+                                url: `${BASE_API_URL}/achievements/${achievementId}/history-logs`,
+                                method: 'GET',
+                                success: function(response) {
+                                    if (response.data.length == 0) {
+                                        const historyLogRow = `
+                                            <p class="text-center text-sm text-secondary">History logs data is still empty.</p>
+                                        `;
+
+                                        historyLogsElement.append(historyLogRow);
+                                    } else {
+                                        for (let i = 0; i < response.data.length; i++) {
+                                            const historyLog = response.data[i];
+                                            const iconType = historyLog.log_type == 'approval' ? 'fa-check' : 'reject' ? 'fa-xmark' : '';
+                                            const historyLogRow = `
+                                                <div class="d-flex pb-3 border-bottom border-secondary">
+                                                    <div class="rounded-profile-letter me-3" style="background-color: var(--green-500);">
+                                                        <i class="fa-solid ${iconType} font-semibold text-white"></i>
+                                                    </div>
+                                                    <div class="d-flex flex-column gap-1">
+                                                        <p class="my-0 text-sm font-medium">${historyLog.log_message}</p>
+                                                        <p class="my-0 text-xs text-secondary">at ${formatDateToIndonesian(historyLog.log_createdat)}</p>
+                                                    </div>
+                                                </div>
+                                            `;
+    
+                                            historyLogsElement.append(historyLogRow);
+                                        }
+                                    }
+                                },
+                                error: function(response) {
+                                    const historyLogRow = `
+                                        <p class="text-center text-sm text-secondary">History logs data is still empty.</p>
+                                    `;
+
+                                    historyLogsElement.append(historyLogRow);
+                                    console.log('Error while fetching achievement history logs!');
                                 }
                             });
                         });

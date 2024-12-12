@@ -32,6 +32,7 @@ $app->group('/api', function ($api) {
         $api->get('/{id}', AchievementController::class . ':show');
         $api->patch('/{id}/approval', AchievementController::class . ':approveAchievement')->add(new BECheckAdminOrLecturerMiddleware());
         $api->get('/{id}/approver-list', AchievementController::class . ':getApproverList');
+        $api->get('/{id}/history-logs', AchievementController::class . ':getHistoryLogs');
         $api->post('', AchievementController::class . ':store')->add(new BECheckStudentMiddleware());
     })->add(new BECheckAuthMiddleware());
 

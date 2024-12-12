@@ -11,6 +11,7 @@ use App\Helpers\UploadFileHelper;
 use App\Models\AchievementApprover;
 use App\Models\AchievementCategoryDetails;
 use App\Models\AchievementFile;
+use App\Models\AchievementLog;
 use App\Models\AchievementVerification;
 use App\Models\Model;
 use Ramsey\Uuid\Uuid;
@@ -23,6 +24,7 @@ class AchievementController extends Controller {
     private $achievementFileModel;
     private $achievementCategoryDetailsModel;
     private $achievementVerificationModel;
+    private $achievementLogModel;
 
     public function __construct() {
         $this->baseModel = new Model();
@@ -31,6 +33,7 @@ class AchievementController extends Controller {
         $this->achievementFileModel = new AchievementFile();
         $this->achievementCategoryDetailsModel = new AchievementCategoryDetails();
         $this->achievementVerificationModel = new AchievementVerification();
+        $this->achievementLogModel = new AchievementLog();
     }
 
     public function index(Request $request, Response $response): Response {
@@ -257,6 +260,17 @@ class AchievementController extends Controller {
         return ResponseHelper::success($response, $achievementApprovers, 'Successfully get achievement approvers.');
     }
 
+    public function getHistoryLogs(Request $request, Response $response, array $args): Response {
+        $achievementId = $args['id'];
+        $historyLogs = $this->achievementLogModel->getByAchievementId($achievementId);
+
+        if (!$historyLogs) {
+            return ResponseHelper::error($response, 'History logs not found.', 404);
+        }
+
+        return ResponseHelper::success($response, $historyLogs, 'Successfully get achievement history logs.');
+    }
+
     public function store(Request $request, Response $response): ResponseInterface {
         $data = $request->getParsedBody();
         $uploadedFiles = $request->getUploadedFiles();
@@ -350,6 +364,7 @@ class AchievementController extends Controller {
     public function approveAchievement(Request $request, Response $response, array $args): ResponseInterface {
         $achievementId = $args['id'];
         $userId = $_SESSION['user']['id'];
+        $userFullname = $_SESSION['user']['fullname'] ?? 'Admin';
         $data = json_decode($request->getBody(), true);
         $approvalAction = (string) ($request->getQueryParams()['action'] ?? '');
 
@@ -363,6 +378,8 @@ class AchievementController extends Controller {
 
         if (empty($approvalAction)) {
             return ResponseHelper::error($response, 'Approval action is required.', 400);
+        } else if ($approvalAction != 'approve' && $approvalAction != 'reject') {
+            return ResponseHelper::error($response, 'Invalid approval action.', 400);
         }
 
         if ($approvalAction == 'reject') {
@@ -416,6 +433,12 @@ class AchievementController extends Controller {
                     'verification_isdone' => 1
                 );
             }
+
+            $logData = array(
+                'achievement_id' => $achievementId,
+                'log_type' => $approvalAction,
+                'log_message' => 'Approver ' . $userFullname . ' ' . $approvalAction . ' this achievement.',
+            );
         }
         try {
             $this->baseModel->getDbConnection()->beginTransaction();
@@ -424,10 +447,15 @@ class AchievementController extends Controller {
             if ($approvalAction == 'reject' || $allApproversApproved) {
                 $this->achievementVerificationModel->update($verificationData);
             }
+            $this->achievementLogModel->create($logData);
             // End of Transactions
             $this->baseModel->getDbConnection()->commit();
 
-            return ResponseHelper::success($response, [], 'Successfully approve achievement.');
+            return ResponseHelper::success(
+                $response,
+                [],
+                $approvalAction == 'reject' ? 'Successfully rejected achievement.' : 'Successfully approved achievement.'
+            );
         } catch (\Exception $e) {
             $this->baseModel->getDbConnection()->rollBack();
             return ResponseHelper::error($response, $e->getMessage(), 500);
