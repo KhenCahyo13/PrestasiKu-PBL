@@ -2,10 +2,6 @@
     $title = 'PrestasiKu - Forgot Password';
     ob_start();
 ?>
-<!-- Left Content -->
-<section class="left-content">
-
-</section>
 <!-- Right Content -->
 <section class="container px-5 right-content">
     <p class="my-0 text-primary heading-5">PrestasiKu</p>

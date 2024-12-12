@@ -24,6 +24,19 @@
 </head>
 <body>
     <main class="d-flex">
+        <!-- Left Content -->
+        <section class="left-content">
+            <div class="pattern-top">
+                <img src="<?= images('scribble1.png') ?>" alt="Scribble Pattern 1">
+            </div>
+            <div class="pattern-bottom">
+                <img src="<?= images('scribble1.png') ?>" alt="Scribble Pattern 1">
+            </div>
+            <div class="d-flex align-items-center justify-content-center" style="height: 100vh;">
+                <h1 class="my-0 font-semibold heading-2 text-white">PrestasiKu</h1>
+            </div>
+        </section>
+        <!-- Right Content -->
         <?= $content ?? '<p>Page not found!</p>' ?>
     </main>
 

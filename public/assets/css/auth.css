@@ -1,6 +1,7 @@
 @import url('./variables.css');
 
 .left-content {
+    position: relative;
     display: none;
 }
 
@@ -17,6 +18,23 @@
         width: 50%;
         min-height: 100vh;
         background-color: var(--primary-color);
+        overflow: hidden;
+     }
+
+     .left-content .pattern-top {
+        position: absolute;
+        top: -40%;
+        left: -50%;
+     }
+
+     .left-content .pattern-bottom {
+        position: absolute;
+        bottom: -70%;
+        right: -80%;
+     }
+
+     .left-content .pattern-top img, .left-content .pattern-bottom img {
+        width: 75%;
      }
 
      .right-content {
